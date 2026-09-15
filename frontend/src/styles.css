@@ -15,3 +15,118 @@
 @font-face{font-family:'RostelecomBasis';src:url('../design/font/RostelecomBasis-Medium.otf') format('opentype');font-weight:500 600;font-style:normal;font-display:swap}
 @font-face{font-family:'RostelecomBasis';src:url('../design/font/RostelecomBasis-Bold.otf') format('opentype');font-weight:700 800;font-style:normal;font-display:swap}
 body *,button,input,select{font-family:'RostelecomBasis',sans-serif!important}
+/* ===== Typography per design.rt.ru Gen2 (Atomaro) ===== */
+:root{--typo-display-l:48px/52px;--typo-display-l-w:500;--typo-display-m:42px/44px;--typo-display-m-w:500;--typo-display-s:32px/44px;--typo-display-s-w:500;--typo-h1:28px/32px;--typo-h1-w:700;--typo-h2:22px/24px;--typo-h2-w:700;--typo-h3:18px/20px;--typo-h3-w:700;--typo-h4:16px/20px;--typo-h4-w:700;--typo-h5:14px/20px;--typo-h5-w:700;--typo-body-l:18px/26px;--typo-body-l-w:400;--typo-body-m:16px/24px;--typo-body-m-w:400;--typo-body-s:14px/20px;--typo-body-s-w:400;--typo-desc-l:12px/16px;--typo-desc-l-w:400;--typo-desc-l-ls:0;--typo-desc-m:11px/16px;--typo-desc-m-w:400;--typo-desc-m-ls:.2px;--typo-desc-s:10px/12px;--typo-desc-s-w:400;--typo-desc-s-ls:.4px;--button-xl-font:500 16px/24px 'RostelecomBasis';--button-l-font:500 16px/24px 'RostelecomBasis';--button-m-font:500 14px/20px 'RostelecomBasis';--button-s-font:500 12px/16px 'RostelecomBasis'}
+/* Base body text -> body-m 16/24 */
+body{font-size:16px;line-height:24px;font-weight:400}
+/* Heading -> heading-h1..h3 */
+.page-header h1{font-size:28px;line-height:32px;font-weight:700;letter-spacing:0}
+.modal-heading h2{font-size:22px;line-height:24px;font-weight:700;letter-spacing:0}
+.import-title h2,.result-state h2,.check-state h2,.catalog-card h2,.upload-zone h2{font-size:18px;line-height:20px;font-weight:700;letter-spacing:0}
+.panel-head h2,.modal h3{font-size:16px;line-height:20px;font-weight:700;letter-spacing:0}
+.kpi-body strong,.donut strong{font-size:28px;line-height:32px;font-weight:700;letter-spacing:0}
+.validation b,.result-numbers b{font-size:22px;line-height:24px;font-weight:700;letter-spacing:0}
+/* Body -> body-s / body-s-strong */
+.page-header p,.catalog-card p,.check-state p,.result-state p,.import-title p,.nav-item,.menu-item,.role-select,.search input,.filter-link,.mapping select,td{font-size:14px;line-height:20px;font-weight:400}
+.upload-zone p{font-size:16px;line-height:24px;font-weight:400}
+.uni-cell b,td b,.work-card .card-title,.col-head b,.modal-stats b,.help-card b,.report-card b,.setting-row b,.import-note b,.user-mini b,.workspace button,.date-filter,.add-card,.toast,.modal-interaction b,.mapping b,.rank b,.rank strong{font-size:14px;line-height:20px;font-weight:500}
+/* Description -> description-l/m/s */
+.import-steps div,.import-steps span{font-size:12px;line-height:16px;font-weight:500}
+.panel-head span,.kpi-body>span,.live,.table-meta,.user-mini span:last-child,.card-product,.modal-stats span,.modal-heading .muted,.modal-interaction span,.report-card span,.setting-row div span,.import-note span,.file-hint,.import-footer span,.subtext,.person small,.owner,.pagination,.chart-legend,.rank-num,.catalog-card>span{font-size:11px;line-height:16px;font-weight:400;letter-spacing:.2px}
+.kpi-body b,.file-pill{font-size:11px;line-height:16px;font-weight:500;letter-spacing:.2px}
+.eyebrow,.nav-label{font-size:11px;line-height:16px;font-weight:500}
+.workspace>span,.card-foot .person,.card-time,.col-count,.kpi-body small{font-size:10px;line-height:12px;font-weight:400;letter-spacing:.4px}
+th,.status-tag,.count-badge,.filter-count,.file-type{font-size:10px;line-height:12px;font-weight:500;letter-spacing:.4px}
+/* Buttons -> medium 500 */
+.button,.atomaro-button{font-size:14px;line-height:20px;font-weight:500}
+/* ===== Spacing per design.rt.ru Gen2 (Atomaro), base 16px = 1rem = spacing.4x ===== */
+:root{--space-px:1px;--space-0_5x:2px;--space-1x:4px;--space-1_5x:6px;--space-2x:8px;--space-3x:12px;--space-4x:16px;--space-5x:20px;--space-6x:24px;--space-8x:32px;--space-10x:40px;--space-12x:48px;--space-16x:64px;--space-20x:80px;--space-24x:96px;--space-32x:128px;--space-48x:192px}
+/* Layout */
+.content{padding:var(--space-6x) var(--space-6x) var(--space-8x)}
+.sidebar{padding:var(--space-6x) var(--space-4x)}
+.page-header{align-items:center;margin-bottom:var(--space-6x)}
+.page-header h1{margin:0}
+.page-actions{gap:var(--space-3x)}
+.filter-strip{gap:var(--space-6x);margin-bottom:var(--space-6x)}
+.kpi-grid{gap:var(--space-4x)}
+.dashboard-grid,.report-cards,.catalog-grid{gap:var(--space-4x)}
+.donut-wrap{gap:var(--space-16x)}
+/* Cards and panels */
+.kpi{gap:var(--space-3x);padding:var(--space-5x)}
+.kpi-body strong{margin:var(--space-2x) 0}
+.kpi-more{right:var(--space-4x);top:var(--space-5x)}
+.panel-head h2{margin:0 0 var(--space-2x)}
+.attention-panel{padding:var(--space-6x)}
+.activity-list{margin-top:var(--space-4x)}
+.activity{gap:var(--space-3x)}
+.attention-table{margin-top:var(--space-4x)}
+.attention-row{gap:var(--space-4x);padding:var(--space-3x) 0}
+.legend div{padding:var(--space-2x) 0}
+.big-chart,.ranking{padding:var(--space-6x)}
+.rank{gap:var(--space-2x);margin:var(--space-6x) 0}
+.progress{margin-top:var(--space-2x)}
+.line-chart{padding:var(--space-6x) 0 0 var(--space-10x)}
+/* Toolbar and tables */
+.toolbar,.workflow-toolbar{gap:var(--space-2x);margin-bottom:var(--space-5x)}
+.search{padding:0 var(--space-3x)}
+.uni-cell{gap:var(--space-3x)}
+.person{gap:var(--space-2x)}
+.text-button{gap:var(--space-2x)}
+.table-meta{padding:0 var(--space-6x)}
+th{padding:var(--space-3x) var(--space-6x)}
+td{padding:var(--space-4x) var(--space-6x)}
+.pagination{padding:0 var(--space-6x)}
+.status-tag{padding:var(--space-1x) var(--space-2x)}
+.count-badge{padding:var(--space-1x) var(--space-1_5x)}
+.col-count{padding:var(--space-0_5x) var(--space-1x)}
+/* Workflow board */
+.board-col{padding:var(--space-3x)}
+.card-title{margin:var(--space-2x) 0}
+.card-foot{margin-top:var(--space-3x);padding-top:var(--space-2x)}
+.add-card{margin:var(--space-3x) var(--space-0_5x)}
+/* Import flow */
+.import-steps{margin:var(--space-6x) auto var(--space-8x)}
+.import-steps div{gap:var(--space-2x)}
+.import-steps div:not(:last-child):after{margin:0 var(--space-4x)}
+.import-panel{padding:var(--space-10x)}
+.upload-zone{padding:var(--space-12x) var(--space-5x)}
+.upload-zone h2{margin:var(--space-4x) 0 var(--space-1x)}
+.file-hint{margin-top:var(--space-4x)}
+.import-note{gap:var(--space-2x);padding:var(--space-3x);margin-top:var(--space-4x)}
+.import-title{padding-bottom:var(--space-5x)}
+.mapping{padding:var(--space-4x) 0}
+.mapping>div{gap:var(--space-3x);padding:var(--space-3x) 0}
+.import-footer{padding-top:var(--space-4x)}
+.check-state{padding:var(--space-8x) var(--space-2x)}
+.check-header{gap:var(--space-3x)}
+.validation{gap:var(--space-12x);margin:var(--space-8x) 0}
+.result-numbers{gap:var(--space-16x);margin:var(--space-8x) 0}
+/* Reports, catalogs, settings */
+.report-card{gap:var(--space-3x);padding:var(--space-5x)}
+.catalog-card{padding:var(--space-6x)}
+.catalog-card>span{margin-top:var(--space-5x)}
+.settings-list{padding:var(--space-2x) var(--space-6x)}
+.setting-row{gap:var(--space-4x);padding:var(--space-4x) 0}
+/* Modal and menus */
+.modal{padding:var(--space-6x)}
+.modal-heading{gap:var(--space-3x)}
+.modal-heading h2{margin:0 0 var(--space-1x)}
+.modal-close{right:var(--space-5x);top:var(--space-5x)}
+.modal-stats{gap:var(--space-4x);margin:var(--space-6x) 0;padding:var(--space-4x) 0}
+.modal-stats span{margin-bottom:var(--space-1x)}
+.modal-footer{gap:var(--space-2x);margin-top:var(--space-6x)}
+.menu-popup{padding:var(--space-1x)}
+.menu-item{padding:var(--space-2x) var(--space-3x)}
+.toast{bottom:var(--space-6x);right:var(--space-8x);padding:var(--space-3x) var(--space-4x)}
+/* Sidebar */
+.workspace{padding:var(--space-4x) var(--space-3x)}
+.brand{padding:0 var(--space-3x) var(--space-6x)}
+nav{padding-top:var(--space-6x)}
+.nav-label{padding:0 var(--space-3x) var(--space-2x);margin-top:var(--space-4x)}
+.nav-item{padding:var(--space-2x) var(--space-3x)}
+.help-card{gap:var(--space-2x);padding:var(--space-3x);margin:var(--space-4x) var(--space-1x) var(--space-5x)}
+.user-mini{padding:var(--space-4x) var(--space-2x) 0}
+.role-select{padding:var(--space-2x) var(--space-3x)}
+/* Misc */
+.file-pill{gap:var(--space-2x);padding:var(--space-2x)}
+.import-note b,.import-note span,.report-card span,.setting-row div span{margin-top:var(--space-1x)}
