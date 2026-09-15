@@ -12,6 +12,7 @@ import { Education, Government, Pulse } from '@atomaro/icons/24/culture';
 import { Table, XLSX } from '@atomaro/icons/24/document';
 import { ArrowRight, CheckLarge, CheckSmall, ChevronDown, CloseSmall, More } from '@atomaro/icons/24/navigation';
 import './styles.css';
+import LoginPage from './LoginPage.jsx';
 
 const stages = [
   { id: 'new', label: 'Новый контакт', color: '#8300ff' },
@@ -52,6 +53,7 @@ const activity = [
 function App() {
   const [page, setPage] = useState('dashboard');
   const [role, setRole] = useState('Руководитель');
+  const [authed, setAuthed] = useState(false);
   const [cards, setCards] = useState(initialCards);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
@@ -66,6 +68,7 @@ function App() {
   };
   const filteredCards = useMemo(() => cards.filter(c => `${c.university} ${c.product} ${c.direction} ${c.owner}`.toLowerCase().includes(search.toLowerCase())), [cards, search]);
 
+  if (!authed) return <LoginPage onLogin={(r) => { setRole(r); setAuthed(true); }} />;
   return <div className="app-shell">
     <aside className={`sidebar ${mobileNav ? 'open' : ''}`}>
       <div className="brand"><img className="brand-logo" src="/logo/logo.svg" alt="Ростелеком" /><button className="close-nav" onClick={() => setMobileNav(false)}><CloseSmall size={18} fill="currentColor"/></button></div>
