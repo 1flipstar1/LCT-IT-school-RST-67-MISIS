@@ -285,14 +285,44 @@ th.sortable .th-chip{display:inline-flex;align-items:center;margin-left:var(--sp
    (название и значение — в подсказке). */
 .stage-stats-body{align-items:center;gap:var(--space-8x)}
 .stage-stats-body .donut-wrap{height:240px}
-.stage-stats-body .donut{position:relative;width:210px;height:210px}
+.stage-stats-body .donut{position:relative;width:210px;height:210px;background:transparent;--donut-progress:0}
+.stage-stats-body .donut:before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--donut-background);mask:conic-gradient(#000 calc(var(--donut-progress) * 1deg),transparent 0)}
 .stage-stats-body .donut:after{width:148px;height:148px}
-.stage-stats-body .donut strong{font-size:28px;line-height:32px}
-.stage-bars{flex:1;min-width:0;gap:3px;height:240px;align-items:flex-end;overflow-x:auto}
-.stage-bar{flex:1 1 0;min-width:44px}
+.donut-segments{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.donut-segment{fill:none;stroke:transparent;stroke-width:31;pointer-events:stroke}
+.stage-stats-body .donut>div{z-index:3;width:148px;height:78px;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.stage-stats-body .donut .donut-stage-label{font-size:16px;line-height:22px;overflow-wrap:anywhere}
+.stage-stats-body .donut strong{font-size:56px;line-height:56px}
+.stage-stats-body .donut span{font-size:18px;line-height:22px;color:#7c8797}
+.stage-bars{flex:1;min-width:0;gap:3px;height:240px;align-items:flex-end;overflow:hidden}
+.stage-bar{flex:1 1 0;min-width:0;width:100%;height:100%}
 .stage-bar-value{display:none}
-.stage-bar-area{width:100%;max-width:none;height:240px;background:transparent;border-radius:0}
+.stage-bar-area{position:relative;width:100%;max-width:none;height:240px;background:transparent;border-radius:0}
 .stage-bar-fill{border-radius:4px 4px 0 0}
+.stage-bar-area > .popover__root{position:absolute;bottom:0;left:0;display:block;width:100%;max-width:none;height:max(6px,var(--stage-bar-height))}
+.stage-bar-area > .popover__root .popover_trigger{display:block;width:100%;height:100%}
+.stage-bar-area .stage-bar-fill{display:block}
+.stage-bar-popover-content{display:grid;gap:4px;max-width:240px}
+.stage-bar-popover-content b{font-size:13px;line-height:18px;color:#182230}
+.stage-bar-popover-content span{font-size:12px;line-height:16px;color:#526073}
+.dashboard-universities{margin-top:var(--space-6x)}
+.dashboard-universities .dashboard-view-all td{padding:var(--space-3x) var(--space-6x)}
+.dashboard-universities .dashboard-view-all:hover{background:transparent}
 .board{grid-template-columns:repeat(13,minmax(185px,1fr))}
 .col-head{height:auto;min-height:29px}
 .col-head b{line-height:1.4;font-weight:600}
+/* ===== Дашборд: под графиком 50/50 — слева статистика, справа сообщения ===== */
+.dash-bottom{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4x);margin-top:var(--space-6x);align-items:stretch}
+.dash-left{display:flex;flex-direction:column;gap:var(--space-6x);min-width:0}
+.dash-right{display:flex;flex-direction:column;min-width:0}
+.messages-panel{padding:var(--space-6x)}
+.messages-list{margin-top:var(--space-4x)}
+.message{display:flex;gap:var(--space-3x);padding:var(--space-3x) 0;border-bottom:1px solid #f0f1f4}
+.message:last-child{border-bottom:0}
+.message b{display:block;font-size:13px;line-height:18px;color:#273343}
+.message p{margin:var(--space-0_5x) 0 var(--space-1x);font-size:12px;line-height:16px;color:#526073}
+.message span{font-size:10px;line-height:12px;color:#a1a9b6}
+/* KPI-карточки в левой колонке (50%): ровно 2x2, по высоте равны сообщениям */
+.dash-left .kpi-grid{flex:1;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:var(--space-4x);margin-bottom:0}
+.dash-left .kpi{min-width:0;padding:var(--space-4x)}
+@media(max-width:760px){.dash-bottom{grid-template-columns:1fr}}
