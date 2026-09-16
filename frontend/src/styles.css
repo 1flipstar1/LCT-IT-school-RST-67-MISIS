@@ -280,12 +280,19 @@ th.sortable .th-chip{display:inline-flex;align-items:center;margin-left:var(--sp
 .sidebar ::-webkit-scrollbar{width:8px}
 .sidebar ::-webkit-scrollbar-thumb{background:#8300ff;border:2px solid #f4f4f5}
 /* ===== Адаптация под 13 этапов обработки заявок (logic/Этапы.md) =====
-   Композиция панели сохранена (диаграмма слева, столбики справа); при нехватке
-   ширины столбики прокручиваются. Канбан-доска — 13 колонок с прокруткой. */
+   Блок графиков — первый на странице, увеличенной высоты: кольцевая диаграмма
+   слева, 13 столбиков справа одной высоты с ней; подложек и подписей нет
+   (название и значение — в подсказке). */
 .stage-stats-body{align-items:center;gap:var(--space-8x)}
-.stage-bars{overflow-x:auto;padding-bottom:var(--space-1x)}
-.stage-bar{flex:1 1 0;min-width:64px}
-.stage-bar-label{font-size:10px;line-height:12px;letter-spacing:0;white-space:normal;text-align:center;max-height:26px;overflow:hidden}
+.stage-stats-body .donut-wrap{height:240px}
+.stage-stats-body .donut{position:relative;width:210px;height:210px}
+.stage-stats-body .donut:after{width:148px;height:148px}
+.stage-stats-body .donut strong{font-size:28px;line-height:32px}
+.stage-bars{flex:1;min-width:0;gap:3px;height:240px;align-items:flex-end;overflow-x:auto}
+.stage-bar{flex:1 1 0;min-width:44px}
+.stage-bar-value{display:none}
+.stage-bar-area{width:100%;max-width:none;height:240px;background:transparent;border-radius:0}
+.stage-bar-fill{border-radius:4px 4px 0 0}
 .board{grid-template-columns:repeat(13,minmax(185px,1fr))}
 .col-head{height:auto;min-height:29px}
 .col-head b{line-height:1.4;font-weight:600}
