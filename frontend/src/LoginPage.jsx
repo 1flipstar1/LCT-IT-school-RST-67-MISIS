@@ -32,37 +32,32 @@ export default function LoginPage({ onLogin }) {
       <div className="login-card">
         <img className="login-logo" src="/logo/logo.svg" alt="Ростелеком" />
         <h1 className="login-title">Вход в систему</h1>
-        <p className="login-subtitle">Система контроля и обработки статистических данных по обучению студентов ВУЗов и школ по ИТ-направлениям</p>
 
         <form className="login-form" onSubmit={submit} noValidate>
-          <label className="login-field">
-            <span>Логин</span>
-            <div className="login-input-wrap">
-              <User size={17} fill="currentColor"/>
-              <input
-                type="text"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-                placeholder="example@rt.ru"
-                autoComplete="username"
-              />
-            </div>
+          <label className="login-input-wrap">
+            <span className="login-field-caption">Логин</span>
+            <User size={17} fill="currentColor"/>
+            <input
+              type="text"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+              placeholder="example@rt.ru"
+              autoComplete="username"
+            />
           </label>
-          <label className="login-field">
-            <span>Пароль</span>
-            <div className="login-input-wrap">
-              <Lock size={17} fill="currentColor"/>
-              <input
-                type={showPwd ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="current-password"
-              />
-              <button type="button" className="login-toggle" onClick={() => setShowPwd((v) => !v)} aria-label="Показать пароль">
-                {showPwd ? <PasswordHide size={17} fill="currentColor"/> : <PasswordShow size={17} fill="currentColor"/>}
-              </button>
-            </div>
+          <label className="login-input-wrap">
+            <span className="login-field-caption">Пароль</span>
+            <Lock size={17} fill="currentColor"/>
+            <input
+              type={showPwd ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+            />
+            <button type="button" className="login-toggle" onClick={() => setShowPwd((v) => !v)} aria-label="Показать пароль">
+              {showPwd ? <PasswordHide size={17} fill="currentColor"/> : <PasswordShow size={17} fill="currentColor"/>}
+            </button>
           </label>
 
           <div className="login-row">
@@ -84,7 +79,6 @@ export default function LoginPage({ onLogin }) {
         <div className="login-divider"><span>или</span></div>
 
         <div className="login-demo">
-          <span>Демо-режим — войти как:</span>
           <div className="login-demo-chips">
             {demoRoles.map((r) => (
               <button key={r.id} className="login-demo-chip" onClick={() => onLogin(r.id)}>
@@ -94,10 +88,6 @@ export default function LoginPage({ onLogin }) {
           </div>
         </div>
 
-        <div className="login-footer">
-          <span>© 2026 Ростелеком</span>
-          <a href="mailto:design@rt.ru">design@rt.ru</a>
-        </div>
       </div>
     </div>
   );
