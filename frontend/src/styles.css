@@ -14,6 +14,7 @@
 @font-face{font-family:'RostelecomBasis';src:url('../design/font/RostelecomBasis-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:'RostelecomBasis';src:url('../design/font/RostelecomBasis-Medium.otf') format('opentype');font-weight:500 600;font-style:normal;font-display:swap}
 @font-face{font-family:'RostelecomBasis';src:url('../design/font/RostelecomBasis-Bold.otf') format('opentype');font-weight:700 800;font-style:normal;font-display:swap}
+@font-face{font-family:'RostelecomBasicHighlight';src:url('../design/font/RostelecomBasic-MediumHighlight/RostelecomBasis-MediumHighlight.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
 body *,button,input,select{font-family:'RostelecomBasis',sans-serif!important}
 /* ===== Typography per design.rt.ru Gen2 (Atomaro) ===== */
 :root{--typo-display-l:48px/52px;--typo-display-l-w:500;--typo-display-m:42px/44px;--typo-display-m-w:500;--typo-display-s:32px/44px;--typo-display-s-w:500;--typo-h1:28px/32px;--typo-h1-w:700;--typo-h2:22px/24px;--typo-h2-w:700;--typo-h3:18px/20px;--typo-h3-w:700;--typo-h4:16px/20px;--typo-h4-w:700;--typo-h5:14px/20px;--typo-h5-w:700;--typo-body-l:18px/26px;--typo-body-l-w:400;--typo-body-m:16px/24px;--typo-body-m-w:400;--typo-body-s:14px/20px;--typo-body-s-w:400;--typo-desc-l:12px/16px;--typo-desc-l-w:400;--typo-desc-l-ls:0;--typo-desc-m:11px/16px;--typo-desc-m-w:400;--typo-desc-m-ls:.2px;--typo-desc-s:10px/12px;--typo-desc-s-w:400;--typo-desc-s-ls:.4px;--button-xl-font:500 16px/24px 'RostelecomBasis';--button-l-font:500 16px/24px 'RostelecomBasis';--button-m-font:500 14px/20px 'RostelecomBasis';--button-s-font:500 12px/16px 'RostelecomBasis'}
@@ -53,6 +54,7 @@ th,.status-tag,.count-badge,.filter-count,.file-type{font-size:10px;line-height:
 .donut-wrap{gap:var(--space-16x)}
 /* Dashboard: combined panel — donut + per-stage breakdown */
 .stage-stats{padding:var(--space-6x)}
+.stage-stats .panel-head h2{font-size:22px;line-height:28px}
 .stage-stats-body{display:flex;align-items:center;gap:var(--space-12x);margin-top:var(--space-4x)}
 .stage-bars{flex:1;min-width:0;display:flex;align-items:flex-end;gap:var(--space-2x);padding-top:var(--space-2x)}
 .stage-bar{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:var(--space-1x)}
@@ -134,8 +136,10 @@ nav{padding-top:var(--space-6x)}
 .nav-label{padding:0 var(--space-3x) var(--space-2x);margin-top:var(--space-4x)}
 .nav-item{padding:var(--space-2x) var(--space-3x)}
 .help-card{gap:var(--space-2x);padding:var(--space-3x);margin:var(--space-4x) var(--space-1x) var(--space-5x)}
-.user-mini{padding:var(--space-4x) var(--space-2x) 0}
+.user-mini{padding:var(--space-4x) var(--space-1x) 0 var(--space-3x)}
 .role-select{padding:var(--space-2x) var(--space-3x)}
+/* Align the account control with navigation items and make its hit area clearer. */
+.user-mini .role-select{width:32px;height:32px;padding:0;justify-content:center}
 /* Misc */
 .file-pill{gap:var(--space-2x);padding:var(--space-2x)}
 .import-note b,.import-note span,.report-card span,.setting-row div span{margin-top:var(--space-1x)}
@@ -199,18 +203,39 @@ nav{padding-top:var(--space-6x)}
   .main{margin-left:calc(220px + var(--space-3x));}
 }
 
-/* User avatar (bottom-left of the left navigation): brand radial gradient,
-   center #FF4F12 -> edges #7700FF, bold white initials.
-   .user-mini span{display:block} (higher specificity than the base .avatar
-   display:inline-grid) would otherwise strip the grid centering, so re-assert
-   grid + place-items:center here to keep the initials centered in the circle. */
+/* User avatar from the avatars folder, randomized on each session render. */
 .user-mini .avatar{
+  position:relative;
   display:grid;
   place-items:center;
-  background:radial-gradient(circle at 50% 50%,#FF4F12 0%,#7700FF 100%);
+  overflow:hidden;
+  background:#fff;
   color:#fff;
   font-weight:700;
   line-height:1;
+  border:1px solid rgba(131,0,255,.12);
+}
+
+.user-mini .avatar img{
+  position:absolute;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+}
+
+.user-mini .avatar-initials{
+  position:relative;
+  z-index:1;
+  color:#fff!important;
+  font-family:'RostelecomBasicHighlight','RostelecomBasis',sans-serif!important;
+  font-size:11px;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:.02em;
+  text-shadow:0 2px 6px rgba(0,0,0,.18);
 }
 
 /* Universities: clickable column header filter */
@@ -308,11 +333,16 @@ th.sortable .th-chip{display:inline-flex;align-items:center;margin-left:var(--sp
 .dashboard-universities{margin-top:var(--space-6x)}
 .dashboard-universities .dashboard-view-all td{padding:var(--space-3x) var(--space-6x)}
 .dashboard-universities .dashboard-view-all:hover{background:transparent}
+.count-up{display:inline-flex;align-items:baseline;font-variant-numeric:tabular-nums;white-space:nowrap}
+.count-up-digit{position:relative;display:inline-block;width:.62em;height:1em;overflow:hidden;vertical-align:-.1em}
+.count-up-digit-track{display:flex;flex-direction:column;transform:translateY(calc(var(--count-up-digit) * -1em));transition:transform .12s ease-out}
+.count-up-digit-track span{height:1em;line-height:1em;text-align:center}
+.count-up-separator{width:.3em;text-align:center}
 .board{grid-template-columns:repeat(13,minmax(185px,1fr))}
 .col-head{height:auto;min-height:29px}
 .col-head b{line-height:1.4;font-weight:600}
 /* ===== Дашборд: под графиком 50/50 — слева статистика, справа сообщения ===== */
-.dash-bottom{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4x);margin-top:var(--space-6x);align-items:stretch}
+.dash-bottom{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4x);margin-top:var(--space-4x);align-items:stretch}
 .dash-left{display:flex;flex-direction:column;gap:var(--space-6x);min-width:0}
 .dash-right{display:flex;flex-direction:column;min-width:0}
 .messages-panel{padding:var(--space-6x)}
@@ -322,7 +352,32 @@ th.sortable .th-chip{display:inline-flex;align-items:center;margin-left:var(--sp
 .message b{display:block;font-size:13px;line-height:18px;color:#273343}
 .message p{margin:var(--space-0_5x) 0 var(--space-1x);font-size:12px;line-height:16px;color:#526073}
 .message span{font-size:10px;line-height:12px;color:#a1a9b6}
+.interactive-messages{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.interactive-messages:hover,.interactive-messages:focus-visible{border-color:var(--brand-purple);box-shadow:0 6px 18px rgba(131,0,255,.10);outline:0}
+.chat-modal{width:min(640px,100%);display:flex;flex-direction:column;max-height:min(720px,calc(100vh - 40px))}
+.chat-title{margin:0 0 var(--space-1x);font-family:Manrope;font-size:22px;line-height:28px;color:#182230}
+.chat-list{display:flex;flex-direction:column;gap:var(--space-2x);overflow:auto;margin:var(--space-6x) calc(var(--space-2x)*-1);padding:0 var(--space-2x)}
+.chat-message{display:flex;gap:var(--space-3x);padding:var(--space-3x);border-radius:8px;background:#f7f8fb}
+.chat-message>div{min-width:0}.chat-message b{display:block;font-size:13px;line-height:18px;color:#273343}.chat-message p{margin:var(--space-1x) 0;font-size:13px;line-height:18px;color:#526073}.chat-message span{font-size:11px;line-height:16px;color:#a1a9b6}
+.chat-compose{display:flex;gap:var(--space-2x);padding-top:var(--space-4x);border-top:1px solid var(--line)}
+.chat-compose input{min-width:0;flex:1;border:1px solid var(--line);border-radius:7px;padding:0 var(--space-3x);outline:0;color:#344154}.chat-compose input:focus{border-color:var(--brand-purple);box-shadow:0 0 0 3px var(--brand-purple-soft)}
+@media(max-width:520px){.chat-compose{flex-direction:column}.chat-compose input{height:42px}.chat-compose .button{width:100%}}
 /* KPI-карточки в левой колонке (50%): ровно 2x2, по высоте равны сообщениям */
 .dash-left .kpi-grid{flex:1;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:var(--space-4x);margin-bottom:0}
 .dash-left .kpi{min-width:0;padding:var(--space-4x)}
 @media(max-width:760px){.dash-bottom{grid-template-columns:1fr}}
+
+/* KPI: value-first layout */
+.kpi{align-items:center;justify-content:center;text-align:center;min-height:224px;padding:var(--space-6x)}
+.kpi-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.kpi-value{display:flex;align-items:center;justify-content:center;gap:var(--space-3x)}
+.kpi-body strong{order:0;margin:0;font-size:70px;line-height:74px;letter-spacing:-.055em;color:#303038}
+.kpi-change{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.kpi-value b{font-size:23px;line-height:28px;font-weight:600;color:#078b68;white-space:nowrap}
+.kpi-value b.warning{color:var(--brand-orange)}
+.kpi-value small{font-size:14px;line-height:18px;color:#7c7c85;white-space:nowrap}
+.kpi-body>span{order:1;color:#4f4f57;font-size:25px;line-height:30px;font-weight:500}
+.dash-left .kpi{padding:var(--space-5x);min-height:192px}
+.dash-left .kpi-body strong{font-size:62px;line-height:66px}
+.dash-left .kpi-body>span{font-size:23px;line-height:28px}
+@media(max-width:760px){.kpi{min-height:180px}.kpi-body strong{font-size:54px;line-height:58px}.kpi-body>span{font-size:21px;line-height:26px}}

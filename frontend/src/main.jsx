@@ -58,6 +58,22 @@ const activity = [
   ['Система', 'синхронизировала 24 записи из LMS', 'вчера, 18:42', 'sys']
 ];
 
+const avatarFiles = [
+  'Mask group.svg',
+  'Mask group-1.svg',
+  'Mask group-2.svg',
+  'Mask group-3.svg',
+  'Mask group-4.svg',
+  'Mask group-5.svg',
+  'Mask group-6.svg',
+  'Mask group-7.svg'
+];
+
+const getRandomAvatarSrc = () => {
+  const file = avatarFiles[Math.floor(Math.random() * avatarFiles.length)];
+  return new URL(`../avatars/${file}`, import.meta.url).href;
+};
+
 function App() {
   const [page, setPage] = useState('dashboard');
   const [role, setRole] = useState('Руководитель');
@@ -68,6 +84,8 @@ function App() {
   const [toast, setToast] = useState('');
   const [mobileNav, setMobileNav] = useState(false);
   const [importStep, setImportStep] = useState(0);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [userAvatar, setUserAvatar] = useState(() => getRandomAvatarSrc());
 
   const notify = (message) => { setToast(message); setTimeout(() => setToast(''), 2800); };
   const moveCard = (id, stage) => {
@@ -93,12 +111,12 @@ function App() {
         <NavItem icon={<Catalog fill="currentColor"/>} label="Каталоги" active={page === 'catalogs'} onClick={() => setPage('catalogs')} />
         {role !== 'Пользователь' && <><div className="nav-label">УПРАВЛЕНИЕ</div><NavItem icon={<Users fill="currentColor"/>} label="Пользователи" active={page === 'users'} onClick={() => setPage('users')} /><NavItem icon={<Settings fill="currentColor"/>} label="Настройки" active={page === 'settings'} onClick={() => setPage('settings')} /></>}
       </nav>
-      <div className="sidebar-bottom"><div className="help-card"><HelpMonochrome size={19} fill="currentColor"/><div><b>Нужна помощь?</b><span>Открыть базу знаний</span></div><ArrowRight size={15} fill="currentColor"/></div><div className="user-mini"><span className="avatar">АК</span><div><b>Алексей Козлов</b><span>Настройки аккаунта</span></div><RoleMenu role={role} setRole={(value) => { setRole(value); notify(`Режим: ${value}`); }} /></div></div>
+      <div className="sidebar-bottom"><div className="help-card"><HelpMonochrome size={19} fill="currentColor"/><div><b>Нужна помощь?</b><span>Открыть базу знаний</span></div><ArrowRight size={15} fill="currentColor"/></div><div className="user-mini"><span className="avatar user-avatar" aria-label="Аватар пользователя"><img src={userAvatar} alt="" /><span className="avatar-initials">АК</span></span><div><b>Алексей Козлов</b><span>Настройки аккаунта</span></div><RoleMenu role={role} setRole={(value) => { setRole(value); notify(`Режим: ${value}`); }} /></div></div>
     </aside>
     <main className="main">
-      <div className="content">{page === 'dashboard' && <Dashboard setPage={setPage} notify={notify} cards={cards}/>} {page === 'universities' && <Universities search={search} setSearch={setSearch} onSelect={setSelected} notify={notify}/>} {page === 'workflow' && <Workflow cards={filteredCards} search={search} setSearch={setSearch} moveCard={moveCard} onSelect={setSelected} />} {page === 'analytics' && <Analytics/>} {page === 'import' && <Import step={importStep} setStep={setImportStep} notify={notify}/>} {page === 'reports' && <Reports notify={notify}/>} {page === 'catalogs' && <Catalogs/>} {(page === 'users' || page === 'settings') && <Admin page={page} notify={notify}/>}</div>
+      <div className="content">{page === 'dashboard' && <Dashboard setPage={setPage} notify={notify} cards={cards} openChat={() => setChatOpen(true)}/>} {page === 'universities' && <Universities search={search} setSearch={setSearch} onSelect={setSelected} notify={notify}/>} {page === 'workflow' && <Workflow cards={filteredCards} search={search} setSearch={setSearch} moveCard={moveCard} onSelect={setSelected} />} {page === 'analytics' && <Analytics/>} {page === 'import' && <Import step={importStep} setStep={setImportStep} notify={notify}/>} {page === 'reports' && <Reports notify={notify}/>} {page === 'catalogs' && <Catalogs/>} {(page === 'users' || page === 'settings') && <Admin page={page} notify={notify}/>}</div>
     </main>
-    {selected && <UniversityModal university={selected} close={() => setSelected(null)} notify={notify}/>} {toast && <div className="toast"><CheckSmall size={17} fill="currentColor"/>{toast}</div>}
+    {selected && <UniversityModal university={selected} close={() => setSelected(null)} notify={notify}/>} <ChatModal open={chatOpen} close={() => setChatOpen(false)} /> {toast && <div className="toast"><CheckSmall size={17} fill="currentColor"/>{toast}</div>}
   </div>;
 }
 
@@ -109,55 +127,26 @@ function PageHeader({title,children}) { return <div className="page-header"><h1>
 function Button({children,primary=false,onClick,icon}) { return <AtomaroButton className={`button atomaro-button ${primary?'primary':''}`} variant={primary ? 'primary' : 'outline'} iconPrefix={icon} label={children} onClick={onClick}/> }
 function RoleMenu({role,setRole}) { return <Menu.Root><Menu.Trigger className="role-select"><SecurityCheck size={15} fill="currentColor"/><span>{role}</span><ChevronDown size={14} fill="currentColor"/></Menu.Trigger><Menu.Portal><Menu.Positioner className="menu-positioner" sideOffset={6} align="end"><Menu.Popup className="menu-popup">{['Руководитель','Пользователь','Администратор'].map(item=><Menu.Item key={item} className={`menu-item ${item===role?'selected':''}`} onClick={()=>setRole(item)}>{item}{item===role&&<CheckSmall size={14} fill="currentColor"/>}</Menu.Item>)}</Menu.Popup></Menu.Positioner></Menu.Portal></Menu.Root> }
 function stageStats(cards){return stages.map(s=>({id:s.id,label:s.label,short:s.short,color:s.color,n:cards.filter(c=>c.stage===s.id).length}))}
-function Dashboard({ setPage, notify, cards }) {
+function Dashboard({ setPage, notify, cards, openChat }) {
   const chartRef = useRef(null);
   const [hoveredStage, setHoveredStage] = useState(null);
   const [hoveredDonutStage, setHoveredDonutStage] = useState(null);
   const stats = stageStats(cards);
   const total = stats.reduce((a, x) => a + x.n, 0) || 1;
   const maxN = Math.max(1, ...stats.map((x) => x.n));
-  const dashboardUniversities = universities
-    .slice(0, 4)
-    .sort((a, b) => a[5].split(".").reverse().join("").localeCompare(b[5].split(".").reverse().join("")));
   let acc = 0;
   const slices = [];
   const sliceAngles = [];
   const donutSegments = [];
-  for (const x of stats) {
-    if (!x.n) continue;
-    const a = (acc / total) * 360;
-    acc += x.n;
-    const b = (acc / total) * 360;
-    slices.push(x.color + " " + a + "deg " + b + "deg");
-    sliceAngles.push(b);
-    donutSegments.push({ stage: x, start: a / 360, ratio: x.n / total });
-  }
-  const donutBg = "conic-gradient(" + slices.join(",") + ")";
+  for (const x of stats) { if (!x.n) continue; const a = acc / total * 360; acc += x.n; const b = acc / total * 360; slices.push(x.color + ' ' + a + 'deg ' + b + 'deg'); sliceAngles.push(b); donutSegments.push({ stage: x, start: a / 360, ratio: x.n / total }); }
+  const donutBg = 'conic-gradient(' + slices.join(',') + ')';
   useLayoutEffect(() => {
-    const context = gsap.context(() => {
-      const fills = gsap.utils.toArray(".stage-bar-fill");
-      const timeline = gsap.timeline();
-
-      gsap.set(fills, { scaleY: 0, transformOrigin: "bottom" });
-      gsap.set(".donut", { "--donut-progress": 0 });
-
-      sliceAngles.forEach((angle) => {
-        timeline.to(".donut", {
-          "--donut-progress": angle,
-          duration: 0.18,
-          ease: "power2.out",
-        });
-      });
-
-      timeline.to(
-        fills,
-        { scaleY: 1, duration: 0.55, stagger: 0.055, ease: "power3.out" },
-        0.12,
-      );
-    }, chartRef);
-
+    const context = gsap.context(() => { const fills = gsap.utils.toArray('.stage-bar-fill'); const timeline = gsap.timeline(); gsap.set(fills, { scaleY: 0, transformOrigin: 'bottom' }); gsap.set('.donut', { '--donut-progress': 0 }); sliceAngles.forEach((angle) => timeline.to('.donut', { '--donut-progress': angle, duration: 0.18, ease: 'power2.out' })); timeline.to(fills, { scaleY: 1, duration: 0.55, stagger: 0.055, ease: 'power3.out' }, 0.12); }, chartRef);
     return () => context.revert();
   }, [cards]);
+  const dashboardUniversities = universities
+    .slice(0, 4)
+    .sort((a, b) => a[5].split(".").reverse().join("").localeCompare(b[5].split(".").reverse().join("")));
   return (
     <>
       <PageHeader title="Добрый день, Алексей">
@@ -261,7 +250,7 @@ function Dashboard({ setPage, notify, cards }) {
               tone="indigo"
             />
             <Kpi
-              title="Активных взаимодействий"
+              title="Активных заявок"
               value="48"
               change="+8%"
               note="за текущий период"
@@ -271,7 +260,7 @@ function Dashboard({ setPage, notify, cards }) {
             <Kpi
               title="Требуют внимания"
               value="7"
-              change="2 новых"
+              change="+2%"
               note="просрочено по SLA"
               icon={<AttentionMonochrome fill="currentColor" />}
               tone="orange"
@@ -288,13 +277,13 @@ function Dashboard({ setPage, notify, cards }) {
           </section>
         </div>
         <div className="dash-right">
-          <section className="panel messages-panel">
+          <section className="panel messages-panel interactive-messages" role="button" tabIndex={0} aria-label="Открыть чат" onClick={openChat} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openChat(); } }}>
             <div className="panel-head">
               <div>
                 <h2>Сообщения</h2>
                 <span>3 непрочитанных</span>
               </div>
-              <button className="dots">
+              <button className="dots" aria-label="Открыть чат" onClick={event => { event.stopPropagation(); openChat(); }}>
                 <More size={19} fill="currentColor" />
               </button>
             </div>
@@ -474,19 +463,76 @@ function Dashboard({ setPage, notify, cards }) {
     </>
   );
 }
-function Kpi({ title, value, change, note, icon, tone, warning }) {
+function RollingDigit({ digit }) {
   return (
-    <div className="kpi">
-      <div className={`kpi-icon ${tone}`}>{icon}</div>
+    <span className="count-up-digit" style={{ "--count-up-digit": digit }}>
+      <span className="count-up-digit-track">
+        {Array.from({ length: 10 }, (_, index) => <span key={index}>{index}</span>)}
+      </span>
+    </span>
+  );
+}
+
+function CountUp({ value }) {
+  const rawValue = String(value);
+  const target = Number(rawValue.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
+  const suffix = rawValue.replace(/[\d\s.,]/g, "");
+  const hasThousands = /\s/.test(rawValue);
+  const [current, setCurrent] = useState(0);
+
+  useLayoutEffect(() => {
+    const state = { value: 0 };
+    const tween = gsap.to(state, {
+      value: target,
+      duration: 1.05,
+      ease: "power2.out",
+      onUpdate: () => setCurrent(Math.round(state.value)),
+    });
+    return () => tween.kill();
+  }, [target]);
+
+  const formatted = hasThousands
+    ? current.toLocaleString("ru-RU").replace(/\u00a0/g, " ")
+    : String(current);
+
+  return (
+    <span className="count-up" aria-label={rawValue}>
+      {formatted.split("").map((character, index) => (
+        /\d/.test(character)
+          ? <RollingDigit key={index} digit={Number(character)} />
+          : <span className="count-up-separator" key={index}>{character}</span>
+      ))}
+      {suffix && <span>{suffix}</span>}
+    </span>
+  );
+}
+
+function Kpi({ title, value, change, note, icon, tone, warning }) {
+  const changeRef = useRef(null);
+
+  const animateChange = (active) => {
+    if (!changeRef.current) return;
+    gsap.to(changeRef.current, {
+      fontSize: active ? 27 : 23,
+      fontWeight: active ? 700 : 600,
+      duration: active ? 0.22 : 0.3,
+      ease: active ? "power2.out" : "power2.inOut",
+      overwrite: "auto",
+    });
+  };
+
+  return (
+    <div className="kpi" onMouseEnter={() => animateChange(true)} onMouseLeave={() => animateChange(false)}>
       <div className="kpi-body">
-        <span>{title}</span>
-        <strong>{value}</strong>
-        <div>
-          <b className={warning ? "warning" : ""}>{change}</b>
-          <small>{note}</small>
+        <div className="kpi-value">
+          <strong><CountUp value={value} /></strong>
+          <div className="kpi-change">
+            <b ref={changeRef} className={warning ? "warning" : ""}>{change}</b>
+            <small>за мес.</small>
+          </div>
         </div>
+        <span>{title}</span>
       </div>
-      <More className="kpi-more" size={17} fill="currentColor" />
     </div>
   );
 }
@@ -628,6 +674,21 @@ function ImportCheck({next}) { return <div className="check-state"><div classNam
 function Reports({notify}) { return <><PageHeader title="Отчёты"><Button primary onClick={()=>notify('Конструктор отчёта открыт')} icon={<AddLarge size={16} fill="currentColor"/>}>Создать отчёт</Button></PageHeader><div className="report-cards"><div className="report-card"><Table size={24} fill="currentColor"/><div><b>Реестр взаимодействий</b><span>Вузы, статусы, ответственные</span></div><Button onClick={()=>notify('Отчёт скачивается')} icon={<Download size={15} fill="currentColor"/>}>XLSX</Button></div><div className="report-card"><BarChart3 size={24}/><div><b>Статистика по программам</b><span>Обучающиеся и заявки за период</span></div><Button onClick={()=>notify('Отчёт скачивается')} icon={<Download size={15} fill="currentColor"/>}>PDF</Button></div></div><section className="panel table-panel"><div className="panel-head"><div><h2>История отчётов</h2><span>Последние сформированные документы</span></div></div><table><thead><tr><th>НАЗВАНИЕ</th><th>АВТОР</th><th>ДАТА СОЗДАНИЯ</th><th>ФОРМАТ</th><th>СТАТУС</th></tr></thead><tbody>{[['Реестр вузов — май 2026','Алексей Козлов','Сегодня, 10:24','XLSX'],['Отчёт по конверсии Q1','Елена Ким','14.05.2026','PDF'],['Программы обучения — регионы','Михаил Орлов','12.05.2026','XLSX']].map(r=><tr key={r[0]}><td><b>{r[0]}</b></td><td>{r[1]}</td><td className="muted">{r[2]}</td><td><span className="file-type">{r[3]}</span></td><td><span className="status-tag green">Готов</span></td></tr>)}</tbody></table></section></>}
 function Catalogs() { return <><PageHeader title="Каталоги"/><div className="catalog-grid">{[['ИТ-продукты','12 записей',<Catalog fill="currentColor"/>,'МойОфис, Р7-Офис, Контур'],['ИТ-направления','8 записей',<Education fill="currentColor"/>,'Программная инженерия, Аналитика данных'],['Ответственные','16 записей',<Users fill="currentColor"/>,'Команда KAM и представители вузов']].map(x=><div className="catalog-card" key={x[0]}>{x[2]}<span>{x[1]}</span><h2>{x[0]}</h2><p>{x[3]}</p><ArrowRight size={18} fill="currentColor"/></div>)}</div></>}
 function Admin({page,notify}) { return <><PageHeader title={page==='users'?'Пользователи':'Настройки системы'}><Button primary onClick={()=>notify('Форма добавления открыта')} icon={<AddLarge size={16} fill="currentColor"/>}>{page==='users'?'Добавить пользователя':'Добавить интеграцию'}</Button></PageHeader><section className="panel table-panel"><div className="table-meta"><span><b>{page==='users'?'Команда проекта':'Подключения'}</b></span><Button icon={<SettingsAdjust size={15} fill="currentColor"/>}>Фильтры</Button></div>{page==='users'?<table><thead><tr><th>ПОЛЬЗОВАТЕЛЬ</th><th>РОЛЬ</th><th>СТАТУС</th><th>ПОСЛЕДНИЙ ВХОД</th><th></th></tr></thead><tbody>{[['Алексей Козлов','alexey@rtk.ru','Администратор','Сегодня, 09:42'],['Алина Воронова','alina@rtk.ru','Пользователь','Сегодня, 09:18'],['Михаил Орлов','mikhail@rtk.ru','Пользователь','Вчера, 18:05'],['Елена Ким','elena@rtk.ru','Руководитель','Вчера, 17:44']].map(u=><tr key={u[0]}><td><span className="person"><span className="avatar tiny">{u[0].split(' ').map(x=>x[0]).join('')}</span><span><b>{u[0]}</b><small>{u[1]}</small></span></span></td><td><span className="status-tag purple">{u[2]}</span></td><td><span className="status-tag green">Активен</span></td><td className="muted">{u[3]}</td><td><More size={18} fill="currentColor"/></td></tr>)}</tbody></table>:<div className="settings-list">{[['LMS Ростелекома','Данные обучения синхронизируются каждые 4 часа','Подключено'],['Сайт ИТ Школы','Импорт заявок с публичного сайта','Подключено'],['Уведомления','Email-уведомления о смене статуса и SLA','Включены']].map(x=><div className="setting-row"><div><b>{x[0]}</b><span>{x[1]}</span></div><span className="status-tag green">{x[2]}</span><button className="icon-button"><Settings size={17} fill="currentColor"/></button></div>)}</div>}</section></>}
+function ChatModal({open,close}) {
+  const [messages, setMessages] = useState([
+    {author:'Алексей Козлов', initials:'АК', text:'Обновите статус взаимодействия по Казанскому федеральному университету', time:'10 минут назад'},
+    {author:'Елена Ким', initials:'ЕК', tone:'ec', text:'Загружен новый пакет документов для подписания', time:'1 час назад'},
+    {author:'Система', initials:'СИ', tone:'sys', text:'Синхронизация с LMS завершена: обновлено 24 записи', time:'Вчера, 18:42'}
+  ]);
+  const [draft, setDraft] = useState('');
+  const send = () => {
+    const text = draft.trim();
+    if (!text) return;
+    setMessages(current => [...current, {author:'Вы', initials:'ВЫ', text, time:'Только что'}]);
+    setDraft('');
+  };
+  return <Dialog.Root open={open} onOpenChange={(value) => !value && close()}><Dialog.Portal><Dialog.Backdrop className="modal-backdrop"/><Dialog.Viewport className="modal-viewport"><Dialog.Popup className="modal chat-modal"><Dialog.Close className="modal-close" aria-label="Закрыть чат"><CloseSmall size={18} fill="currentColor"/></Dialog.Close><Dialog.Title className="chat-title">Сообщения</Dialog.Title><Dialog.Description className="muted">Общий чат команды</Dialog.Description><div className="chat-list">{messages.map((message,index)=><div className="chat-message" key={`${message.author}-${index}`}><span className={`avatar tiny ${message.tone || ''}`}>{message.initials}</span><div><b>{message.author}</b><p>{message.text}</p><span>{message.time}</span></div></div>)}</div><form className="chat-compose" onSubmit={event => { event.preventDefault(); send(); }}><input value={draft} onChange={event => setDraft(event.target.value)} placeholder="Напишите сообщение..." aria-label="Текст сообщения"/><Button primary>Отправить</Button></form></Dialog.Popup></Dialog.Viewport></Dialog.Portal></Dialog.Root>
+}
 function UniversityModal({university,close,notify}) { return <Dialog.Root open={Boolean(university)} onOpenChange={(open)=>!open&&close()}><Dialog.Portal><Dialog.Backdrop className="modal-backdrop"/><Dialog.Viewport className="modal-viewport"><Dialog.Popup className="modal"><Dialog.Close className="modal-close" aria-label="Закрыть"><CloseSmall size={18} fill="currentColor"/></Dialog.Close><div className="modal-heading"><span className="uni-logo large">{university.split(' ').map(x=>x[0]).join('').slice(0,2)}</span><div><Dialog.Title asChild><h2>{university}</h2></Dialog.Title><Dialog.Description className="muted">Последнее обновление сегодня в 10:24</Dialog.Description></div></div><div className="modal-stats"><div><span>Активных взаимодействий</span><b>4</b></div><div><span>Текущая конверсия</span><b>42%</b></div><div><span>Менеджер</span><b>Алина Воронова</b></div></div><h3>Текущие взаимодействия</h3>{[['МойОфис','Информационные системы','Подписание документов'],['Р7-Офис','Программная инженерия','Обмен документами'],['Контур','Аналитика данных','Контроль исполнения']].map(x=><div className="modal-interaction" key={x[0]}><div><b>{x[0]}</b><span>{x[1]}</span></div><span className="status-tag blue">{x[2]}</span><ArrowRight size={17} fill="currentColor"/></div>)}<div className="modal-footer"><Dialog.Close render={<Button />}>Закрыть</Dialog.Close><Button primary onClick={()=>notify('Изменения сохранены')}>Редактировать вуз</Button></div></Dialog.Popup></Dialog.Viewport></Dialog.Portal></Dialog.Root> }
 
 createRoot(document.getElementById('root')).render(<App />);
