@@ -1,0 +1,1 @@
+import{t as e}from"./index-CXQVuTEd.js";import{t}from"./usePersistentState-BkBcs7ME.js";import{c as n}from"./legacyUi-D-Ij2Ixf.js";function r(){let[r,i]=t(`legacy.cards`,n),a=e();return{cards:r,moveCard:(e,t)=>{i(n=>n.map(n=>n.id===e?{...n,stage:t}:n)),a.success(`Статус взаимодействия обновлён`)}}}export{r as t};
