@@ -6,8 +6,11 @@ import {
   HomeIcon,
   IntegrationIcon,
   InteractionsIcon,
+  PulseIcon,
   ReportIcon,
+  SettingsIcon,
   UniversityIcon,
+  UploadIcon,
   UsersIcon,
   WorkflowIcon,
 } from '../ui/icons.js';
@@ -15,6 +18,8 @@ import {
 /**
  * Структура меню. Разделы сгруппированы по задачам пользователя, а не по сущностям базы:
  * «Работа» — ежедневные дела менеджера, «Данные» — выгрузки и справочники, «Управление» — настройки.
+ * Последний раздел — экраны прежнего дизайна из ветки main: они сохранены целиком
+ * и живут на адресах /main/*, см. features/legacy.
  * badge — ключ счётчика из useNavigationBadges.
  */
 export const NAVIGATION = [
@@ -44,6 +49,21 @@ export const NAVIGATION = [
       { to: '/integrations', label: 'Интеграции', icon: IntegrationIcon, permission: PERMISSION.manageIntegrations, badge: 'inbox' },
       { to: '/users', label: 'Пользователи и доступ', icon: UsersIcon, permission: PERMISSION.manageUsers },
       { to: '/audit', label: 'Журнал действий', icon: HistoryIcon, permission: PERMISSION.viewAudit },
+    ],
+  },
+  {
+    id: 'legacy',
+    label: 'Экраны main',
+    items: [
+      { to: '/main/dashboard', label: 'Дашборд', icon: HomeIcon },
+      { to: '/main/universities', label: 'Мои вузы', icon: UniversityIcon },
+      { to: '/main/workflow', label: 'Workflow', icon: PulseIcon },
+      { to: '/main/analytics', label: 'Аналитика', icon: AnalyticsIcon },
+      { to: '/main/import', label: 'Импорт данных', icon: UploadIcon },
+      { to: '/main/reports', label: 'Отчёты', icon: ReportIcon },
+      { to: '/main/catalogs', label: 'Каталоги', icon: CatalogIcon },
+      { to: '/main/users', label: 'Пользователи', icon: UsersIcon, permission: PERMISSION.manageUsers },
+      { to: '/main/settings', label: 'Настройки', icon: SettingsIcon, permission: PERMISSION.manageUsers },
     ],
   },
 ];
