@@ -1,0 +1,81 @@
+.root {
+  display: grid;
+  gap: var(--space-3x);
+}
+
+.zone {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1x);
+  padding: var(--space-5x) var(--space-4x);
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-l);
+  background: var(--color-surface-muted);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.zone:hover,
+.dragging {
+  border-color: var(--color-brand);
+  background: var(--color-brand-softer);
+}
+
+.zone:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.zoneIcon {
+  color: var(--color-brand);
+}
+
+.zoneTitle {
+  font: var(--font-body-s);
+  color: var(--color-text);
+}
+
+.pick {
+  color: var(--color-brand);
+  font-weight: 500;
+}
+
+.zoneHint {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2x);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  padding: var(--space-1x) var(--space-1x) var(--space-1x) var(--space-3x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-m);
+}
+
+.fileIcon {
+  color: var(--color-text-secondary);
+}
+
+.fileName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--font-body-s);
+}
+
+.fileSize {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}

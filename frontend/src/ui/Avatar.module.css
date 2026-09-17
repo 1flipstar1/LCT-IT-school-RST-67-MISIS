@@ -1,0 +1,60 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+  color: var(--color-brand-active);
+  font-weight: 700;
+}
+
+.brand {
+  background: radial-gradient(circle at 50% 50%, var(--color-accent) 0%, var(--color-brand-hover) 100%);
+  color: var(--color-text-on-brand);
+}
+
+.s {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.m {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+}
+
+.l {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+}
+
+.person {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  min-width: 0;
+}
+
+.personText {
+  display: grid;
+  min-width: 0;
+}
+
+.name {
+  font: var(--font-body-s);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.caption {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,0 +1,219 @@
+.field {
+  display: grid;
+  gap: var(--space-1_5x);
+  min-width: 0;
+}
+
+.label {
+  font: var(--font-body-s-strong);
+  color: var(--color-text);
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+.hint {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+.error {
+  font: var(--font-caption-strong);
+  color: var(--color-danger);
+}
+
+.control {
+  width: 100%;
+  min-height: var(--control-height-m);
+  padding: var(--space-2x) var(--space-3x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  font: var(--font-body-s);
+  color: var(--color-text);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.control::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.control:hover {
+  border-color: var(--color-text-tertiary);
+}
+
+.control:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.control:disabled {
+  background: var(--color-surface-muted);
+  color: var(--color-text-disabled);
+}
+
+.invalid {
+  border-color: var(--color-danger);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.selectWrap {
+  position: relative;
+  display: block;
+}
+
+.select {
+  appearance: none;
+  padding-right: var(--space-10x);
+  cursor: pointer;
+}
+
+.selectIcon {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3x);
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+/* ---------- Поиск ---------- */
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  min-width: 0;
+  height: var(--control-height-m);
+  padding: 0 var(--space-3x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  color: var(--color-text-tertiary);
+}
+
+.search:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--color-text);
+}
+
+.search input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* ---------- Чекбокс ---------- */
+.checkbox {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2x);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+.checkbox input,
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: var(--space-0_5x);
+  flex-shrink: 0;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  color: transparent;
+  transition: all var(--duration-fast);
+}
+
+.checkbox:hover .box {
+  border-color: var(--color-brand);
+}
+
+.checkbox input:checked + .box {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+
+.checkbox input:focus-visible + .box,
+.switch input:focus-visible + .track {
+  box-shadow: var(--focus-ring);
+}
+
+.checkboxText {
+  display: grid;
+  gap: var(--space-0_5x);
+}
+
+.checkboxDescription {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Переключатель ---------- */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+.track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+  transition: background var(--duration-base);
+}
+
+.track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-s);
+  transition: transform var(--duration-base) var(--easing);
+}
+
+.switch input:checked + .track {
+  background: var(--color-brand);
+}
+
+.switch input:checked + .track::after {
+  transform: translateX(16px);
+}

@@ -1,0 +1,120 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+  font-family: var(--font-family);
+}
+
+.hitArea {
+  fill: transparent;
+}
+
+.interactiveRow {
+  cursor: pointer;
+}
+
+.interactiveRow:hover .axisLabel {
+  fill: var(--color-brand-hover);
+}
+
+.groupLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  fill: var(--color-text-tertiary);
+}
+
+.axisLabel {
+  font-size: 14px;
+  fill: var(--color-text);
+}
+
+.valueLabel {
+  font-size: 14px;
+  font-weight: 500;
+  fill: var(--color-text);
+}
+
+.bar {
+  fill: var(--color-brand);
+  transition: fill var(--duration-fast);
+}
+
+.barActive {
+  fill: var(--color-brand-active);
+}
+
+.gridLine {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.tickLabel {
+  font-size: 12px;
+  fill: var(--color-text-tertiary);
+}
+
+.line {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.crosshair {
+  stroke: var(--color-border-strong);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.point {
+  fill: var(--color-brand);
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: var(--z-popup);
+  display: grid;
+  gap: var(--space-0_5x);
+  min-width: 140px;
+  max-width: 260px;
+  padding: var(--space-2x) var(--space-3x);
+  border-radius: var(--radius-m);
+  background: var(--color-text);
+  color: var(--color-text-on-brand);
+  font: var(--font-caption);
+  box-shadow: var(--shadow-m);
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+.tooltip b {
+  font: var(--font-caption-strong);
+}
+
+.tableView {
+  margin: 0 calc(var(--space-6x) * -1);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer {
+  margin-top: var(--space-4x);
+  padding-top: var(--space-4x);
+  border-top: 1px solid var(--color-border);
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 760px) {
+  .tableView {
+    margin: 0 calc(var(--space-4x) * -1);
+  }
+}

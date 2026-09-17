@@ -1,0 +1,23 @@
+.head {
+  display: grid;
+  gap: var(--space-4x);
+  padding: var(--space-2x) var(--space-6x) var(--space-4x);
+}
+
+.search {
+  max-width: 420px;
+}
+
+.strong {
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  .head {
+    padding: var(--space-2x) var(--space-4x) var(--space-4x);
+  }
+
+  .search {
+    max-width: none;
+  }
+}

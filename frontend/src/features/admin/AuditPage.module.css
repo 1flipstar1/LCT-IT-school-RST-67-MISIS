@@ -1,0 +1,29 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2x);
+  margin-bottom: var(--space-4x);
+}
+
+.search {
+  flex: 1;
+  max-width: 420px;
+}
+
+.time {
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}
+
+.more {
+  margin-top: var(--space-3x);
+  font: var(--font-body-s);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 760px) {
+  .search {
+    max-width: none;
+    flex-basis: 100%;
+  }
+}

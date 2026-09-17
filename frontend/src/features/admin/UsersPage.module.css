@@ -1,0 +1,58 @@
+.roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4x);
+  margin-bottom: var(--space-4x);
+}
+
+.role {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1x);
+  padding: var(--space-4x) var(--space-5x);
+  border-radius: var(--radius-l);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.roleName {
+  font: var(--font-body-m-strong);
+}
+
+.roleDescription {
+  font: var(--font-body-s);
+  color: var(--color-text-secondary);
+}
+
+.select {
+  height: var(--control-height-m);
+  max-width: 220px;
+  padding: 0 var(--space-3x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  font: var(--font-body-s);
+  color: var(--color-text);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.select:disabled {
+  background: var(--color-surface-muted);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+.muted {
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 960px) {
+  .roles {
+    grid-template-columns: 1fr;
+  }
+}

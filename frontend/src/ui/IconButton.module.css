@@ -1,0 +1,27 @@
+.iconButton {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-m);
+  color: var(--color-text-secondary);
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.iconButton:hover {
+  background: var(--color-neutral-soft);
+  color: var(--color-text);
+}
+
+.iconButton[data-popup-open] {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.s {
+  width: var(--control-height-s);
+  height: var(--control-height-s);
+}
+
+.m {
+  width: var(--control-height-m);
+  height: var(--control-height-m);
+}

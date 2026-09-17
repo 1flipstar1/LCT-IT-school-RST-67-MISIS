@@ -1,0 +1,151 @@
+.board {
+  display: flex;
+  gap: var(--space-4x);
+  margin: 0 calc(var(--space-8x) * -1);
+  padding: 0 var(--space-8x) var(--space-4x);
+  overflow-x: auto;
+}
+
+.phase {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2x);
+}
+
+.phaseHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  padding: 0 var(--space-1x);
+  font: var(--font-caption-strong);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.phaseCount {
+  min-width: 22px;
+  padding: 0 var(--space-1_5x);
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  line-height: 20px;
+  text-align: center;
+  letter-spacing: 0;
+}
+
+.columns {
+  display: flex;
+  gap: var(--space-2x);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+  width: 248px;
+  min-height: 420px;
+  padding: var(--space-2x);
+  border: 1px solid transparent;
+  border-radius: var(--radius-l);
+  background: var(--color-neutral-soft);
+  transition: opacity var(--duration-base), border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.dimmed {
+  opacity: 0.45;
+}
+
+.dropTarget {
+  border-color: var(--color-brand);
+  border-style: dashed;
+  background: var(--color-brand-softer);
+}
+
+.columnHeader {
+  display: grid;
+  gap: var(--space-0_5x);
+  padding: var(--space-1x) var(--space-2x) var(--space-2x);
+}
+
+.columnTitle {
+  font: var(--font-body-s-strong);
+}
+
+.columnMeta {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+.cards {
+  display: grid;
+  gap: var(--space-2x);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-1x);
+  padding: var(--space-3x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-s);
+  cursor: grab;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.card:hover {
+  border-color: var(--color-brand);
+  color: var(--color-text);
+  box-shadow: var(--shadow-m);
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.cardTitle {
+  font: var(--font-body-s-strong);
+}
+
+.cardMeta {
+  font: var(--font-caption);
+  color: var(--color-text-secondary);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2x);
+  margin-top: var(--space-2x);
+}
+
+.emptyColumn {
+  padding: var(--space-4x) var(--space-2x);
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .board {
+    margin: 0 calc(var(--space-6x) * -1);
+    padding: 0 var(--space-6x) var(--space-4x);
+  }
+}
+
+@media (max-width: 960px) {
+  .board {
+    margin: 0 calc(var(--space-4x) * -1);
+    padding: 0 var(--space-4x) var(--space-4x);
+  }
+
+  .column {
+    width: 232px;
+    min-height: 240px;
+  }
+}

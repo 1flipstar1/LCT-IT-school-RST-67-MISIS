@@ -1,0 +1,113 @@
+.wrap {
+  overflow-x: auto;
+}
+
+.table {
+  font: var(--font-body-s);
+}
+
+.table th {
+  padding: var(--space-3x) var(--space-4x);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  font: var(--font-caption-strong);
+  color: var(--color-text-secondary);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-3x) var(--space-4x);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: var(--space-6x);
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: var(--space-6x);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.clickable:hover {
+  background: var(--color-brand-softer);
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+@media (max-width: 760px) {
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    display: grid;
+    gap: var(--space-2x);
+    padding: var(--space-4x);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .table td,
+  .table td:first-child,
+  .table td:last-child {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    align-items: center;
+    gap: var(--space-3x);
+    padding: 0;
+    border: 0;
+    text-align: left !important;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font: var(--font-caption);
+    color: var(--color-text-tertiary);
+  }
+
+  .table td:empty,
+  .table td[data-label='']::before {
+    display: none;
+  }
+
+  .table td.primary {
+    grid-template-columns: 1fr;
+    order: -1;
+  }
+
+  .table td.primary::before {
+    display: none;
+  }
+
+  .hideOnMobile {
+    display: none !important;
+  }
+}

@@ -1,20 +1,11 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { gsap } from 'gsap';
-import { Button as AtomaroButton, Popover } from '@atomaro/ui-kit';
-import '@atomaro/ui-kit/styles/atomaro-default-light-all.css';
-import { Dialog } from '@base-ui/react/dialog';
-import { Menu } from '@base-ui/react/menu';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { AddLarge, Catalog, Download, Filter, Home, Search, SecurityCheck, Settings, SettingsAdjust, Upload } from '@atomaro/icons/24/action';
-import { AttentionMonochrome, HelpMonochrome } from '@atomaro/icons/24/alert';
-import { StatisticsColumn } from '@atomaro/icons/24/business';
-import { Calendar, Users } from '@atomaro/icons/24/communication';
-import { Education, Government, Pulse } from '@atomaro/icons/24/culture';
-import { Table, XLSX } from '@atomaro/icons/24/document';
-import { ArrowRight, CheckLarge, CheckSmall, ChevronDown, CloseSmall, More } from '@atomaro/icons/24/navigation';
-import './styles.css';
-import LoginPage from './LoginPage.jsx';
+import '@atomaro/ui-kit/styles/atomaro-default-light-all.css';
+import './styles/tokens.css';
+import './styles/base.css';
+import { App } from './app/App.jsx';
 
+<<<<<<< HEAD
 const stages = [
   { id: 's1', label: 'Коммуникация с вузом', short: 'Коммуникация', color: '#ffd9c2' },
   { id: 's2', label: 'Организация встречи', short: 'Встреча', color: '#ffceb3' },
@@ -692,3 +683,10 @@ function ChatModal({open,close}) {
 function UniversityModal({university,close,notify}) { return <Dialog.Root open={Boolean(university)} onOpenChange={(open)=>!open&&close()}><Dialog.Portal><Dialog.Backdrop className="modal-backdrop"/><Dialog.Viewport className="modal-viewport"><Dialog.Popup className="modal"><Dialog.Close className="modal-close" aria-label="Закрыть"><CloseSmall size={18} fill="currentColor"/></Dialog.Close><div className="modal-heading"><span className="uni-logo large">{university.split(' ').map(x=>x[0]).join('').slice(0,2)}</span><div><Dialog.Title asChild><h2>{university}</h2></Dialog.Title><Dialog.Description className="muted">Последнее обновление сегодня в 10:24</Dialog.Description></div></div><div className="modal-stats"><div><span>Активных взаимодействий</span><b>4</b></div><div><span>Текущая конверсия</span><b>42%</b></div><div><span>Менеджер</span><b>Алина Воронова</b></div></div><h3>Текущие взаимодействия</h3>{[['МойОфис','Информационные системы','Подписание документов'],['Р7-Офис','Программная инженерия','Обмен документами'],['Контур','Аналитика данных','Контроль исполнения']].map(x=><div className="modal-interaction" key={x[0]}><div><b>{x[0]}</b><span>{x[1]}</span></div><span className="status-tag blue">{x[2]}</span><ArrowRight size={17} fill="currentColor"/></div>)}<div className="modal-footer"><Dialog.Close render={<Button />}>Закрыть</Dialog.Close><Button primary onClick={()=>notify('Изменения сохранены')}>Редактировать вуз</Button></div></Dialog.Popup></Dialog.Viewport></Dialog.Portal></Dialog.Root> }
 
 createRoot(document.getElementById('root')).render(<App />);
+=======
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+>>>>>>> 4fac213f82c30ec4e7565b0516d8388b2eb41c62
