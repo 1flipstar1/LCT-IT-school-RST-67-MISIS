@@ -9,7 +9,6 @@ import {
   PulseIcon,
   ReportIcon,
   SettingsIcon,
-  UniversityIcon,
   UploadIcon,
   UsersIcon,
   WorkflowIcon,
@@ -29,7 +28,6 @@ export const NAVIGATION = [
     items: [
       { to: '/', label: 'Главная', icon: HomeIcon, exact: true },
       { to: '/interactions', label: 'Взаимодействия', icon: InteractionsIcon, badge: 'attention' },
-      { to: '/universities', label: 'Вузы', icon: UniversityIcon },
     ],
   },
   {
@@ -56,7 +54,6 @@ export const NAVIGATION = [
     label: 'Экраны main',
     items: [
       { to: '/main/dashboard', label: 'Дашборд', icon: HomeIcon },
-      { to: '/main/universities', label: 'Мои вузы', icon: UniversityIcon },
       { to: '/main/workflow', label: 'Workflow', icon: PulseIcon },
       { to: '/main/analytics', label: 'Аналитика', icon: AnalyticsIcon },
       { to: '/main/import', label: 'Импорт данных', icon: UploadIcon },

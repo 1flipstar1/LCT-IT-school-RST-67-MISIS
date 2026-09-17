@@ -1,0 +1,1 @@
+import{Pt as e,zt as t}from"./icons-D3rSKzzY.js";import{P as n}from"./index-D3ucbuGt.js";var r=t(e(),1);function i(e,t,i=n){let[a,o]=(0,r.useState)(()=>i.read(e,t)),s=(0,r.useRef)(t);return(0,r.useEffect)(()=>{let t=setTimeout(()=>i.write(e,a),250);return()=>clearTimeout(t)},[e,a,i]),[a,o,(0,r.useCallback)(()=>o(s.current),[])]}export{i as t};

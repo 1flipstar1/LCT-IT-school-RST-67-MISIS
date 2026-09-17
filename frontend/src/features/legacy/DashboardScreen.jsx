@@ -6,7 +6,6 @@ import { useSession } from '../../auth/SessionProvider.jsx';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import {
   AddIcon,
-  ArrowRightIcon,
   CalendarIcon,
   ChevronDownIcon,
   FilterIcon,
@@ -247,13 +246,6 @@ export function DashboardScreen() {
                 <td className="muted">{university.updatedAt}</td>
               </tr>
             ))}
-            <tr className="dashboard-view-all">
-              <td colSpan="5">
-                <button className="text-button" onClick={() => navigate('/main/universities')}>
-                  Посмотреть все <ArrowRightIcon size={15} fill="currentColor" />
-                </button>
-              </td>
-            </tr>
           </tbody>
         </table>
       </section>

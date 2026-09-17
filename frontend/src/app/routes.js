@@ -11,8 +11,6 @@ export const ROUTES = [
   { path: '/', component: page(() => import('../features/dashboard/DashboardPage.jsx'), 'DashboardPage') },
   { path: '/interactions', component: page(() => import('../features/interactions/InteractionsPage.jsx'), 'InteractionsPage') },
   { path: '/interactions/:id', component: page(() => import('../features/interactions/InteractionPage.jsx'), 'InteractionPage') },
-  { path: '/universities', component: page(() => import('../features/universities/UniversitiesPage.jsx'), 'UniversitiesPage') },
-  { path: '/universities/:id', component: page(() => import('../features/universities/UniversityPage.jsx'), 'UniversityPage') },
   { path: '/analytics', component: page(() => import('../features/analytics/AnalyticsPage.jsx'), 'AnalyticsPage') },
   { path: '/reports', component: page(() => import('../features/reports/ReportsPage.jsx'), 'ReportsPage') },
   { path: '/catalogs', component: page(() => import('../features/catalogs/CatalogsPage.jsx'), 'CatalogsPage') },
@@ -45,7 +43,6 @@ export const ROUTES = [
 
   // Экраны прежнего дизайна (ветка main) — перенесены целиком, см. features/legacy.
   { path: '/main/dashboard', component: page(() => import('../features/legacy/DashboardScreen.jsx'), 'DashboardScreen') },
-  { path: '/main/universities', component: page(() => import('../features/legacy/UniversitiesScreen.jsx'), 'UniversitiesScreen') },
   { path: '/main/workflow', component: page(() => import('../features/legacy/WorkflowScreen.jsx'), 'WorkflowScreen') },
   { path: '/main/analytics', component: page(() => import('../features/legacy/AnalyticsScreen.jsx'), 'AnalyticsScreen') },
   { path: '/main/import', component: page(() => import('../features/legacy/ImportScreen.jsx'), 'ImportScreen') },

@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { Link } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { formatDate, formatDays, formatFileSize, formatRelativeDateTime } from '../../domain/format.js';
 import { PERMISSION } from '../../domain/roles.js';
@@ -11,7 +10,7 @@ import { Badge } from '../../ui/Badge.jsx';
 import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
-import { AttachmentIcon, DocumentIcon, MailIcon, PhoneIcon, UsersIcon, WorkflowIcon } from '../../ui/icons.js';
+import { AttachmentIcon, DocumentIcon, MailIcon, PhoneIcon, WorkflowIcon } from '../../ui/icons.js';
 import { PageHeader } from '../../ui/PageHeader.jsx';
 import { Tabs } from '../../ui/Tabs.jsx';
 import { ErrorPage } from '../errors/ErrorPage.jsx';
@@ -150,9 +149,7 @@ function InteractionView({ row }) {
               <div className={styles.personBlock}>
                 <p className={styles.personRole}>От вуза</p>
                 {shownContacts.length === 0 ? (
-                  <p className={styles.muted}>
-                    Контакты не добавлены. <Link to={`/universities/${university.id}`}>Открыть карточку вуза</Link>
-                  </p>
+                  <p className={styles.muted}>Контакты не добавлены.</p>
                 ) : (
                   shownContacts.map((contact) => (
                     <div key={contact.id} className={styles.contact}>
@@ -185,11 +182,6 @@ function InteractionView({ row }) {
             </p>
             <p>
               <span className={styles.muted}>Начато:</span> {formatDate(row.startedAt)}
-            </p>
-            <p>
-              <Link to={`/universities/${university.id}`}>
-                <UsersIcon size={16} fill="currentColor" /> Все взаимодействия с вузом
-              </Link>
             </p>
           </Card>
         </aside>
