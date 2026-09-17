@@ -1,0 +1,117 @@
+@font-face {
+  font-family: 'RostelecomBasis';
+  src: url('../../design/font/RostelecomBasis-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RostelecomBasis';
+  src: url('../../design/font/RostelecomBasis-Medium.otf') format('opentype');
+  font-weight: 500 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RostelecomBasis';
+  src: url('../../design/font/RostelecomBasis-Bold.otf') format('opentype');
+  font-weight: 700 800;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+body {
+  margin: 0;
+  font: var(--font-body-s);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-family);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--color-brand);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-brand-hover);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-s);
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* ---------- Печать отчётов в PDF ---------- */
+@media print {
+  body {
+    background: #fff;
+  }
+  [data-print-hidden] {
+    display: none !important;
+  }
+}

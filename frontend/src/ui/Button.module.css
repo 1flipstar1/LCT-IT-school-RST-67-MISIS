@@ -1,0 +1,16 @@
+.button {
+  font: var(--font-body-s-strong);
+  white-space: nowrap;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.fullWidth {
+  width: 100%;
+  justify-content: center;
+}

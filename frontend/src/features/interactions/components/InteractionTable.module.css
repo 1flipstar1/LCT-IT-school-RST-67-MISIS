@@ -1,0 +1,22 @@
+.university,
+.stack {
+  display: grid;
+  gap: var(--space-0_5x);
+  min-width: 0;
+}
+
+.universityName {
+  font: var(--font-body-s-strong);
+  color: var(--color-text);
+}
+
+.date {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+.secondary {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}

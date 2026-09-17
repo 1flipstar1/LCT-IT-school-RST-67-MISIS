@@ -1,0 +1,128 @@
+.card {
+  margin-bottom: var(--space-4x);
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10x);
+}
+
+/* ---------- Кольцо ---------- */
+.donut {
+  position: relative;
+  flex-shrink: 0;
+  width: 220px;
+  height: 220px;
+}
+
+.donut svg {
+  display: block;
+}
+
+.donutTrack {
+  fill: none;
+  stroke: var(--color-neutral-soft);
+}
+
+.segment {
+  cursor: pointer;
+  transition: opacity var(--duration-base);
+}
+
+.dimmed {
+  opacity: 0.35;
+}
+
+.donutValue {
+  font-family: var(--font-family);
+  font-size: 52px;
+  font-weight: 700;
+  fill: var(--color-text);
+  pointer-events: none;
+}
+
+.donutLabel {
+  font-family: var(--font-family);
+  font-size: 14px;
+  fill: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+/* ---------- Столбцы ---------- */
+.bars {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.barsSvg {
+  display: block;
+  overflow: visible;
+  font-family: var(--font-family);
+}
+
+.barGroup {
+  cursor: pointer;
+}
+
+.hitArea {
+  fill: transparent;
+}
+
+.bar {
+  transition: opacity var(--duration-base);
+}
+
+.emptyBar {
+  fill: var(--color-neutral-soft);
+}
+
+.axisLine {
+  stroke: var(--color-border-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.axisLabel {
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--color-text-secondary);
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  z-index: var(--z-popup);
+  display: grid;
+  gap: var(--space-0_5x);
+  width: 220px;
+  padding: var(--space-2x) var(--space-3x);
+  border-radius: var(--radius-m);
+  background: var(--color-text);
+  color: var(--color-text-on-brand);
+  font: var(--font-caption);
+  box-shadow: var(--shadow-m);
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+.tooltip b {
+  font: var(--font-caption-strong);
+}
+
+@media (max-width: 960px) {
+  .body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-8x);
+  }
+
+  .donut {
+    align-self: center;
+  }
+
+  .bars {
+    padding-top: var(--space-12x);
+  }
+}

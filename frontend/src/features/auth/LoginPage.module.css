@@ -1,0 +1,191 @@
+.page {
+  display: grid;
+  grid-template-columns: minmax(360px, 5fr) 7fr;
+  min-height: 100vh;
+  background: var(--color-surface);
+}
+
+/* ---------- Промо-панель ---------- */
+.promo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-10x);
+  overflow: hidden;
+  background: linear-gradient(160deg, #8a14ff 0%, var(--color-brand) 45%, #4a0094 100%);
+  color: var(--color-text-on-brand);
+}
+
+.promo::after {
+  content: '';
+  position: absolute;
+  right: -160px;
+  bottom: -160px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  opacity: 0.9;
+  filter: blur(4px);
+}
+
+.promoLogo {
+  width: 168px;
+  filter: brightness(0) invert(1);
+}
+
+.promoText {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-4x);
+  max-width: 460px;
+}
+
+.promoTitle {
+  font: var(--font-display);
+}
+
+.promoLead {
+  font: var(--font-body-l);
+  opacity: 0.9;
+}
+
+.benefits {
+  display: grid;
+  gap: var(--space-3x);
+  margin: var(--space-4x) 0 0;
+  padding: 0;
+  list-style: none;
+  font: var(--font-body-m);
+}
+
+.benefits li {
+  display: flex;
+  gap: var(--space-3x);
+}
+
+/* ---------- Форма ---------- */
+.formSide {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-6x);
+  padding: var(--space-8x) var(--space-6x);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-5x);
+  width: min(440px, 100%);
+}
+
+.cardLogo {
+  display: none;
+  width: 148px;
+}
+
+.title {
+  font: var(--font-h1);
+}
+
+.subtitle {
+  margin-top: calc(var(--space-3x) * -1);
+  font: var(--font-body-m);
+  color: var(--color-text-secondary);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+  font: var(--font-caption-strong);
+  color: var(--color-text-tertiary);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.roles {
+  display: grid;
+  gap: var(--space-2x);
+  margin: calc(var(--space-2x) * -1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.role {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+  width: 100%;
+  padding: var(--space-3x) var(--space-4x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-l);
+  text-align: left;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.role:hover {
+  border-color: var(--color-brand);
+  background: var(--color-brand-softer);
+}
+
+.roleIcon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-m);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.roleText {
+  display: grid;
+  flex: 1;
+  gap: var(--space-0_5x);
+}
+
+.roleLabel {
+  font: var(--font-body-m-strong);
+}
+
+.roleDescription {
+  font: var(--font-caption);
+  color: var(--color-text-secondary);
+}
+
+.roleArrow {
+  color: var(--color-text-tertiary);
+}
+
+.role:hover .roleArrow {
+  color: var(--color-brand);
+}
+
+.legal {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 960px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .promo {
+    display: none;
+  }
+
+  .cardLogo {
+    display: block;
+  }
+}

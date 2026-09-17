@@ -1,0 +1,67 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4x);
+  margin-bottom: var(--space-4x);
+}
+
+.metric {
+  display: grid;
+  gap: var(--space-1x);
+  padding: var(--space-4x) var(--space-5x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-l);
+  background: var(--color-surface);
+}
+
+.metricLabel {
+  font: var(--font-body-s);
+  color: var(--color-text-secondary);
+}
+
+.metricValue {
+  font: var(--font-h1);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: var(--space-4x);
+}
+
+.contacts {
+  display: grid;
+  gap: var(--space-5x);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact {
+  display: grid;
+  gap: var(--space-1x);
+}
+
+.contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1_5x);
+  width: fit-content;
+  margin-left: calc(36px + var(--space-2x));
+  font: var(--font-body-s);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1180px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .stats {
+    grid-template-columns: 1fr;
+    gap: var(--space-2x);
+  }
+}

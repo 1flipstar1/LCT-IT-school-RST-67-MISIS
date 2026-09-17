@@ -1,0 +1,104 @@
+.stepper {
+  display: grid;
+  gap: var(--space-4x);
+}
+
+.phaseLabel {
+  margin-bottom: var(--space-2x);
+  font: var(--font-caption-strong);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  gap: var(--space-3x);
+  padding-bottom: var(--space-3x);
+}
+
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  bottom: 2px;
+  left: 11px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--color-border);
+}
+
+.done:not(:last-child)::before {
+  background: var(--color-brand);
+}
+
+.marker {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-surface);
+  font: var(--font-caption-strong);
+  color: var(--color-text-tertiary);
+}
+
+.done .marker {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+
+.current .marker {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+  box-shadow: 0 0 0 4px var(--color-brand-soft);
+}
+
+.skipped .marker {
+  border-style: dashed;
+}
+
+.text {
+  display: grid;
+  gap: var(--space-0_5x);
+  padding-top: var(--space-0_5x);
+}
+
+.name {
+  font: var(--font-body-s);
+  color: var(--color-text-secondary);
+}
+
+.done .name {
+  color: var(--color-text);
+}
+
+.current .name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.skipped .name {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+}
+
+.note {
+  font: var(--font-caption-strong);
+  color: var(--color-text-tertiary);
+}
+
+.current .note {
+  color: var(--color-brand-hover);
+}

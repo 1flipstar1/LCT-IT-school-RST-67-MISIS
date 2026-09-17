@@ -1,0 +1,34 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4x);
+  margin: var(--space-5x) 0 var(--space-3x);
+}
+
+.count {
+  font: var(--font-body-s-strong);
+  color: var(--color-text-secondary);
+}
+
+.toolbarControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+}
+
+.sort {
+  min-width: 220px;
+}
+
+@media (max-width: 760px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbarControls {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

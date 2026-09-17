@@ -1,0 +1,95 @@
+.bar {
+  display: grid;
+  gap: var(--space-3x);
+}
+
+.search {
+  max-width: 520px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.reset {
+  padding: var(--space-2x);
+  font: var(--font-body-s-strong);
+  color: var(--color-brand);
+}
+
+.reset:hover {
+  color: var(--color-brand-hover);
+}
+
+.period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.periodSelect {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  height: var(--control-height-m);
+  padding: 0 var(--space-3x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.periodSelect:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.periodSelect select {
+  appearance: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.dates {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  color: var(--color-text-tertiary);
+}
+
+.dates input {
+  height: var(--control-height-m);
+  padding: 0 var(--space-2x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  font: var(--font-body-s);
+  color: var(--color-text);
+}
+
+@media (max-width: 760px) {
+  .search {
+    max-width: none;
+  }
+
+  /* На телефоне фильтры — горизонтальная лента, а не пять строк кнопок. */
+  .filters {
+    flex-wrap: nowrap;
+    margin: 0 calc(var(--space-4x) * -1);
+    padding: 0 var(--space-4x) var(--space-1x);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filters > * {
+    flex-shrink: 0;
+  }
+}

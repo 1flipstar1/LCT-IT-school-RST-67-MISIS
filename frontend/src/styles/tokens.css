@@ -1,0 +1,136 @@
+/*
+ * Дизайн-токены ИТ Школы Ростелекома.
+ * Основа — дизайн-система Ростелекома 2-го поколения (Атомаро), см. design/*.md.
+ * Компоненты используют только эти переменные: никаких «магических» цветов и отступов.
+ *
+ * Контраст текстовых пар проверен по WCAG 2.1 AA (>= 4.5:1):
+ *   text / surface 16.8 · text-secondary / surface 7.3 · text-tertiary / surface 5.0
+ *   brand / surface 6.2 · brand / brand-soft 4.9 · warning-text / warning-soft 5.2
+ * Оранжевый --color-accent (3.3:1) — только для иконок и заливок, не для текста.
+ */
+:root {
+  /* ---------- Цвет: бренд ---------- */
+  --color-brand: #8300ff;
+  --color-brand-hover: #6f00db;
+  --color-brand-active: #5c00b5;
+  --color-brand-soft: #f0e0ff;
+  --color-brand-softer: #f8f1ff;
+  --color-accent: #ff4f12;
+  --color-accent-soft: #ffeae2;
+
+  /* ---------- Цвет: поверхности ---------- */
+  --color-bg: #f4f4f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8f8f9;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-overlay: rgb(24 24 32 / 48%);
+
+  /* ---------- Цвет: текст ---------- */
+  --color-text: #1d1d22;
+  --color-text-secondary: #56565f;
+  --color-text-tertiary: #6e6e78;
+  --color-text-disabled: #a1a1aa;
+  --color-text-on-brand: #ffffff;
+
+  /* ---------- Цвет: статусы (всегда вместе с иконкой или подписью) ---------- */
+  --color-success: #0b7a52;
+  --color-success-soft: #e3f5ec;
+  --color-warning: #ff4f12;
+  --color-warning-text: #b3380b;
+  --color-warning-soft: #ffeae2;
+  --color-danger: #c4271c;
+  --color-danger-soft: #fdeceb;
+  --color-neutral-soft: #efeff1;
+
+  /* ---------- Типографика (design/типография.md) ---------- */
+  --font-family: 'RostelecomBasis', system-ui, sans-serif;
+  --font-display: 700 42px/44px var(--font-family);
+  --font-h1: 700 28px/32px var(--font-family);
+  --font-h2: 700 22px/24px var(--font-family);
+  --font-h3: 700 18px/20px var(--font-family);
+  --font-h4: 700 16px/20px var(--font-family);
+  --font-body-l: 400 18px/26px var(--font-family);
+  --font-body-m: 400 16px/24px var(--font-family);
+  --font-body-m-strong: 500 16px/24px var(--font-family);
+  --font-body-s: 400 14px/20px var(--font-family);
+  --font-body-s-strong: 500 14px/20px var(--font-family);
+  --font-caption: 400 12px/16px var(--font-family);
+  --font-caption-strong: 500 12px/16px var(--font-family);
+
+  /* ---------- Отступы: модуль 4px (design/отступы.md) ---------- */
+  --space-0_5x: 2px;
+  --space-1x: 4px;
+  --space-1_5x: 6px;
+  --space-2x: 8px;
+  --space-3x: 12px;
+  --space-4x: 16px;
+  --space-5x: 20px;
+  --space-6x: 24px;
+  --space-8x: 32px;
+  --space-10x: 40px;
+  --space-12x: 48px;
+  --space-16x: 64px;
+
+  /* ---------- Форма ---------- */
+  --radius-s: 6px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  --shadow-s: 0 1px 2px rgb(24 24 32 / 6%);
+  --shadow-m: 0 4px 16px rgb(24 24 32 / 8%);
+  --shadow-l: 0 16px 48px rgb(24 24 32 / 16%);
+  --focus-ring: 0 0 0 3px rgb(131 0 255 / 32%);
+
+  /* ---------- Каркас ---------- */
+  --sidebar-width: 264px;
+  --content-max-width: 1440px;
+  --control-height-s: 32px;
+  --control-height-m: 40px;
+  --control-height-l: 48px;
+
+  --z-sticky: 10;
+  --z-sidebar: 20;
+  --z-overlay: 40;
+  --z-popup: 50;
+  --z-toast: 60;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --easing: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ---------- Шрифты Атомаро: по умолчанию кит ссылается на Manrope, у нас — Rostelecom Basis ---------- */
+  --font-family-base: var(--font-family);
+  --font-family-body: var(--font-family);
+  --font-family-description: var(--font-family);
+  --font-family-display: var(--font-family);
+  --font-family-heading: var(--font-family);
+  --button-xl-font: 500 16px/24px var(--font-family);
+  --button-l-font: 500 16px/24px var(--font-family);
+  --button-m-font: 500 14px/20px var(--font-family);
+  --button-s-font: 500 12px/16px var(--font-family);
+
+  /* ---------- Переопределения кнопок Атомаро под фирменный фиолетовый ---------- */
+  --button-primary-accent-bg-color-default: var(--color-brand);
+  --button-primary-accent-bg-color-hover: var(--color-brand-hover);
+  --button-primary-accent-bg-color-active: var(--color-brand-active);
+  --button-primary-accent-border-color-default: transparent;
+  --button-primary-accent-border-color-hover: transparent;
+  --button-primary-accent-border-color-active: transparent;
+  --button-outline-accent-bg-color-default: var(--color-surface);
+  --button-outline-accent-bg-color-hover: var(--color-brand-softer);
+  --button-outline-accent-bg-color-active: var(--color-brand-soft);
+  --button-outline-accent-border-color-default: var(--color-border-strong);
+  --button-outline-accent-border-color-hover: var(--color-brand);
+  --button-outline-accent-border-color-active: var(--color-brand);
+  --button-outline-accent-label-color-default: var(--color-text);
+  --button-outline-accent-label-color-hover: var(--color-brand-hover);
+  --button-outline-accent-label-color-active: var(--color-brand-active);
+  --button-outline-accent-icon-color-default: var(--color-text-secondary);
+  --button-outline-accent-icon-color-hover: var(--color-brand-hover);
+  --button-outline-accent-icon-color-active: var(--color-brand-active);
+  --button-ghost-accent-label-color-default: var(--color-brand);
+  --button-ghost-accent-icon-color-default: var(--color-brand);
+}

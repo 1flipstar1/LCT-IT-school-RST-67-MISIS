@@ -1,0 +1,44 @@
+.university {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+  min-width: 0;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-m);
+  background: var(--color-brand-soft);
+  color: var(--color-brand-active);
+  font: var(--font-caption-strong);
+}
+
+.universityName,
+.strong {
+  font: var(--font-body-s-strong);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-0_5x);
+}
+
+.secondary {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+}
+
+.date {
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+.footer {
+  padding: var(--space-2x) var(--space-4x);
+  border-top: 1px solid var(--color-border);
+}

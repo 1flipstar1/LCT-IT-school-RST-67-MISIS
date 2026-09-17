@@ -1,0 +1,41 @@
+.page {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3x);
+  max-width: 520px;
+  margin: var(--space-16x) auto;
+  padding: 0 var(--space-4x);
+  text-align: center;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.code {
+  font: var(--font-caption-strong);
+  color: var(--color-text-tertiary);
+}
+
+.title {
+  font: var(--font-h2);
+}
+
+.hint {
+  font: var(--font-body-m);
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3x);
+  margin-top: var(--space-4x);
+}
