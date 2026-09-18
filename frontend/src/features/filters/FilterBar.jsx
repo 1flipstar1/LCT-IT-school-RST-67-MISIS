@@ -1,11 +1,16 @@
+import { useState } from 'react';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { countActiveFilters, EMPTY_FILTERS, PERIOD_PRESETS } from '../../domain/filters.js';
 import { PERMISSION } from '../../domain/roles.js';
+import { cn } from '../../lib/cn.js';
 import { useManagers } from '../../store/selectors.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
+import { Button } from '../../ui/Button.jsx';
+import { DateInput } from '../../ui/DateInput.jsx';
 import { SearchField, Switch } from '../../ui/Field.jsx';
-import { CalendarIcon, ChevronDownIcon } from '../../ui/icons.js';
+import { CalendarIcon, ChevronDownIcon, FilterIcon } from '../../ui/icons.js';
 import { MultiSelectFilter } from '../../ui/MultiSelectFilter.jsx';
+import { SidePanel } from '../../ui/SidePanel.jsx';
 import styles from './FilterBar.module.css';
 
 const toOptions = (items) => items.map((item) => ({ value: item.id, label: item.name }));
@@ -14,38 +19,39 @@ const toOptions = (items) => items.map((item) => ({ value: item.id, label: item.
  * Панель фильтров — одна и та же во «Взаимодействиях», «Аналитике» и «Отчётах»,
  * чтобы пользователь один раз научился и везде фильтровал одинаково.
  * show — какие фильтры нужны на странице.
+ * variant="panel" — рядом с поиском одна кнопка «Фильтры», сами фильтры открываются в панели справа;
+ * resultLabel — сколько записей найдено («24 взаимодействия»): подпись кнопки «Показать…» в панели.
  */
-export function FilterBar({ filters, onChange, show = {}, stages = [], searchPlaceholder = 'Вуз, направление, продукт или менеджер' }) {
-  const { universities, directions, products } = useStoreState();
-  const managers = useManagers();
-  const session = useSession();
+export function FilterBar({
+  filters,
+  onChange,
+  show = {},
+  stages = [],
+  variant = 'inline',
+  resultLabel,
+  searchPlaceholder = 'Вуз, направление, продукт или менеджер',
+}) {
   const set = (patch) => onChange({ ...filters, ...patch });
+  const reset = () => onChange({ ...EMPTY_FILTERS, query: filters.query });
   const activeCount = countActiveFilters(filters);
+  const inPanel = variant === 'panel';
 
-  const canSeeManagers = session.can(PERMISSION.viewAllInteractions);
+  const search = show.search !== false && (
+    <SearchField className={styles.search} value={filters.query} onChange={(query) => set({ query })} placeholder={searchPlaceholder} />
+  );
+  const fields = <FilterFields filters={filters} set={set} show={show} stages={stages} fieldClassName={inPanel ? styles.panelField : undefined} />;
+
+  if (inPanel) {
+    return <FilterPanelBar search={search} fields={fields} activeCount={activeCount} onReset={reset} resultLabel={resultLabel} />;
+  }
 
   return (
     <div className={styles.bar}>
-      {show.search !== false && (
-        <SearchField className={styles.search} value={filters.query} onChange={(query) => set({ query })} placeholder={searchPlaceholder} />
-      )}
-
+      {search}
       <div className={styles.filters}>
-        <PeriodFilter period={filters.period} onChange={(period) => set({ period })} />
-        <MultiSelectFilter label="Вузы" options={toOptions(universities)} value={filters.universityIds} onChange={(universityIds) => set({ universityIds })} />
-        <MultiSelectFilter label="Направления" options={toOptions(directions)} value={filters.directionIds} onChange={(directionIds) => set({ directionIds })} />
-        <MultiSelectFilter label="Продукты" options={toOptions(products)} value={filters.productIds} onChange={(productIds) => set({ productIds })} />
-        {canSeeManagers && (
-          <MultiSelectFilter label="Ответственные" options={toOptions(managers)} value={filters.managerIds} onChange={(managerIds) => set({ managerIds })} />
-        )}
-        {show.stages && stages.length > 0 && (
-          <MultiSelectFilter label="Этапы" options={toOptions(stages)} value={filters.stageIds} onChange={(stageIds) => set({ stageIds })} />
-        )}
-        {show.attention && (
-          <Switch label="Только срочные" checked={filters.onlyAttention} onChange={(onlyAttention) => set({ onlyAttention })} />
-        )}
+        {fields}
         {activeCount > 0 && (
-          <button type="button" className={styles.reset} onClick={() => onChange({ ...EMPTY_FILTERS, query: filters.query })}>
+          <button type="button" className={styles.reset} onClick={reset}>
             Сбросить фильтры ({activeCount})
           </button>
         )}
@@ -54,10 +60,67 @@ export function FilterBar({ filters, onChange, show = {}, stages = [], searchPla
   );
 }
 
-export function PeriodFilter({ period, onChange }) {
+/** Сами поля фильтров: строкой под поиском или столбиком в боковой панели. */
+function FilterFields({ filters, set, show, stages, fieldClassName }) {
+  const { universities, directions, products } = useStoreState();
+  const managers = useManagers();
+  const { can } = useSession();
+
+  return (
+    <>
+      <PeriodFilter className={fieldClassName} period={filters.period} onChange={(period) => set({ period })} />
+      <MultiSelectFilter className={fieldClassName} label="Вузы" options={toOptions(universities)} value={filters.universityIds} onChange={(universityIds) => set({ universityIds })} />
+      <MultiSelectFilter className={fieldClassName} label="Направления" options={toOptions(directions)} value={filters.directionIds} onChange={(directionIds) => set({ directionIds })} />
+      <MultiSelectFilter className={fieldClassName} label="Продукты" options={toOptions(products)} value={filters.productIds} onChange={(productIds) => set({ productIds })} />
+      {can(PERMISSION.viewAllInteractions) && (
+        <MultiSelectFilter className={fieldClassName} label="Ответственные" options={toOptions(managers)} value={filters.managerIds} onChange={(managerIds) => set({ managerIds })} />
+      )}
+      {show.stages && stages.length > 0 && (
+        <MultiSelectFilter className={fieldClassName} label="Этапы" options={toOptions(stages)} value={filters.stageIds} onChange={(stageIds) => set({ stageIds })} />
+      )}
+      {show.attention && <Switch label="Только срочные" checked={filters.onlyAttention} onChange={(onlyAttention) => set({ onlyAttention })} />}
+    </>
+  );
+}
+
+/** Поиск + кнопка «Фильтры» с числом активных фильтров; поля — в панели справа. */
+function FilterPanelBar({ search, fields, activeCount, onReset, resultLabel }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className={styles.panelBar}>
+      {search}
+      <Button icon={FilterIcon} onClick={() => setOpen(true)}>
+        Фильтры
+        {activeCount > 0 && <span className={styles.badge}>{activeCount}</span>}
+      </Button>
+
+      <SidePanel
+        open={open}
+        onOpenChange={setOpen}
+        title="Фильтры"
+        description="Изменения применяются сразу."
+        footer={
+          <>
+            <Button variant="ghost" onClick={onReset} disabled={activeCount === 0}>
+              Сбросить
+            </Button>
+            <Button variant="primary" onClick={() => setOpen(false)}>
+              {resultLabel ? `Показать ${resultLabel}` : 'Готово'}
+            </Button>
+          </>
+        }
+      >
+        {fields}
+      </SidePanel>
+    </div>
+  );
+}
+
+export function PeriodFilter({ period, onChange, className }) {
   const isCustom = period.preset === 'custom';
   return (
-    <div className={styles.period}>
+    <div className={cn(styles.period, className)}>
       <label className={styles.periodSelect}>
         <CalendarIcon size={18} fill="currentColor" aria-hidden="true" />
         <span className="visually-hidden">Период</span>
@@ -72,9 +135,9 @@ export function PeriodFilter({ period, onChange }) {
       </label>
       {isCustom && (
         <span className={styles.dates}>
-          <input type="date" aria-label="Начало периода" value={period.from} max={period.to || undefined} onChange={(event) => onChange({ ...period, from: event.target.value })} />
+          <DateInput className={styles.date} aria-label="Начало периода" value={period.from} max={period.to || undefined} onChange={(from) => onChange({ ...period, from })} />
           <span aria-hidden="true">—</span>
-          <input type="date" aria-label="Конец периода" value={period.to} min={period.from || undefined} onChange={(event) => onChange({ ...period, to: event.target.value })} />
+          <DateInput className={styles.date} aria-label="Конец периода" value={period.to} min={period.from || undefined} onChange={(to) => onChange({ ...period, to })} />
         </span>
       )}
     </div>

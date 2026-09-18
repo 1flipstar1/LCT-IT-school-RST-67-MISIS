@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from '../../../app/router.jsx';
 import { getTransitionTargets, PHASES } from '../../../domain/workflow.js';
 import { cn } from '../../../lib/cn.js';
+import { useOffsetTop } from '../../../lib/useOffsetTop.js';
 import { Avatar } from '../../../ui/Avatar.jsx';
 import { TransitionDialog } from '../TransitionDialog.jsx';
 import { SlaBadge } from './SlaBadge.jsx';
@@ -11,11 +12,13 @@ import styles from './InteractionBoard.module.css';
  * Доска этапов. Карточку можно перетащить на соседний этап — откроется окно перехода,
  * где можно добавить комментарий и файлы. Недоступные для перехода колонки приглушаются.
  * Без мыши (и на телефоне) этап меняется в карточке взаимодействия.
+ * На компьютере доска дотягивается до низа окна: горизонтальная прокрутка — у нижнего края экрана.
  */
 export function InteractionBoard({ workflow, rows }) {
   const [dragged, setDragged] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
   const [pendingTransition, setPendingTransition] = useState(null);
+  const [boardRef, boardTop] = useOffsetTop();
 
   const rowsByStage = useMemo(() => {
     const grouped = new Map(workflow.stages.map((stage) => [stage.id, []]));
@@ -40,7 +43,7 @@ export function InteractionBoard({ workflow, rows }) {
 
   return (
     <>
-      <div className={styles.board}>
+      <div ref={boardRef} className={styles.board} style={{ '--board-top': `${boardTop}px` }}>
         {PHASES.map((phase) => {
           const stages = workflow.stages.filter((stage) => stage.phase === phase.id);
           if (stages.length === 0) return null;

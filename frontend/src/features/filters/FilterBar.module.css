@@ -66,13 +66,8 @@
   color: var(--color-text-tertiary);
 }
 
-.dates input {
-  height: var(--control-height-m);
-  padding: 0 var(--space-2x);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-m);
-  font: var(--font-body-s);
-  color: var(--color-text);
+.date {
+  width: 160px;
 }
 
 @media (max-width: 760px) {
@@ -92,4 +87,54 @@
   .filters > * {
     flex-shrink: 0;
   }
+}
+
+/* ---------- variant="panel": поиск и одна кнопка, поля — в панели справа ---------- */
+.panelBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+}
+
+.panelBar .search {
+  flex: 1;
+}
+
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: var(--space-1_5x);
+  padding: 0 var(--space-1_5x);
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font: var(--font-caption-strong);
+}
+
+/* В панели каждое поле — во всю ширину, стрелка раскрытия прижата вправо. */
+.panelField {
+  width: 100%;
+}
+
+.panelField > svg:last-child {
+  margin-left: auto;
+}
+
+.period.panelField {
+  display: grid;
+}
+
+.panelField .periodSelect select {
+  flex: 1;
+}
+
+.panelField .dates {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.panelField .date {
+  width: 100%;
 }

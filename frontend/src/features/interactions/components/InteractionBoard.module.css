@@ -131,6 +131,27 @@
   text-align: center;
 }
 
+/*
+ * Компьютер: доска занимает всё место до нижнего края окна, нижний отступ страницы гасится —
+ * полоса горизонтальной прокрутки оказывается у самого низа экрана. Длинные колонки
+ * прокручиваются внутри себя. На узких экранах доска остаётся обычной высоты.
+ */
+@media (min-width: 961px) {
+  .board {
+    height: max(480px, calc(100dvh - var(--board-top, 0px)));
+    margin-bottom: calc(var(--content-padding-bottom) * -1);
+  }
+
+  .columns {
+    min-height: 0;
+  }
+
+  .column {
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
 @media (max-width: 1100px) {
   .board {
     margin: 0 calc(var(--space-6x) * -1);

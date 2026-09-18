@@ -8,9 +8,9 @@ import styles from './MultiSelectFilter.module.css';
 
 /**
  * Фильтр-«чип» с выбором нескольких значений. Когда значений больше семи, появляется поиск.
- * options: [{ value, label }]
+ * options: [{ value, label }]; className — для кнопки-триггера (например, растянуть на всю ширину).
  */
-export function MultiSelectFilter({ label, options, value, onChange }) {
+export function MultiSelectFilter({ label, options, value, onChange, className }) {
   const [query, setQuery] = useState('');
   const selected = new Set(value);
 
@@ -27,7 +27,7 @@ export function MultiSelectFilter({ label, options, value, onChange }) {
 
   return (
     <Popover.Root onOpenChange={(open) => !open && setQuery('')}>
-      <Popover.Trigger className={cn(styles.trigger, value.length > 0 && styles.active)}>
+      <Popover.Trigger className={cn(styles.trigger, value.length > 0 && styles.active, className)}>
         <span className={styles.label}>{label}</span>
         {summary && <span className={styles.summary}>{summary}</span>}
         <ChevronDownIcon size={16} fill="currentColor" />

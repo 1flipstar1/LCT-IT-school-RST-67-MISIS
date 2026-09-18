@@ -26,9 +26,11 @@
 }
 
 .content {
+  /* Нижний отступ — переменной: доска «Взаимодействий» гасит его, чтобы дотянуться до низа окна. */
+  --content-padding-bottom: var(--space-16x);
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-8x) var(--space-8x) var(--space-16x);
+  padding: var(--space-8x) var(--space-8x) var(--content-padding-bottom);
 }
 
 .mobileBar,
@@ -49,7 +51,8 @@
 
 @media (max-width: 1100px) {
   .content {
-    padding: var(--space-6x) var(--space-6x) var(--space-12x);
+    --content-padding-bottom: var(--space-12x);
+    padding: var(--space-6x) var(--space-6x) var(--content-padding-bottom);
   }
 }
 
@@ -84,6 +87,7 @@
   }
 
   .content {
-    padding: var(--space-5x) var(--space-4x) var(--space-12x);
+    --content-padding-bottom: var(--space-12x);
+    padding: var(--space-5x) var(--space-4x) var(--content-padding-bottom);
   }
 }

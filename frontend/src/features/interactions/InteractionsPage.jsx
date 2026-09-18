@@ -60,6 +60,7 @@ export function InteractionsPage() {
   const workflow = workflows.find((item) => item.id === workflowId) ?? workflows[0];
   const filtered = useMemo(() => filterInteractionRows(rows, filters).sort(SORTS[sort]?.compare ?? SORTS.urgency.compare), [rows, filters, sort]);
   const boardRows = filtered.filter((row) => row.workflowId === workflow.id);
+  const countLabel = `${filtered.length} ${plural(filtered.length, ['взаимодействие', 'взаимодействия', 'взаимодействий'])}`;
 
   return (
     <>
@@ -73,11 +74,18 @@ export function InteractionsPage() {
         }
       />
 
-      <FilterBar filters={filters} onChange={setFilters} show={{ stages: true, attention: true }} stages={workflow.stages} />
+      <FilterBar
+        variant="panel"
+        filters={filters}
+        onChange={setFilters}
+        show={{ stages: true, attention: true }}
+        stages={workflow.stages}
+        resultLabel={countLabel}
+      />
 
       <div className={styles.toolbar}>
         <p className={styles.count} aria-live="polite">
-          {filtered.length} {plural(filtered.length, ['взаимодействие', 'взаимодействия', 'взаимодействий'])}
+          {countLabel}
         </p>
         <div className={styles.toolbarControls}>
           {view === 'table' ? (

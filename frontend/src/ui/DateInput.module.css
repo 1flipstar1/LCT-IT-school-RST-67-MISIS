@@ -1,0 +1,69 @@
+.field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: var(--control-height-m);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+}
+
+.field:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.invalid,
+.invalid:focus-within {
+  border-color: var(--color-danger);
+}
+
+.input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 var(--space-3x);
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: var(--font-body-s);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+/* Кольцо фокуса рисует рамка поля — у самого input оно лишнее. */
+.input:focus-visible {
+  box-shadow: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.calendar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 100%;
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  color: var(--color-text-secondary);
+}
+
+.calendar:hover {
+  color: var(--color-brand);
+}
+
+/* Системный календарь раскрывается от этого поля, поэтому оно прижато к низу рамки. */
+.picker {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
