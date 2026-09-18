@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import logoUrl from '../../logo/logo.svg';
 import { Link, useRouter } from '../app/router.jsx';
 import { useSession } from '../auth/SessionProvider.jsx';
@@ -10,7 +10,7 @@ import { useStoreState } from '../store/StoreProvider.jsx';
 import { Avatar } from '../ui/Avatar.jsx';
 import { avatarImageAt } from '../ui/avatarImages.js';
 import { IconButton } from '../ui/IconButton.jsx';
-import { ArrowRightIcon, HelpIcon, SignOutIcon } from '../ui/icons.js';
+import { ArrowRightIcon, ChevronDownIcon, HelpIcon, SettingsIcon, SignOutIcon } from '../ui/icons.js';
 import { isNavItemActive, NAVIGATION } from './navigation.js';
 import styles from './Sidebar.module.css';
 
@@ -36,6 +36,8 @@ export function Sidebar({ open, onNavigate }) {
   const groups = NAVIGATION.map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) })).filter(
     (group) => group.items.length > 0,
   );
+  const hasActiveItem = groups.some((group) => group.items.some((item) => isNavItemActive(item, pathname)));
+  const [settingsOpen, setSettingsOpen] = useState(hasActiveItem);
 
   return (
     <aside className={cn(styles.sidebar, open && styles.open)} aria-label="Основная навигация" data-print-hidden>
@@ -44,6 +46,26 @@ export function Sidebar({ open, onNavigate }) {
       </Link>
 
       <nav className={styles.nav}>
+        <section className={styles.accordion}>
+          <button
+            type="button"
+            className={cn(styles.accordionToggle, hasActiveItem && styles.accordionActive)}
+            aria-expanded={settingsOpen}
+            aria-controls="sidebar-settings"
+            onClick={() => setSettingsOpen((value) => !value)}
+          >
+            <SettingsIcon size={20} fill="currentColor" aria-hidden="true" />
+            <span className={styles.itemLabel}>Настройки</span>
+            <ChevronDownIcon
+              size={20}
+              fill="currentColor"
+              className={cn(styles.accordionChevron, settingsOpen && styles.accordionChevronOpen)}
+              aria-hidden="true"
+            />
+          </button>
+
+          {settingsOpen && (
+            <div id="sidebar-settings" className={styles.accordionContent}>
         {groups.map((group) => (
           <div key={group.id} className={styles.group}>
             <p className={styles.groupLabel}>{group.label}</p>
@@ -69,6 +91,9 @@ export function Sidebar({ open, onNavigate }) {
             </ul>
           </div>
         ))}
+            </div>
+          )}
+        </section>
       </nav>
 
       <div className={styles.footer}>
