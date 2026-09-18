@@ -16,9 +16,9 @@ import {
   UploadIcon,
   WarningIcon,
 } from '../../ui/icons.js';
-import { countCardsByStage, LEGACY_UNIVERSITIES, sortableDate } from './legacyData.js';
+import { NewInteractionDialog } from '../interactions/NewInteractionDialog.jsx';
+import { countCardsByStage, LEGACY_CARDS, LEGACY_UNIVERSITIES, sortableDate } from './legacyData.js';
 import { Kpi, LegacyButton, LegacyScreen, PageHeader, UniversityCell } from './legacyUi.jsx';
-import { useLegacyCards } from './useLegacyCards.js';
 
 /** Кольцо диаграммы прежнего дизайна: радиус 89 при размере 210 → длина окружности. */
 const DONUT_CIRCUMFERENCE = 559.2;
@@ -37,12 +37,12 @@ export function DashboardScreen() {
   useDocumentTitle('Дашборд — дизайн main');
   const { navigate } = useRouter();
   const { user } = useSession();
-  const { cards } = useLegacyCards();
   const chartRef = useRef(null);
+  const [creating, setCreating] = useState(false);
   const [hoveredStage, setHoveredStage] = useState(null);
   const [hoveredDonutStage, setHoveredDonutStage] = useState(null);
 
-  const stats = countCardsByStage(cards);
+  const stats = countCardsByStage(LEGACY_CARDS);
   const total = stats.reduce((sum, stage) => sum + stage.n, 0) || 1;
   const maxN = Math.max(1, ...stats.map((stage) => stage.n));
   const dashboardUniversities = LEGACY_UNIVERSITIES.slice(0, 4).sort((a, b) =>
@@ -80,8 +80,8 @@ export function DashboardScreen() {
     }, chartRef);
 
     return () => context.revert();
-    // Перезапуск при смене карточек: этапы и высоты столбцов пересчитаны.
-  }, [cards]);
+    // Данные статичные — анимация проигрывается один раз при открытии экрана.
+  }, []);
 
   return (
     <LegacyScreen>
@@ -89,7 +89,7 @@ export function DashboardScreen() {
         <LegacyButton onClick={() => navigate('/main/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
           Импортировать
         </LegacyButton>
-        <LegacyButton primary onClick={() => navigate('/main/workflow')} icon={<AddIcon size={16} fill="currentColor" />}>
+        <LegacyButton primary onClick={() => setCreating(true)} icon={<AddIcon size={16} fill="currentColor" />}>
           Новое взаимодействие
         </LegacyButton>
       </PageHeader>
@@ -249,6 +249,8 @@ export function DashboardScreen() {
           </tbody>
         </table>
       </section>
+
+      <NewInteractionDialog open={creating} onOpenChange={setCreating} />
     </LegacyScreen>
   );
 }

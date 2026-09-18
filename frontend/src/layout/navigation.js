@@ -6,9 +6,7 @@ import {
   HomeIcon,
   IntegrationIcon,
   InteractionsIcon,
-  PulseIcon,
   ReportIcon,
-  SettingsIcon,
   UploadIcon,
   UsersIcon,
   WorkflowIcon,
@@ -54,13 +52,7 @@ export const NAVIGATION = [
     label: 'Экраны main',
     items: [
       { to: '/main/dashboard', label: 'Дашборд', icon: HomeIcon },
-      { to: '/main/workflow', label: 'Workflow', icon: PulseIcon },
-      { to: '/main/analytics', label: 'Аналитика', icon: AnalyticsIcon },
       { to: '/main/import', label: 'Импорт данных', icon: UploadIcon },
-      { to: '/main/reports', label: 'Отчёты', icon: ReportIcon },
-      { to: '/main/catalogs', label: 'Каталоги', icon: CatalogIcon },
-      { to: '/main/users', label: 'Пользователи', icon: UsersIcon, permission: PERMISSION.manageUsers },
-      { to: '/main/settings', label: 'Настройки', icon: SettingsIcon, permission: PERMISSION.manageUsers },
     ],
   },
 ];

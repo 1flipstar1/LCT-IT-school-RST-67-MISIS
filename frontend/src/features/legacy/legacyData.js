@@ -1,6 +1,6 @@
 /**
  * Демо-данные экранов прежнего дизайна (ветка main). Перенесены из frontend/src/main.jsx
- * той ветки как есть: 13 этапов обработки заявок, карточки доски и список вузов.
+ * той ветки как есть: 13 этапов обработки заявок, карточки взаимодействий и список вузов.
  * Новые экраны берут данные из store/ — здесь оставлен демонстрационный набор main.
  */
 
@@ -54,11 +54,3 @@ export const sortableDate = (value) => value.split('.').reverse().join('');
 /** Сколько карточек на каждом этапе — основа кольца и столбцов на прежней главной. */
 export const countCardsByStage = (cards) =>
   LEGACY_STAGES.map((stage) => ({ ...stage, n: cards.filter((card) => card.stage === stage.id).length }));
-
-export const searchCards = (cards, query) => {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return cards;
-  return cards.filter((card) =>
-    `${card.university} ${card.product} ${card.direction} ${card.owner}`.toLowerCase().includes(needle),
-  );
-};

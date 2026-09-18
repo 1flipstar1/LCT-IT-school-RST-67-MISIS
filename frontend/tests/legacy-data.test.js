@@ -4,7 +4,6 @@ import {
   countCardsByStage,
   LEGACY_CARDS,
   LEGACY_STAGES,
-  searchCards,
   sortableDate,
   universityLogo,
 } from '../src/features/legacy/legacyData.js';
@@ -19,13 +18,6 @@ describe('экраны прежнего дизайна: данные', () => {
     );
     assert.equal(counts.find((stage) => stage.id === 's1').n, 2);
     assert.equal(counts.find((stage) => stage.id === 's4').n, 0);
-  });
-
-  it('ищет по вузу, продукту, направлению и ответственному', () => {
-    assert.equal(searchCards(LEGACY_CARDS, '').length, LEGACY_CARDS.length);
-    assert.equal(searchCards(LEGACY_CARDS, 'итмо').length, 1);
-    assert.equal(searchCards(LEGACY_CARDS, 'Алина Воронова').length, 3);
-    assert.equal(searchCards(LEGACY_CARDS, 'нет такого').length, 0);
   });
 
   it('строит логотип вуза и сортируемую дату как в main', () => {

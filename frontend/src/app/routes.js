@@ -41,21 +41,7 @@ export const ROUTES = [
   },
   { path: '/help', component: page(() => import('../features/help/HelpPage.jsx'), 'HelpPage') },
 
-  // Экраны прежнего дизайна (ветка main) — перенесены целиком, см. features/legacy.
+  // Экраны прежнего дизайна (ветка main): дашборд и импорт, см. features/legacy.
   { path: '/main/dashboard', component: page(() => import('../features/legacy/DashboardScreen.jsx'), 'DashboardScreen') },
-  { path: '/main/workflow', component: page(() => import('../features/legacy/WorkflowScreen.jsx'), 'WorkflowScreen') },
-  { path: '/main/analytics', component: page(() => import('../features/legacy/AnalyticsScreen.jsx'), 'AnalyticsScreen') },
   { path: '/main/import', component: page(() => import('../features/legacy/ImportScreen.jsx'), 'ImportScreen') },
-  { path: '/main/reports', component: page(() => import('../features/legacy/ReportsScreen.jsx'), 'ReportsScreen') },
-  { path: '/main/catalogs', component: page(() => import('../features/legacy/CatalogsScreen.jsx'), 'CatalogsScreen') },
-  {
-    path: '/main/users',
-    permission: PERMISSION.manageUsers,
-    component: page(() => import('../features/legacy/UsersScreen.jsx'), 'UsersScreen'),
-  },
-  {
-    path: '/main/settings',
-    permission: PERMISSION.manageUsers,
-    component: page(() => import('../features/legacy/SettingsScreen.jsx'), 'SettingsScreen'),
-  },
 ];
