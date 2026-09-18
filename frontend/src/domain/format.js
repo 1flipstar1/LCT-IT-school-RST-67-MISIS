@@ -12,8 +12,6 @@ export const formatDate = (value) => (value ? dateFormatter.format(toDate(value)
 
 export const formatNumber = (value) => numberFormatter.format(value);
 
-export const formatPercent = (value) => `${Math.round(value)}%`;
-
 export function formatMonth(isoMonth) {
   const label = monthFormatter.format(new Date(`${isoMonth}-01T00:00:00`)).replace('.', '');
   return label.charAt(0).toUpperCase() + label.slice(1);

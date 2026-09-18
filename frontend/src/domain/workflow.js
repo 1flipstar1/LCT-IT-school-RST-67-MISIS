@@ -11,8 +11,6 @@ export const PHASES = [
   { id: 'teaching', label: 'Обучение' },
 ];
 
-export const PHASE_LABEL = Object.fromEntries(PHASES.map((phase) => [phase.id, phase.label]));
-
 export const SLA_STATE = Object.freeze({
   ok: 'ok',
   soon: 'soon',

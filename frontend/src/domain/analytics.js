@@ -1,5 +1,3 @@
-import { PHASES } from './workflow.js';
-
 /** Количество взаимодействий на каждом этапе процесса — основа воронки. */
 export function countByStage(rows, workflow) {
   const counts = new Map(workflow.stages.map((stage) => [stage.id, 0]));
@@ -7,14 +5,6 @@ export function countByStage(rows, workflow) {
     if (row.workflowId === workflow.id) counts.set(row.stageId, (counts.get(row.stageId) ?? 0) + 1);
   });
   return workflow.stages.map((stage) => ({ stage, count: counts.get(stage.id) }));
-}
-
-export function countByPhase(rows, workflow) {
-  const byStage = countByStage(rows, workflow);
-  return PHASES.map((phase) => ({
-    phase,
-    count: byStage.filter((item) => item.stage.phase === phase.id).reduce((sum, item) => sum + item.count, 0),
-  }));
 }
 
 /**
