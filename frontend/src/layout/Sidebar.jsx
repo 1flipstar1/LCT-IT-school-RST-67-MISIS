@@ -8,6 +8,7 @@ import { cn } from '../lib/cn.js';
 import { useVisibleInteractionRows } from '../store/selectors.js';
 import { useStoreState } from '../store/StoreProvider.jsx';
 import { Avatar } from '../ui/Avatar.jsx';
+import { avatarImageAt } from '../ui/avatarImages.js';
 import { IconButton } from '../ui/IconButton.jsx';
 import { ArrowRightIcon, HelpIcon, SignOutIcon } from '../ui/icons.js';
 import { isNavItemActive, NAVIGATION } from './navigation.js';
@@ -28,7 +29,9 @@ function useNavigationBadges() {
 export function Sidebar({ open, onNavigate }) {
   const { pathname } = useRouter();
   const { user, role, can, logout } = useSession();
+  const { users } = useStoreState();
   const badges = useNavigationBadges();
+  const avatarSrc = avatarImageAt(users.findIndex((item) => item.id === user.id));
 
   const groups = NAVIGATION.map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) })).filter(
     (group) => group.items.length > 0,
@@ -80,7 +83,7 @@ export function Sidebar({ open, onNavigate }) {
           <ArrowRightIcon size={16} fill="currentColor" className={styles.helpArrow} />
         </Link>
         <div className={styles.user}>
-          <Avatar name={user.name} variant="brand" />
+          <Avatar name={user.name} src={avatarSrc} variant="brand" />
           <div className={styles.userText}>
             <span className={styles.userName}>{user.name}</span>
             <span className={styles.userRole}>{ROLE_INFO[role].label}</span>

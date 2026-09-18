@@ -2,11 +2,14 @@ import { initials } from '../domain/format.js';
 import { cn } from '../lib/cn.js';
 import styles from './Avatar.module.css';
 
-/** variant="brand" — фирменный градиент для аватара текущего пользователя. */
-export function Avatar({ name, size = 'm', variant = 'soft', className }) {
+/**
+ * variant="brand" — фирменный градиент для аватара текущего пользователя.
+ * src — готовая картинка (см. ui/avatarImages.js); без неё рисуются инициалы.
+ */
+export function Avatar({ name, src, size = 'm', variant = 'soft', className }) {
   return (
-    <span className={cn(styles.avatar, styles[size], styles[variant], className)} aria-hidden="true">
-      {initials(name)}
+    <span className={cn(styles.avatar, styles[size], styles[variant], src && styles.picture, className)} aria-hidden="true">
+      {src ? <img src={src} alt="" className={styles.image} /> : initials(name)}
     </span>
   );
 }
