@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create diagram directory
+        run: mkdir -p docs
+
       - name: Generate repository diagram
         uses: githubocto/repo-visualizer@0.9.1
         with:
