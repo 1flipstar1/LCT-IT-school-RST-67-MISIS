@@ -24,6 +24,53 @@
 
 .nav {
   display: grid;
+  gap: var(--space-2x);
+}
+
+.accordion {
+  display: grid;
+  gap: var(--space-2x);
+}
+
+.accordionToggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--control-height-m);
+  gap: var(--space-3x);
+  padding: var(--space-2x) var(--space-3x);
+  border: 0;
+  border-radius: var(--radius-m);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: var(--font-body-s-strong);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.accordionToggle:hover,
+.accordionActive {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.accordionToggle:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.accordionChevron {
+  flex-shrink: 0;
+  transition: transform var(--duration-fast);
+}
+
+.accordionChevronOpen {
+  transform: rotate(180deg);
+}
+
+.accordionContent {
+  display: grid;
   gap: var(--space-5x);
 }
 
