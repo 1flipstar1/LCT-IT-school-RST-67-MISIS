@@ -6,8 +6,7 @@
 
 .legacy.legacy-dashboard .page-header,
 .legacy.legacy-dashboard .stage-stats,
-.legacy.legacy-dashboard .dash-bottom,
-.legacy.legacy-dashboard .filter-strip {
+.legacy.legacy-dashboard .dash-bottom {
   margin-bottom: var(--space-6x);
 }
 
@@ -21,14 +20,6 @@
 
 .legacy.legacy-dashboard .page-header h1 {
   font: var(--font-h1);
-}
-
-.legacy.legacy-dashboard .filter-strip {
-  min-height: var(--control-height-l);
-  height: auto;
-  gap: var(--space-4x);
-  padding: var(--space-2x) 0;
-  color: var(--color-text-secondary);
 }
 
 .legacy.legacy-dashboard .stage-stats,
@@ -101,6 +92,10 @@
   margin-top: 0;
 }
 
+.legacy.legacy-dashboard .dash-right {
+  align-items: stretch;
+}
+
 .legacy.legacy-dashboard .dash-left .kpi-grid {
   gap: var(--space-4x);
   grid-template-rows: repeat(3, minmax(0, 1fr));
@@ -162,7 +157,13 @@
 }
 
 .legacy.legacy-dashboard .dash-feed-head {
-  min-height: 48px;
+  min-height: 0;
+  padding: var(--space-5x) var(--space-5x) var(--space-3x);
+}
+
+.legacy.legacy-dashboard .dash-feed-panel {
+  padding: 0;
+  overflow: hidden;
 }
 
 .legacy.legacy-dashboard .dash-feed-head h2 {
@@ -175,23 +176,25 @@
   min-width: 24px;
   height: 24px;
   padding: 0 var(--space-1_5x);
-  border-radius: var(--radius-s);
+  border-radius: var(--radius-full);
   background: var(--color-warning-soft);
   color: var(--color-warning-text);
   font: var(--font-caption-strong);
 }
 
 .legacy.legacy-dashboard .dash-feed-list {
-  margin-top: var(--space-2x);
+  flex: 1;
+  margin: 0;
+  padding: 0 var(--space-2x);
 }
 
 .legacy.legacy-dashboard .dash-feed-item {
   gap: var(--space-3x);
-  min-height: 72px;
+  min-height: 0;
   margin: 0;
-  padding: var(--space-3x) 0;
+  padding: var(--space-3x);
   border-color: var(--color-border);
-  border-radius: 0;
+  border-radius: var(--radius-m);
 }
 
 .legacy.legacy-dashboard .dash-feed-item:hover,
@@ -231,6 +234,7 @@
 
 .legacy.legacy-dashboard .dash-feed-status {
   padding: var(--space-1x) var(--space-2x);
+  border-radius: var(--radius-full);
   background: var(--color-warning-soft);
   color: var(--color-warning-text);
 }
@@ -246,8 +250,9 @@
 }
 
 .legacy.legacy-dashboard .dash-feed-empty {
-  margin: var(--space-4x) 0;
+  margin: 0 var(--space-3x) var(--space-3x);
   padding: var(--space-3x);
+  border-radius: var(--radius-m);
   background: var(--color-surface-muted);
   color: var(--color-text-secondary);
   font: var(--font-body-s);
@@ -255,8 +260,11 @@
 
 .legacy.legacy-dashboard .dash-feed-more {
   gap: var(--space-2x);
-  margin-top: var(--space-2x);
-  padding: var(--space-3x) 0 0;
+  align-self: stretch;
+  justify-content: space-between;
+  margin: 0;
+  padding: var(--space-3x) var(--space-5x);
+  border-top: 1px solid var(--color-border);
   color: var(--color-brand);
   font: var(--font-body-s-strong);
 }
@@ -292,15 +300,20 @@
 }
 
 @media (max-width: 560px) {
-  .legacy.legacy-dashboard .filter-strip {
+  .legacy.legacy-dashboard .page-actions {
     flex-wrap: wrap;
-    overflow: visible;
-    white-space: normal;
   }
 
-  .legacy.legacy-dashboard .stage-stats,
-  .legacy.legacy-dashboard .dash-feed-panel {
+  .legacy.legacy-dashboard .stage-stats {
     padding: var(--space-4x);
+  }
+
+  .legacy.legacy-dashboard .dash-feed-head {
+    padding: var(--space-4x) var(--space-4x) var(--space-3x);
+  }
+
+  .legacy.legacy-dashboard .dash-feed-more {
+    padding: var(--space-3x) var(--space-4x);
   }
 
   .legacy.legacy-dashboard .dash-left .kpi-grid {

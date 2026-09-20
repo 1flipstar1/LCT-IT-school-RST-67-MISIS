@@ -30,7 +30,7 @@ function useNavigationBadges() {
 function NavigationGroup({ group, pathname, badges, onNavigate }) {
   return (
     <div className={styles.group}>
-      <p className={styles.groupLabel}>{group.label}</p>
+      {group.label && <p className={styles.groupLabel}>{group.label}</p>}
       <ul className={styles.list}>
         {group.items.map((item) => {
           const active = isNavItemActive(item, pathname);
@@ -100,7 +100,7 @@ export function Sidebar({ open, onNavigate }) {
 
       <nav className={styles.nav}>
         {groups
-          .filter((group) => group.id !== 'admin' && group.id !== 'legacy')
+          .filter((group) => group.id !== 'admin')
           .map((group) => <NavigationGroup key={group.id} group={group} pathname={pathname} badges={badges} onNavigate={onNavigate} />)}
 
         {adminGroup && <section className={styles.accordion}>
@@ -149,9 +149,6 @@ export function Sidebar({ open, onNavigate }) {
             </div>
         </section>}
 
-        {groups
-          .filter((group) => group.id === 'legacy')
-          .map((group) => <NavigationGroup key={group.id} group={group} pathname={pathname} badges={badges} onNavigate={onNavigate} />)}
       </nav>
 
       <div className={styles.footer}>

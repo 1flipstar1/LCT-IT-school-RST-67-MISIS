@@ -25,7 +25,6 @@
 }
 
 .active {
-  border-color: var(--color-brand);
   background: var(--color-brand-softer);
 }
 

@@ -6,7 +6,7 @@ import styles from './DataTable.module.css';
  * columns: [{ id, header, cell: (row) => node, width, align, primary, hideOnMobile }]
  * primary-колонка на телефоне становится заголовком карточки.
  */
-export function DataTable({ columns, rows, rowKey = (row) => row.id, onRowClick, getRowLabel, empty, caption }) {
+export function DataTable({ columns, rows, rowKey = (row) => row.id, onRowClick, getRowLabel, empty, caption, bodyRef, className }) {
   if (rows.length === 0 && empty) return empty;
 
   const handleKeyDown = (event, row) => {
@@ -17,7 +17,7 @@ export function DataTable({ columns, rows, rowKey = (row) => row.id, onRowClick,
   };
 
   return (
-    <div className={styles.wrap}>
+    <div className={cn(styles.wrap, className)}>
       <table className={styles.table}>
         {caption && <caption className="visually-hidden">{caption}</caption>}
         <thead>
@@ -29,7 +29,7 @@ export function DataTable({ columns, rows, rowKey = (row) => row.id, onRowClick,
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody ref={bodyRef}>
           {rows.map((row) => (
             <tr
               key={rowKey(row)}

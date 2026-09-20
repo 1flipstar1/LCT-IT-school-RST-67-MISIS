@@ -12,8 +12,6 @@ import { useStoreState } from '../../store/StoreProvider.jsx';
 import {
   AddIcon,
   ArrowRightIcon,
-  CalendarIcon,
-  ChevronDownIcon,
   DocumentIcon,
   EducationIcon,
   FilterIcon,
@@ -35,7 +33,7 @@ const DONUT_CIRCUMFERENCE = 559.2;
  * и первые заявки списком. Данные — демонстрационные, как в main.
  */
 export function DashboardScreen() {
-  useDocumentTitle('Дашборд — дизайн main');
+  useDocumentTitle('Дашборд');
   const { navigate } = useRouter();
   const { user } = useSession();
   const { events } = useStoreState();
@@ -114,6 +112,9 @@ export function DashboardScreen() {
   return (
     <LegacyScreen className="legacy-dashboard">
       <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`}>
+        <LegacyButton icon={<FilterIcon size={16} fill="currentColor" />}>
+          Все менеджеры
+        </LegacyButton>
         <LegacyButton onClick={() => navigate('/main/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
           Импортировать
         </LegacyButton>
@@ -259,18 +260,6 @@ export function DashboardScreen() {
             </Link>
           </section>
         </div>
-      </div>
-
-      <div className="filter-strip">
-        <div className="date-filter">
-          <CalendarIcon size={16} fill="currentColor" /> 01 мая — 15 мая 2026 <ChevronDownIcon size={14} fill="currentColor" />
-        </div>
-        <span className="live">
-          <i /> Данные обновлены 5 мин назад
-        </span>
-        <button className="filter-link">
-          <FilterIcon size={15} fill="currentColor" /> Все менеджеры
-        </button>
       </div>
 
       <section className="panel table-panel dashboard-universities">

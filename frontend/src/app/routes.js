@@ -8,7 +8,7 @@ import { PERMISSION } from '../domain/roles.js';
 const page = (loader, name) => lazy(() => loader().then((module) => ({ default: module[name] })));
 
 export const ROUTES = [
-  { path: '/', component: page(() => import('../features/dashboard/DashboardPage.jsx'), 'DashboardPage') },
+  { path: '/', component: page(() => import('../features/legacy/DashboardScreen.jsx'), 'DashboardScreen') },
   { path: '/interactions', component: page(() => import('../features/interactions/InteractionsPage.jsx'), 'InteractionsPage') },
   { path: '/interactions/:id', component: page(() => import('../features/interactions/InteractionPage.jsx'), 'InteractionPage') },
   { path: '/analytics', component: page(() => import('../features/analytics/AnalyticsPage.jsx'), 'AnalyticsPage') },
