@@ -1,5 +1,4 @@
 import { Button as AtomaroButton } from '@atomaro/ui-kit';
-import { MoreIcon } from '../../ui/icons.js';
 import { universityLogo } from './legacyData.js';
 import './legacy.css';
 
@@ -12,8 +11,8 @@ import './legacy.css';
  * Обёртка экрана. Старый styles.css глобальный, поэтому он изолирован под класс .legacy —
  * любой перенесённый экран обязан рендериться внутри этого контейнера.
  */
-export function LegacyScreen({ children }) {
-  return <div className="legacy">{children}</div>;
+export function LegacyScreen({ children, className = '' }) {
+  return <div className={`legacy ${className}`.trim()}>{children}</div>;
 }
 
 export function PageHeader({ title, children }) {
@@ -38,19 +37,14 @@ export function LegacyButton({ children, primary = false, icon, className = '', 
   );
 }
 
-export function Kpi({ title, value, change, note, icon, tone, warning }) {
+export function Kpi({ title, value, icon, tone }) {
   return (
     <div className="kpi">
       <div className={`kpi-icon ${tone}`}>{icon}</div>
       <div className="kpi-body">
         <span>{title}</span>
         <strong>{value}</strong>
-        <div>
-          <b className={warning ? 'warning' : ''}>{change}</b>
-          <small>{note}</small>
-        </div>
       </div>
-      <MoreIcon className="kpi-more" size={17} fill="currentColor" />
     </div>
   );
 }

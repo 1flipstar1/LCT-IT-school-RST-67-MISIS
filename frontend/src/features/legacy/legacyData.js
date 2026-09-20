@@ -5,19 +5,19 @@
  */
 
 export const LEGACY_STAGES = [
-  { id: 's1', label: 'Коммуникация с вузом', short: 'Коммуникация', color: '#ffd9c2' },
-  { id: 's2', label: 'Организация встречи', short: 'Встреча', color: '#ffceb3' },
-  { id: 's3', label: 'Обмен документами', short: 'Документы', color: '#ffc2a5' },
-  { id: 's4', label: 'Корректировка документов', short: 'Правки', color: '#ffb796' },
-  { id: 's5', label: 'Подписание документов', short: 'Подписание', color: '#ffab87' },
-  { id: 's6', label: 'Передача материалов и лицензий', short: 'Передача', color: '#ffa079' },
-  { id: 's7', label: 'Сопровождение внедрения', short: 'Внедрение', color: '#ff946a' },
-  { id: 's8', label: 'Обучение преподавателей', short: 'Обучение', color: '#ff895b' },
-  { id: 's9', label: 'Актуализация программы', short: 'Программа', color: '#ff7d4d' },
-  { id: 's10', label: 'Ведение занятий', short: 'Занятия', color: '#ff723e' },
-  { id: 's11', label: 'Актуализация документации', short: 'Документация', color: '#ff662f' },
-  { id: 's12', label: 'Повышение квалификации', short: 'Квалификация', color: '#ff5b21' },
-  { id: 's13', label: 'Контроль исполнения', short: 'Контроль', color: '#ff4f12' },
+  { id: 's1', phase: 'acquaintance', label: 'Коммуникация с вузом', short: 'Коммуникация', color: '#ffd9c2' },
+  { id: 's2', phase: 'acquaintance', label: 'Организация встречи', short: 'Встреча', color: '#ffceb3' },
+  { id: 's3', phase: 'contract', label: 'Обмен документами', short: 'Документы', color: '#ffc2a5' },
+  { id: 's4', phase: 'contract', label: 'Корректировка документов', short: 'Правки', color: '#ffb796' },
+  { id: 's5', phase: 'contract', label: 'Подписание документов', short: 'Подписание', color: '#ffab87' },
+  { id: 's6', phase: 'rollout', label: 'Передача материалов и лицензий', short: 'Передача', color: '#ffa079' },
+  { id: 's7', phase: 'rollout', label: 'Сопровождение внедрения', short: 'Внедрение', color: '#ff946a' },
+  { id: 's8', phase: 'rollout', label: 'Обучение преподавателей', short: 'Обучение', color: '#ff895b' },
+  { id: 's9', phase: 'rollout', label: 'Актуализация программы', short: 'Программа', color: '#ff7d4d' },
+  { id: 's10', phase: 'teaching', label: 'Ведение занятий', short: 'Занятия', color: '#ff723e' },
+  { id: 's11', phase: 'teaching', label: 'Актуализация документации', short: 'Документация', color: '#ff662f' },
+  { id: 's12', phase: 'teaching', label: 'Повышение квалификации', short: 'Квалификация', color: '#ff5b21' },
+  { id: 's13', phase: 'teaching', label: 'Контроль исполнения', short: 'Контроль', color: '#ff4f12' },
 ];
 
 export const LEGACY_CARDS = [
