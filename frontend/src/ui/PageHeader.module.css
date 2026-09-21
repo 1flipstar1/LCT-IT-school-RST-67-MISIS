@@ -17,9 +17,10 @@
   color: var(--color-brand);
 }
 
+/* Кнопки стоят на уровне заголовка, а не опускаются вслед за длинным описанием. */
 .row {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-6x);
 }
@@ -53,6 +54,8 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-3x);
+  /* Кнопка Атомаро (--button-m-height) выше строки заголовка (32px в --font-h1) — центрируем её по этой строке. */
+  margin-top: calc((32px - var(--button-m-height, 36px)) / 2);
 }
 
 @media (max-width: 760px) {
@@ -72,6 +75,7 @@
 
   .actions {
     justify-content: stretch;
+    margin-top: 0;
   }
 
   .actions > * {

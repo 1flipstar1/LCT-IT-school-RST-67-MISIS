@@ -3,72 +3,74 @@
   right: var(--space-6x);
   bottom: var(--space-6x);
   z-index: var(--z-toast);
-  display: grid;
-  gap: var(--space-2x);
-  width: min(440px, calc(100vw - var(--space-8x)));
-}
-
-.toast {
   display: flex;
-  align-items: center;
-  gap: var(--space-3x);
-  padding: var(--space-3x) var(--space-3x) var(--space-3x) var(--space-4x);
-  border-radius: var(--radius-l);
-  background: var(--color-text);
-  color: var(--color-text-on-brand);
+  flex-direction: column;
+  align-items: stretch;
+  width: min(440px, calc(100vw - var(--space-8x)));
+  pointer-events: none;
+}
+
+.item {
+  margin-bottom: var(--space-2x);
+  transform-origin: right bottom;
+  pointer-events: auto;
+}
+
+.toast.toast {
+  --toastnotification-m-header-font: var(--font-body-s-strong);
+  --toastnotification-m-subtitle-font: var(--font-caption);
+  --functionbutton-s-font: var(--font-body-s-strong);
+  --functionbutton-tertiary-label-color-default: var(--color-text-secondary);
+  --functionbutton-tertiary-label-color-hover: var(--color-brand-hover);
+  --functionbutton-tertiary-label-color-active: var(--color-brand-active);
+  --functionbutton-tertiary-icon-color-default: var(--color-text-secondary);
+  --functionbutton-tertiary-icon-color-hover: var(--color-brand-hover);
+  --functionbutton-tertiary-icon-color-active: var(--color-brand-active);
+  --closebutton-primary-bg-color-hover: var(--color-brand-softer);
+  --closebutton-primary-bg-color-active: var(--color-brand-soft);
+  --closebutton-primary-icon-color-hover: var(--color-brand-hover);
+  --closebutton-primary-icon-color-active: var(--color-brand-active);
+
+  height: auto !important;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-l);
-  animation: enter var(--duration-base) var(--easing);
+  overflow: hidden;
+  transition: none;
+  font-family: var(--font-family);
 }
 
-.icon {
-  color: #7ee2b8;
+.toast :global(.toast-notification__wrapper) {
+  background: var(--color-surface);
 }
 
-.error .icon {
-  color: #ff9d85;
-}
-
-.message {
-  flex: 1;
-  display: grid;
-  gap: var(--space-0_5x);
-  font: var(--font-body-s);
-}
-
-.code {
-  font: var(--font-caption);
-  color: #c9c9d1;
-}
-
-.undo {
-  padding: var(--space-1_5x) var(--space-2x);
-  border-radius: var(--radius-s);
+.toast :global(.toast-notification__title) {
+  color: var(--color-text);
   font: var(--font-body-s-strong);
-  color: #d4b3ff;
 }
 
-.undo:hover {
-  background: rgb(255 255 255 / 10%);
+.toast :global(.toast-notification__subtitle) {
+  color: var(--color-text-secondary);
+  font: var(--font-caption);
 }
 
-.close {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-s);
-  color: #c9c9d1;
+.toast :global(.toast-notification__icon) {
+  background: var(--color-brand-softer);
+  border: 0;
+  box-shadow: none;
 }
 
-.close:hover {
-  background: rgb(255 255 255 / 10%);
+.toast :global(.toast-notification__icon svg) {
+  fill: var(--color-brand);
 }
 
-@keyframes enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+.toast:global(.toast-notification--error) :global(.toast-notification__icon) {
+  background: var(--color-accent-soft);
+}
+
+.toast:global(.toast-notification--error) :global(.toast-notification__icon svg) {
+  fill: var(--color-accent);
 }
 
 @media (max-width: 760px) {

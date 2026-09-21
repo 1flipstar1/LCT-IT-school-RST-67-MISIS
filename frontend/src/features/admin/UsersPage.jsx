@@ -1,3 +1,5 @@
+import { useLayoutEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { DATA_SCOPE, DATA_SCOPE_LABEL, ROLE, ROLE_INFO } from '../../domain/roles.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
@@ -8,6 +10,7 @@ import { DataTable } from '../../ui/DataTable.jsx';
 import { Switch } from '../../ui/Field.jsx';
 import { MultiSelectFilter } from '../../ui/MultiSelectFilter.jsx';
 import { PageHeader } from '../../ui/PageHeader.jsx';
+import { SelectMenu } from '../../ui/SelectMenu.jsx';
 import { useToast } from '../../ui/Toast.jsx';
 import styles from './UsersPage.module.css';
 
@@ -20,6 +23,21 @@ export function UsersPage() {
   const { user: currentUser } = useSession();
   const actions = useActions();
   const toast = useToast();
+  const tableBodyRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const body = tableBodyRef.current;
+    if (!body || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const context = gsap.context(() => {
+      gsap.fromTo(Array.from(body.rows),
+        { y: 24, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.07, ease: 'power3.out', clearProps: 'transform,opacity,visibility' },
+      );
+    }, body);
+
+    return () => context.revert();
+  }, []);
 
   const leads = users.filter((user) => user.role === ROLE.lead);
 
@@ -40,38 +58,26 @@ export function UsersPage() {
       id: 'role',
       header: 'Роль',
       cell: (user) => (
-        <select
-          className={styles.select}
-          aria-label={`Роль: ${user.name}`}
+        <SelectMenu
+          label={`Роль: ${user.name}`}
           value={user.role}
+          options={ROLE_OPTIONS}
           disabled={user.id === currentUser.id}
           title={user.id === currentUser.id ? 'Свою роль изменить нельзя — попросите другого администратора' : undefined}
-          onChange={(event) => update(user, { role: event.target.value }, `Роль изменена на «${ROLE_INFO[event.target.value].label}»`)}
-        >
-          {ROLE_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          onChange={(role) => update(user, { role }, `Роль изменена на «${ROLE_INFO[role].label}»`)}
+        />
       ),
     },
     {
       id: 'scope',
       header: 'Видит данные',
       cell: (user) => (
-        <select
-          className={styles.select}
-          aria-label={`Видимость данных: ${user.name}`}
+        <SelectMenu
+          label={`Видимость данных: ${user.name}`}
           value={user.access.scope}
-          onChange={(event) => update(user, { access: { ...user.access, scope: event.target.value } }, `Видимость: ${DATA_SCOPE_LABEL[event.target.value].toLowerCase()}`)}
-        >
-          {SCOPE_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          options={SCOPE_OPTIONS}
+          onChange={(scope) => update(user, { access: { ...user.access, scope } }, `Видимость: ${DATA_SCOPE_LABEL[scope].toLowerCase()}`)}
+        />
       ),
     },
     {
@@ -80,6 +86,8 @@ export function UsersPage() {
       cell: (user) => (
         <MultiSelectFilter
           label={user.access.directionIds.length ? 'Только' : 'Все'}
+          ariaLabel={`Направления: ${user.name}`}
+          releaseFocusOnClose
           options={directions.map((direction) => ({ value: direction.id, label: direction.name }))}
           value={user.access.directionIds}
           onChange={(directionIds) => update(user, { access: { ...user.access, directionIds } }, directionIds.length ? `Ограничение по направлениям: ${directionIds.length}` : 'Ограничение по направлениям снято')}
@@ -91,19 +99,12 @@ export function UsersPage() {
       header: 'Руководитель',
       cell: (user) =>
         user.role === ROLE.manager ? (
-          <select
-            className={styles.select}
-            aria-label={`Руководитель: ${user.name}`}
+          <SelectMenu
+            label={`Руководитель: ${user.name}`}
             value={user.leadId ?? ''}
-            onChange={(event) => update(user, { leadId: event.target.value || null }, 'Изменён руководитель')}
-          >
-            <option value="">Не назначен</option>
-            {leads.map((lead) => (
-              <option key={lead.id} value={lead.id}>
-                {lead.name}
-              </option>
-            ))}
-          </select>
+            options={[{ value: '', label: 'Не назначен' }, ...leads.map((lead) => ({ value: lead.id, label: lead.name }))]}
+            onChange={(leadId) => update(user, { leadId: leadId || null }, 'Изменён руководитель')}
+          />
         ) : (
           <span className={styles.muted}>—</span>
         ),
@@ -124,23 +125,11 @@ export function UsersPage() {
 
   return (
     <>
-      <PageHeader
-        title="Пользователи и доступ"
-        description="Роль определяет, что человек может делать. Видимость — какие вузы он видит. Учётные записи создаются в Keycloak, здесь настраиваются права."
-      />
-
-      <section className={styles.roles} aria-label="Описание ролей">
-        {Object.values(ROLE).map((role) => (
-          <div key={role} className={styles.role}>
-            <p className={styles.roleName}>{ROLE_INFO[role].label}</p>
-            <p className={styles.roleDescription}>{ROLE_INFO[role].description}</p>
-          </div>
-        ))}
-      </section>
+      <PageHeader title="Пользователи и доступ" />
 
       <Card padding="none">
         <CardHeader title="Сотрудники" description="Изменения применяются сразу. Каждое действие можно отменить в уведомлении и найти в журнале." />
-        <DataTable caption="Сотрудники и их права" columns={columns} rows={users} />
+        <DataTable caption="Сотрудники и их права" columns={columns} rows={users} bodyRef={tableBodyRef} className={styles.tableWrap} />
       </Card>
     </>
   );

@@ -1,3 +1,7 @@
+.tableWrap {
+  overflow-y: hidden;
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;

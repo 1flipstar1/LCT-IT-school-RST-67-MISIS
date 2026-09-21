@@ -1337,7 +1337,7 @@ gap:var(--space-16x)
 }
 /* Dashboard: combined panel — donut + per-stage breakdown */
 .legacy .stage-stats {
-padding:var(--space-6x)
+padding:var(--space-6x) var(--space-6x) var(--space-4x)
 }
 .legacy .stage-stats-body {
 display:flex;align-items:center;gap:var(--space-12x);margin-top:var(--space-4x)
@@ -1802,28 +1802,32 @@ background:#8300ff;border:2px solid #f4f4f5
    слева, 13 столбиков справа одной высоты с ней; подложек и подписей нет
    (название и значение — в подсказке). */
 .legacy .stage-stats-body {
-align-items:center;gap:var(--space-8x)
+align-items:flex-start;gap:var(--space-8x)
 }
 .legacy .stage-stats-body .donut-wrap {
 height:240px
 }
 .legacy .stage-stats-body .donut {
-position:relative;width:210px;height:210px;background:transparent;--donut-progress:0
+position:relative;width:240px;height:240px;background:transparent;--donut-progress:0
 }
 .legacy .stage-stats-body .donut:before {
-content:'';position:absolute;inset:0;border-radius:50%;background:var(--donut-background);mask:conic-gradient(#000 calc(var(--donut-progress) * 1deg),transparent 0)
+content:none
 }
 .legacy .stage-stats-body .donut:after {
-width:148px;height:148px
+width:168px;height:168px
 }
 .legacy .donut-segments {
-position:absolute;inset:0;width:100%;height:100%;z-index:2
+position:absolute;inset:0;width:100%;height:100%;z-index:2;mask:conic-gradient(#000 calc(var(--donut-progress) * 1deg),transparent 0)
 }
 .legacy .donut-segment {
-fill:none;stroke:transparent;stroke-width:31;pointer-events:stroke
+fill:none;stroke-width:31;pointer-events:stroke;transition:opacity .2s ease
+}
+.legacy .donut-segment.is-dimmed,
+.legacy .stage-bar.is-dimmed {
+opacity:.35
 }
 .legacy .stage-stats-body .donut>div {
-z-index:3;width:148px;height:78px;display:flex;flex-direction:column;align-items:center;pointer-events:none
+z-index:3;width:168px;height:78px;display:flex;flex-direction:column;align-items:center;pointer-events:none
 }
 .legacy .stage-stats-body .donut .donut-stage-label {
 font-size:16px;line-height:22px;overflow-wrap:anywhere
@@ -1835,10 +1839,16 @@ font-size:56px;line-height:56px
 font-size:18px;line-height:22px;color:#7c8797
 }
 .legacy .stage-bars {
-flex:1;min-width:0;gap:3px;height:240px;align-items:flex-end;overflow:hidden
+flex:1;min-width:0;height:266px;display:grid;grid-template-columns:repeat(13,minmax(0,1fr));grid-template-rows:240px 26px;column-gap:6px;row-gap:0;padding-top:0;align-items:stretch;overflow:visible
 }
 .legacy .stage-bar {
-flex:1 1 0;min-width:0;width:100%;height:100%
+grid-column:var(--stage-column);grid-row:1;position:relative;z-index:1;min-width:0;width:100%;height:240px;transition:opacity .2s ease
+}
+.legacy .stage-bars-phase {
+grid-column:var(--phase-from) / var(--phase-to);grid-row:2;position:relative;z-index:0;padding-top:10px;text-align:center;font-family:'RostelecomBasis',sans-serif;font-size:12px;line-height:16px;font-weight:500;color:#6c6c75
+}
+.legacy .stage-bars-phase:before {
+content:'';position:absolute;left:0;right:0;top:5px;height:2px;border-radius:2px;background:#d7d9de
 }
 .legacy .stage-bar-value {
 display:none
@@ -1885,46 +1895,132 @@ height:auto;min-height:29px
 .legacy .col-head b {
 line-height:1.4;font-weight:600
 }
-/* ===== Дашборд: под графиком 50/50 — слева статистика, справа сообщения ===== */
+/* Нижний ряд дашборда: KPI занимают чуть меньше места, ленты — поровну. */
 .legacy .dash-bottom {
-display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4x);margin-top:var(--space-6x);align-items:stretch
+display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,2.2fr);gap:var(--space-4x);margin-top:var(--space-6x);align-items:stretch
+}
+.legacy .dash-left,
+.legacy .dash-right {
+min-width:0
 }
 .legacy .dash-left {
-display:flex;flex-direction:column;gap:var(--space-6x);min-width:0
+display:flex
 }
 .legacy .dash-right {
-display:flex;flex-direction:column;min-width:0
+display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4x)
 }
-.legacy .messages-panel {
-padding:var(--space-6x)
-}
-.legacy .messages-list {
-margin-top:var(--space-4x)
-}
-.legacy .message {
-display:flex;gap:var(--space-3x);padding:var(--space-3x) 0;border-bottom:1px solid #f0f1f4
-}
-.legacy .message:last-child {
-border-bottom:0
-}
-.legacy .message b {
-display:block;font-size:13px;line-height:18px;color:#273343
-}
-.legacy .message p {
-margin:var(--space-0_5x) 0 var(--space-1x);font-size:12px;line-height:16px;color:#526073
-}
-.legacy .message span {
-font-size:10px;line-height:12px;color:#a1a9b6
-}
-/* KPI-карточки в левой колонке (50%): ровно 2x2, по высоте равны сообщениям */
 .legacy .dash-left .kpi-grid {
-flex:1;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:var(--space-4x);margin-bottom:0
+flex:1;min-width:0;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:var(--space-4x);margin-bottom:0
 }
 .legacy .dash-left .kpi {
-min-width:0;padding:var(--space-4x)
+min-width:0;min-height:170px;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:var(--space-5x);border-radius:14px;box-shadow:0 8px 24px rgba(24,34,48,.035)
 }
-@media(max-width:760px) {
+.legacy .dash-left .kpi-icon {
+width:42px;height:42px;flex:none;border-radius:12px
+}
+.legacy .dash-left .kpi-icon svg {
+width:22px;height:22px
+}
+.legacy .dash-left .kpi-body>span {
+max-width:240px;font-size:13px;line-height:18px;color:#637083
+}
+.legacy .dash-left .kpi-body strong {
+margin:6px 0 0;font-size:36px;line-height:40px;color:#182230
+}
+.legacy .dash-feed-panel {
+min-width:0;display:flex;flex-direction:column;padding:var(--space-5x);border-radius:14px;box-shadow:0 8px 24px rgba(24,34,48,.035)
+}
+.legacy .dash-feed-head {
+min-height:52px;gap:var(--space-2x)
+}
+.legacy .dash-feed-head h2 {
+display:flex;align-items:center;gap:var(--space-2x);margin:0 0 5px;font-size:16px;line-height:22px
+}
+.legacy .dash-feed-head>div>span {
+font-size:12px;line-height:17px;color:#8792a2
+}
+.legacy .dash-feed-head .dash-feed-count {
+display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 6px;border-radius:7px;background:#fff0e9;color:#d54b21;font:600 12px/16px Manrope,sans-serif
+}
+.legacy .dash-feed-list {
+flex:1;min-width:0;margin-top:var(--space-2x)
+}
+.legacy .dash-feed-item {
+display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:var(--space-2x);min-width:0;min-height:67px;margin:0 -8px;padding:var(--space-3x) 8px;border-bottom:1px solid #edf0f4;border-radius:8px;text-decoration:none;color:inherit;transition:background .15s ease
+}
+.legacy .dash-feed-item:last-child {
+border-bottom:0
+}
+.legacy .dash-feed-item:hover,
+.legacy .dash-feed-item:focus-visible {
+background:#f8f3ff
+}
+.legacy .dash-feed-item:focus-visible,
+.legacy .dash-feed-more:focus-visible {
+outline:2px solid var(--brand-purple);outline-offset:2px
+}
+.legacy .dash-feed-item:hover b,
+.legacy .dash-feed-item:focus-visible b {
+color:var(--brand-purple)
+}
+.legacy .dash-feed-main {
+display:flex;flex-direction:column;gap:3px;min-width:0
+}
+.legacy .dash-feed-main b {
+font-size:13px;line-height:18px;font-weight:600;color:#273343;overflow-wrap:anywhere
+}
+.legacy .dash-feed-main small {
+font-size:12px;line-height:17px;color:#687588;overflow-wrap:anywhere
+}
+.legacy .dash-feed-author {
+font-size:11px;line-height:15px;color:#929dab
+}
+.legacy .dash-feed-status,
+.legacy .dash-feed-date {
+justify-self:end;white-space:nowrap;font-size:11px;line-height:16px
+}
+.legacy .dash-feed-status {
+padding:4px 7px;border-radius:6px;background:#fff4df;color:#9c6206;font-weight:600
+}
+.legacy .dash-feed-status.is-overdue {
+background:#fff0ec;color:#c93827
+}
+.legacy .dash-feed-date {
+padding-top:4px;color:#8792a2
+}
+.legacy .dash-feed-empty {
+margin:var(--space-4x) 0;padding:var(--space-3x);border-radius:8px;background:#f6f8fa;font-size:12px;line-height:18px;color:#687588
+}
+.legacy .dash-feed-more {
+display:inline-flex;align-items:center;align-self:flex-start;gap:6px;margin-top:var(--space-2x);padding:10px 0 0;color:var(--brand-purple);font-size:12px;line-height:18px;font-weight:600;text-decoration:none
+}
+.legacy .dash-feed-more:hover {
+text-decoration:underline
+}
+@media(max-width:1280px) {
 .legacy .dash-bottom {
-grid-template-columns:1fr
+grid-template-columns:minmax(0,1fr)
+}
+.legacy .dash-left .kpi-grid {
+grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto
+}
+.legacy .dash-left .kpi {
+min-height:145px
+}
+}
+@media(max-width:900px) and (min-width:761px), (max-width:700px) {
+.legacy .dash-right {
+grid-template-columns:minmax(0,1fr)
+}
+}
+@media(max-width:560px) {
+.legacy .dash-left .kpi-grid {
+grid-template-columns:minmax(0,1fr)
+}
+.legacy .dash-left .kpi {
+min-height:132px
+}
+.legacy .dash-feed-panel {
+padding:var(--space-4x)
 }
 }

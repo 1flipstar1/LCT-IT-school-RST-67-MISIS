@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 import { Link } from '../../app/router.jsx';
 import { formatRelativeDateTime } from '../../domain/format.js';
 import { useCatalogIndex } from '../../store/selectors.js';
@@ -35,6 +36,21 @@ export function AuditPage() {
   const index = useCatalogIndex();
   const [query, setQuery] = useState('');
   const [userIds, setUserIds] = useState([]);
+  const tableBodyRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const body = tableBodyRef.current;
+    if (!body || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const context = gsap.context(() => {
+      gsap.fromTo(Array.from(body.rows),
+        { y: 24, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.07, ease: 'power3.out', clearProps: 'transform,opacity,visibility' },
+      );
+    }, body);
+
+    return () => context.revert();
+  }, []);
 
   const entries = useMemo(() => {
     const interactionById = new Map(interactions.map((item) => [item.id, item]));
@@ -80,6 +96,8 @@ export function AuditPage() {
         <DataTable
           caption="Журнал действий"
           rows={filtered.slice(0, PAGE_SIZE)}
+          bodyRef={tableBodyRef}
+          className={styles.tableWrap}
           empty={<EmptyState icon={HistoryIcon} title="Записей нет" description="Измените поиск или фильтр по сотрудникам." />}
           columns={[
             { id: 'at', header: 'Когда', width: 150, cell: (entry) => <span className={styles.time}>{formatRelativeDateTime(entry.at)}</span> },

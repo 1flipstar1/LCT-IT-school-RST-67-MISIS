@@ -2,7 +2,7 @@ import { cn } from '../lib/cn.js';
 import styles from './Badge.module.css';
 
 /**
- * Метка статуса. tone: brand | neutral | success | warning | danger.
+ * Метка статуса. tone: brand | accent | neutral | success | warning | danger.
  * Статусные цвета всегда идут вместе с иконкой или текстом — цвет не единственный носитель смысла.
  */
 export function Badge({ tone = 'neutral', icon: Icon, children, className, title }) {

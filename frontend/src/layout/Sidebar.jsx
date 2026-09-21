@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 import logoUrl from '../../logo/logo.svg';
 import { Link, useRouter } from '../app/router.jsx';
 import { useSession } from '../auth/SessionProvider.jsx';
@@ -26,6 +27,30 @@ function useNavigationBadges() {
   );
 }
 
+function NavigationGroup({ group, pathname, badges, onNavigate }) {
+  return (
+    <div className={styles.group}>
+      {group.label && <p className={styles.groupLabel}>{group.label}</p>}
+      <ul className={styles.list}>
+        {group.items.map((item) => {
+          const active = isNavItemActive(item, pathname);
+          const count = item.badge ? badges[item.badge] : 0;
+          const Icon = item.icon;
+          return (
+            <li key={item.to}>
+              <Link to={item.to} className={cn(styles.item, active && styles.active)} aria-current={active ? 'page' : undefined} onClick={onNavigate}>
+                <Icon size={20} fill="currentColor" />
+                <span className={styles.itemLabel}>{item.label}</span>
+                {count > 0 && <span className={styles.badge}>{count}</span>}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 export function Sidebar({ open, onNavigate }) {
   const { pathname } = useRouter();
   const { user, role, can, logout } = useSession();
@@ -36,8 +61,36 @@ export function Sidebar({ open, onNavigate }) {
   const groups = NAVIGATION.map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) })).filter(
     (group) => group.items.length > 0,
   );
-  const hasActiveItem = groups.some((group) => group.items.some((item) => isNavItemActive(item, pathname)));
-  const [settingsOpen, setSettingsOpen] = useState(hasActiveItem);
+  const adminGroup = groups.find((group) => group.id === 'admin');
+  const hasActiveSettingsItem = adminGroup?.items.some((item) => isNavItemActive(item, pathname));
+  const [settingsOpen, setSettingsOpen] = useState(hasActiveSettingsItem);
+  const settingsContentRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const content = settingsContentRef.current;
+    if (!content) return undefined;
+
+    const items = content.querySelectorAll('li');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      gsap.set(content, { clearProps: 'height,opacity', display: settingsOpen ? 'grid' : 'none' });
+      return undefined;
+    }
+
+    const timeline = gsap.timeline();
+    if (settingsOpen) {
+      timeline
+        .set(content, { display: 'grid', height: 0, autoAlpha: 0 })
+        .to(content, { height: 'auto', autoAlpha: 1, duration: 0.28, ease: 'power2.out' })
+        .fromTo(items, { y: -6, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.2, stagger: 0.04, ease: 'power2.out' }, '-=0.14');
+    } else {
+      timeline
+        .to(content, { height: 0, autoAlpha: 0, duration: 0.24, ease: 'power2.in', onComplete: () => gsap.set(content, { display: 'none' }) }, 0)
+        .to(items, { y: -4, autoAlpha: 0, duration: 0.12, stagger: { each: 0.025, from: 'end' }, ease: 'power1.in' }, 0);
+    }
+
+    return () => timeline.kill();
+  }, [settingsOpen]);
 
   return (
     <aside className={cn(styles.sidebar, open && styles.open)} aria-label="Основная навигация" data-print-hidden>
@@ -46,10 +99,14 @@ export function Sidebar({ open, onNavigate }) {
       </Link>
 
       <nav className={styles.nav}>
-        <section className={styles.accordion}>
+        {groups
+          .filter((group) => group.id !== 'admin')
+          .map((group) => <NavigationGroup key={group.id} group={group} pathname={pathname} badges={badges} onNavigate={onNavigate} />)}
+
+        {adminGroup && <section className={styles.accordion}>
           <button
             type="button"
-            className={cn(styles.accordionToggle, hasActiveItem && styles.accordionActive)}
+            className={cn(styles.accordionToggle, hasActiveSettingsItem && styles.accordionActive)}
             aria-expanded={settingsOpen}
             aria-controls="sidebar-settings"
             onClick={() => setSettingsOpen((value) => !value)}
@@ -64,12 +121,10 @@ export function Sidebar({ open, onNavigate }) {
             />
           </button>
 
-          {settingsOpen && (
-            <div id="sidebar-settings" className={styles.accordionContent}>
-        {groups.map((group) => (
+            <div id="sidebar-settings" ref={settingsContentRef} className={styles.accordionContent} aria-hidden={!settingsOpen}>
+        {groups.filter((group) => group.id === 'admin').map((group) => (
           <div key={group.id} className={styles.group}>
-            <p className={styles.groupLabel}>{group.label}</p>
-            <ul className={styles.list}>
+            <ul className={cn(styles.list, styles.accordionList)}>
               {group.items.map((item) => {
                 const active = isNavItemActive(item, pathname);
                 const count = item.badge ? badges[item.badge] : 0;
@@ -92,8 +147,8 @@ export function Sidebar({ open, onNavigate }) {
           </div>
         ))}
             </div>
-          )}
-        </section>
+        </section>}
+
       </nav>
 
       <div className={styles.footer}>

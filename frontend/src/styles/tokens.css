@@ -83,6 +83,8 @@
   --shadow-m: 0 4px 16px rgb(24 24 32 / 8%);
   --shadow-l: 0 16px 48px rgb(24 24 32 / 16%);
   --focus-ring: 0 0 0 3px rgb(131 0 255 / 32%);
+  --focus-soft: rgb(131 0 255 / 16%);
+  --focus-contrast: rgb(131 0 255 / 20%);
 
   /* ---------- Каркас ---------- */
   --sidebar-width: 264px;
@@ -132,5 +134,11 @@
   --button-outline-accent-icon-color-hover: var(--color-brand-hover);
   --button-outline-accent-icon-color-active: var(--color-brand-active);
   --button-ghost-accent-label-color-default: var(--color-brand);
+  --button-ghost-accent-label-color-hover: var(--color-brand-hover);
+  --button-ghost-accent-label-color-active: var(--color-brand-active);
   --button-ghost-accent-icon-color-default: var(--color-brand);
+  --button-ghost-accent-icon-color-hover: var(--color-brand-hover);
+  --button-ghost-accent-icon-color-active: var(--color-brand-active);
+  --button-ghost-accent-bg-color-hover: var(--color-brand-softer);
+  --button-ghost-accent-bg-color-active: var(--color-brand-soft);
 }

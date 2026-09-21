@@ -36,6 +36,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+  color: var(--color-text-on-brand);
+  background: var(--color-brand);
+}
+
+::-moz-selection {
+  color: var(--color-text-on-brand);
+  background: var(--color-brand);
+}
+
 button,
 input,
 select,
