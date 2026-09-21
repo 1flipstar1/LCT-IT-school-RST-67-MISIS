@@ -30,7 +30,6 @@ export function IntegrationsPage() {
     <>
       <PageHeader
         title="Интеграции"
-        description="LMS и сайт ИТ Школы передают данные по API в формате JSON. Новые записи разберите: добавьте к существующему взаимодействию или создайте новое."
       />
 
       <section className={styles.sources} aria-label="Источники данных">

@@ -1,6 +1,6 @@
 .header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-6x);
   margin-bottom: var(--space-5x);
@@ -8,12 +8,6 @@
 
 .title {
   font: var(--font-h1);
-}
-
-.lead {
-  margin-top: var(--space-2x);
-  font: var(--font-body-m);
-  color: var(--color-text-secondary);
 }
 
 .actions {

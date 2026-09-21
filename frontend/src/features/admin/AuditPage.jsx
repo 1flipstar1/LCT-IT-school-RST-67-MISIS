@@ -70,7 +70,6 @@ export function AuditPage() {
     <>
       <PageHeader
         title="Журнал действий"
-        description="Кто, что и когда менял. Журнал нельзя редактировать — он нужен для разбора спорных ситуаций и проверок по 152-ФЗ и приказу ФСТЭК № 117."
       />
       <div className={styles.filters}>
         <SearchField className={styles.search} value={query} onChange={setQuery} placeholder="Действие или объект" />

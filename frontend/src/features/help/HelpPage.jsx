@@ -28,7 +28,7 @@ export function HelpPage() {
 
   return (
     <>
-      <PageHeader title="Справка" description="Короткие инструкции по основным задачам. Если что-то не получается — найдите код ошибки ниже или напишите в поддержку." />
+      <PageHeader title="Справка" />
 
       <Tabs label="Разделы справки" tabs={sections} value={section} onChange={(value) => navigate(`${pathname}?section=${value}`)} className={styles.tabs} />
 

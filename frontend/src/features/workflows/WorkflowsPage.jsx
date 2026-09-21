@@ -86,7 +86,6 @@ export function WorkflowsPage() {
     <>
       <PageHeader
         title="Этапы работы"
-        description="Шаги, через которые проходит работа с каждым вузом: от поиска контактов до контроля. Здесь меняют названия, порядок и сроки этапов. Для другой аудитории, например школ, можно завести отдельный набор этапов."
         actions={
           <Button variant="primary" icon={AddIcon} onClick={createWorkflow}>
             Новый набор этапов

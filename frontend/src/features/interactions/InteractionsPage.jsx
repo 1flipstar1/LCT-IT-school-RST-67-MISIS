@@ -66,7 +66,6 @@ export function InteractionsPage() {
     <>
       <PageHeader
         title="Взаимодействия"
-        description="Работа с вузами по ИТ-направлениям. Откройте карточку, чтобы сменить этап, оставить комментарий или приложить файлы."
         actions={
           <Button variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>
             Новое взаимодействие

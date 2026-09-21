@@ -75,7 +75,7 @@ export function ReportsPage() {
 
   return (
     <>
-      <PageHeader title="Отчёты" description="Выгрузка взаимодействий с вузами за период в XLSX, XLS или PDF. Выберите фильтры, колонки и формат." />
+      <PageHeader title="Отчёты" />
 
       <div className={styles.layout}>
         <Card className={styles.builder}>

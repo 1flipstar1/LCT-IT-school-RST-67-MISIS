@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useSession } from '../../auth/SessionProvider.jsx';
-import { IMPORT_FIELDS } from '../../domain/import.js';
 import { PERMISSION } from '../../domain/roles.js';
 import { usePersistentState } from '../../lib/usePersistentState.js';
 import { useManagers } from '../../store/selectors.js';
@@ -81,7 +80,6 @@ export function CatalogsPage() {
     <>
       <PageHeader
         title="Справочники"
-        description={`Единые списки для всей системы. Обновляются загрузкой Excel-файла с полями: ${IMPORT_FIELDS.map((field) => field.label).join(', ')}.`}
         actions={
           can(PERMISSION.importCatalogs) && (
             <>

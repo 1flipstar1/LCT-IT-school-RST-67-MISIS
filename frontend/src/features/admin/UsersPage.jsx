@@ -126,7 +126,6 @@ export function UsersPage() {
     <>
       <PageHeader
         title="Пользователи и доступ"
-        description="Роль определяет, что человек может делать. Видимость — какие вузы он видит. Учётные записи создаются в Keycloak, здесь настраиваются права."
       />
 
       <section className={styles.roles} aria-label="Описание ролей">

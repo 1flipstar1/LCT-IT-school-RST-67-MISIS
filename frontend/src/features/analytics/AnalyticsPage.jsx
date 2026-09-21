@@ -88,7 +88,6 @@ export function AnalyticsPage() {
     <div ref={pageRef}>
       <PageHeader
         title="Аналитика"
-        description="Востребованность ИТ-направлений по данным LMS и ход работы с вузами. Графики скачиваются в PNG, вся страница — в PDF."
         actions={
           <Button icon={DownloadIcon} onClick={exportPdf} disabled={exporting}>
             {exporting ? 'Формируем PDF…' : 'Скачать PDF'}
