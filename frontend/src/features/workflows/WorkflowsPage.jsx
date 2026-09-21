@@ -1,13 +1,11 @@
 import { useMemo, useState } from 'react';
-import { createId, formatDate, plural } from '../../domain/format.js';
+import { createId } from '../../domain/format.js';
 import { PHASES } from '../../domain/workflow.js';
-import { cn } from '../../lib/cn.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
 import { useActions } from '../../store/useActions.js';
-import { Badge } from '../../ui/Badge.jsx';
 import { Button } from '../../ui/Button.jsx';
-import { Card, CardHeader } from '../../ui/Card.jsx';
-import { Checkbox, SelectField, TextField } from '../../ui/Field.jsx';
+import { Card } from '../../ui/Card.jsx';
+import { Checkbox, SelectMenuField, TextField } from '../../ui/Field.jsx';
 import { IconButton } from '../../ui/IconButton.jsx';
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, TrashIcon } from '../../ui/icons.js';
 import { InlineAlert } from '../../ui/InlineAlert.jsx';
@@ -93,108 +91,91 @@ export function WorkflowsPage() {
         }
       />
 
-      <div className={styles.layout}>
-        <nav className={styles.list} aria-label="Наборы этапов">
-          {listed.map((workflow) => {
-            const count = interactions.filter((item) => item.workflowId === workflow.id).length;
-            const unsaved = Boolean(drafts[workflow.id]);
+      <Card>
+        {listed.length > 1 && (
+          <SelectMenuField
+            className={styles.picker}
+            label="Набор этапов"
+            value={selectedId}
+            options={listed.map((workflow) => ({
+              value: workflow.id,
+              label: `${(drafts[workflow.id] ?? workflow).name || 'Без названия'}${drafts[workflow.id] ? ' — не сохранено' : ''}`,
+            }))}
+            onChange={(id) => {
+              setSelectedId(id);
+              setProblems([]);
+            }}
+          />
+        )}
+
+        <div className={styles.meta}>
+          <TextField label="Название набора этапов" required value={draft.name} onChange={(event) => updateDraft((workflow) => ({ ...workflow, name: event.target.value }))} />
+          <TextField label="Для кого эти этапы" value={draft.description} onChange={(event) => updateDraft((workflow) => ({ ...workflow, description: event.target.value }))} />
+        </div>
+
+        <ol className={styles.stages}>
+          {draft.stages.map((stage, index) => {
+            const usage = usageByStage.get(stage.id) ?? 0;
             return (
-              <button
-                key={workflow.id}
-                type="button"
-                className={cn(styles.listItem, workflow.id === selectedId && styles.listItemActive)}
-                onClick={() => {
-                  setSelectedId(workflow.id);
-                  setProblems([]);
-                }}
-                aria-current={workflow.id === selectedId}
-              >
-                <span className={styles.listName}>{(drafts[workflow.id] ?? workflow).name || 'Без названия'}</span>
-                <span className={styles.listMeta}>
-                  {workflow.stages.length} {plural(workflow.stages.length, ['этап', 'этапа', 'этапов'])} · {count} {plural(count, ['взаимодействие', 'взаимодействия', 'взаимодействий'])}
-                </span>
-                {unsaved && <Badge tone="warning">Не сохранено</Badge>}
-              </button>
+              <li key={stage.id} className={styles.stage}>
+                <div className={styles.stageOrder}>
+                  <span className={styles.stageNumber}>{index + 1}</span>
+                  <IconButton icon={ArrowUpIcon} size="s" label={`Поднять этап ${index + 1}`} disabled={index === 0} onClick={() => moveStage(index, -1)} />
+                  <IconButton
+                    icon={ArrowDownIcon}
+                    size="s"
+                    label={`Опустить этап ${index + 1}`}
+                    disabled={index === draft.stages.length - 1}
+                    onClick={() => moveStage(index, 1)}
+                  />
+                </div>
+                <div className={styles.stageFields}>
+                  <div className={styles.stageRow}>
+                    <TextField label="Название этапа" value={stage.name} onChange={(event) => updateStage(stage.id, { name: event.target.value })} className={styles.stageName} />
+                    <SelectMenuField label="Фаза" value={stage.phase} options={PHASE_OPTIONS} onChange={(phase) => updateStage(stage.id, { phase })} />
+                    <TextField label="Срок, дней" type="number" min={1} value={stage.slaDays} onChange={(event) => updateStage(stage.id, { slaDays: Number(event.target.value) })} />
+                  </div>
+                  <TextField label="Подсказка менеджеру: что сделать на этапе" value={stage.hint ?? ''} onChange={(event) => updateStage(stage.id, { hint: event.target.value })} />
+                  <div className={styles.stageFooter}>
+                    <Checkbox label="Необязательный этап" description="Можно пропустить с комментарием" checked={Boolean(stage.optional)} onChange={(optional) => updateStage(stage.id, { optional })} />
+                    <span className={styles.usage}>{usage > 0 ? `Сейчас на этапе: ${usage}` : 'Сейчас на этапе никого'}</span>
+                  </div>
+                </div>
+                <IconButton
+                  icon={TrashIcon}
+                  label={usage > 0 ? `Нельзя удалить: на этапе ${usage} взаимод.` : `Удалить этап ${index + 1}`}
+                  disabled={usage > 0 || draft.stages.length <= 2}
+                  onClick={() => updateDraft((workflow) => ({ ...workflow, stages: workflow.stages.filter((item) => item.id !== stage.id) }))}
+                />
+              </li>
             );
           })}
-        </nav>
+        </ol>
 
-        <Card>
-          <CardHeader
-            title={isNew ? 'Новый набор этапов' : `Версия ${saved.version}`}
-            hint="Этапы выбранного набора по порядку: название, фаза, срок и необязательность. Каждое сохранение — новая версия набора."
-            description={isNew ? 'Заполните этапы и сохраните.' : `Изменено ${formatDate(saved.updatedAt)}. После сохранения появится версия ${saved.version + 1}.`}
-          />
+        <Button icon={AddIcon} onClick={() => updateDraft((workflow) => ({ ...workflow, stages: [...workflow.stages, newStage(workflow.stages.at(-1)?.phase)] }))}>
+          Добавить этап
+        </Button>
 
-          <div className={styles.meta}>
-            <TextField label="Название набора этапов" required value={draft.name} onChange={(event) => updateDraft((workflow) => ({ ...workflow, name: event.target.value }))} />
-            <TextField label="Для кого эти этапы" value={draft.description} onChange={(event) => updateDraft((workflow) => ({ ...workflow, description: event.target.value }))} />
-          </div>
+        {problems.length > 0 && (
+          <InlineAlert tone="danger" title="Изменения не сохранены" className={styles.problems}>
+            <ul>
+              {problems.map((problem) => (
+                <li key={problem}>{problem}</li>
+              ))}
+            </ul>
+          </InlineAlert>
+        )}
 
-          <ol className={styles.stages}>
-            {draft.stages.map((stage, index) => {
-              const usage = usageByStage.get(stage.id) ?? 0;
-              return (
-                <li key={stage.id} className={styles.stage}>
-                  <div className={styles.stageOrder}>
-                    <span className={styles.stageNumber}>{index + 1}</span>
-                    <IconButton icon={ArrowUpIcon} size="s" label={`Поднять этап ${index + 1}`} disabled={index === 0} onClick={() => moveStage(index, -1)} />
-                    <IconButton
-                      icon={ArrowDownIcon}
-                      size="s"
-                      label={`Опустить этап ${index + 1}`}
-                      disabled={index === draft.stages.length - 1}
-                      onClick={() => moveStage(index, 1)}
-                    />
-                  </div>
-                  <div className={styles.stageFields}>
-                    <div className={styles.stageRow}>
-                      <TextField label="Название этапа" value={stage.name} onChange={(event) => updateStage(stage.id, { name: event.target.value })} className={styles.stageName} />
-                      <SelectField label="Фаза" value={stage.phase} options={PHASE_OPTIONS} onChange={(event) => updateStage(stage.id, { phase: event.target.value })} />
-                      <TextField label="Срок, дней" type="number" min={1} value={stage.slaDays} onChange={(event) => updateStage(stage.id, { slaDays: Number(event.target.value) })} />
-                    </div>
-                    <TextField label="Подсказка менеджеру: что сделать на этапе" value={stage.hint ?? ''} onChange={(event) => updateStage(stage.id, { hint: event.target.value })} />
-                    <div className={styles.stageFooter}>
-                      <Checkbox label="Необязательный этап" description="Можно пропустить с комментарием" checked={Boolean(stage.optional)} onChange={(optional) => updateStage(stage.id, { optional })} />
-                      <span className={styles.usage}>{usage > 0 ? `Сейчас на этапе: ${usage}` : 'Сейчас на этапе никого'}</span>
-                    </div>
-                  </div>
-                  <IconButton
-                    icon={TrashIcon}
-                    label={usage > 0 ? `Нельзя удалить: на этапе ${usage} взаимод.` : `Удалить этап ${index + 1}`}
-                    disabled={usage > 0 || draft.stages.length <= 2}
-                    onClick={() => updateDraft((workflow) => ({ ...workflow, stages: workflow.stages.filter((item) => item.id !== stage.id) }))}
-                  />
-                </li>
-              );
-            })}
-          </ol>
-
-          <Button icon={AddIcon} onClick={() => updateDraft((workflow) => ({ ...workflow, stages: [...workflow.stages, newStage(workflow.stages.at(-1)?.phase)] }))}>
-            Добавить этап
+        <footer className={styles.footer}>
+          <span className={styles.dirty}>{isDirty ? 'Есть несохранённые изменения' : 'Все изменения сохранены'}</span>
+          <Button onClick={discard} disabled={!isDirty}>
+            {isNew ? 'Удалить черновик' : 'Отменить изменения'}
           </Button>
-
-          {problems.length > 0 && (
-            <InlineAlert tone="danger" title="Изменения не сохранены" className={styles.problems}>
-              <ul>
-                {problems.map((problem) => (
-                  <li key={problem}>{problem}</li>
-                ))}
-              </ul>
-            </InlineAlert>
-          )}
-
-          <footer className={styles.footer}>
-            <span className={styles.dirty}>{isDirty ? 'Есть несохранённые изменения' : 'Все изменения сохранены'}</span>
-            <Button onClick={discard} disabled={!isDirty}>
-              {isNew ? 'Удалить черновик' : 'Отменить изменения'}
-            </Button>
-            <Button variant="primary" onClick={save} disabled={!isDirty}>
-              Сохранить
-            </Button>
-          </footer>
-        </Card>
-      </div>
+          <Button variant="primary" onClick={save} disabled={!isDirty}>
+            Сохранить
+          </Button>
+        </footer>
+      </Card>
     </>
   );
 }

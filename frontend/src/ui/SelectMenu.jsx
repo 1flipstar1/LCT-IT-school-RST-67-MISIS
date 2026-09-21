@@ -1,13 +1,16 @@
 import { Select } from '@base-ui/react/select';
+import { cn } from '../lib/cn.js';
 import { ChevronDownIcon, CheckIcon } from './icons.js';
 import popupStyles from './Popup.module.css';
 import styles from './SelectMenu.module.css';
 
-/** Компактный выбор одного значения для ячеек таблицы. */
-export function SelectMenu({ label, value, options, onChange, disabled, title }) {
+/**
+ * Выбор одного значения: компактный — для ячеек таблицы, fullWidth — для полей формы (см. SelectMenuField).
+ */
+export function SelectMenu({ id, label, value, options, onChange, disabled, title, fullWidth = false }) {
   return (
     <Select.Root value={value} onValueChange={onChange} disabled={disabled} items={options} modal={false}>
-      <Select.Trigger className={styles.trigger} aria-label={label} title={title}>
+      <Select.Trigger id={id} className={cn(styles.trigger, fullWidth && styles.fullWidth)} aria-label={label} title={title}>
         <Select.Value className={styles.value} />
         <ChevronDownIcon size={16} fill="currentColor" aria-hidden="true" />
       </Select.Trigger>

@@ -16,6 +16,11 @@
   text-align: left;
 }
 
+/* В форме список растягивается на всю ширину поля, как соседние поля ввода. */
+.fullWidth {
+  max-width: none;
+}
+
 .trigger:hover:not(:disabled) {
   border-color: var(--color-text-tertiary);
 }

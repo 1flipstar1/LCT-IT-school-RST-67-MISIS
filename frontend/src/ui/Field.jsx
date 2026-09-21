@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { cn } from '../lib/cn.js';
 import { CheckIcon, ChevronDownIcon, SearchIcon } from './icons.js';
 import styles from './Field.module.css';
+import { SelectMenu } from './SelectMenu.jsx';
 
 /**
  * Поля форм. Нативные input/select/textarea: доступны с клавиатуры и скринридерам,
@@ -68,6 +69,16 @@ export function TextAreaField({ label, hint, error, required, className, rows = 
 }
 
 /** options: [{ value, label }]; placeholder — пустой первый пункт. */
+/** Выбор значения в форме: подпись как у остальных полей, список — как в «Пользователях и доступе». */
+export function SelectMenuField({ label, hint, error, required, className, value, options, onChange }) {
+  const id = useId();
+  return (
+    <FieldShell id={id} label={label} hint={hint} error={error} required={required} className={className}>
+      <SelectMenu id={id} label={label} value={value} options={options} onChange={onChange} fullWidth />
+    </FieldShell>
+  );
+}
+
 export function SelectField({ label, hint, error, required, className, options, placeholder, ...selectProps }) {
   const id = useId();
   return (

@@ -112,7 +112,7 @@ export function DashboardScreen() {
 
   return (
     <LegacyScreen className="legacy-dashboard">
-      <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`} hint="Главная: сколько вузов в работе, распределение заявок по этапам, срочные взаимодействия и последние действия.">
+      <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`}>
         <LegacyButton icon={<FilterIcon size={16} fill="currentColor" />}>
           Все менеджеры
         </LegacyButton>
