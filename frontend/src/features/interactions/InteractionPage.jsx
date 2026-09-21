@@ -17,7 +17,6 @@ import { Tabs } from '../../ui/Tabs.jsx';
 import { ErrorPage } from '../errors/ErrorPage.jsx';
 import { AssignManagerDialog } from './AssignManagerDialog.jsx';
 import { CommentComposer } from './components/CommentComposer.jsx';
-import { ContractDetails } from './components/ContractDetails.jsx';
 import { EventFeed } from './components/EventFeed.jsx';
 import { SlaBadge } from './components/SlaBadge.jsx';
 import { StageStepper } from './components/StageStepper.jsx';
@@ -116,7 +115,6 @@ function InteractionView({ row }) {
               tabs={[
                 { value: 'history', label: 'История', count: ownEvents.length },
                 { value: 'files', label: 'Файлы', count: fileCount },
-                { value: 'contract', label: 'Данные договора' },
               ]}
             />
             <div className={styles.tabPanel} role="tabpanel">
@@ -127,7 +125,6 @@ function InteractionView({ row }) {
                 </div>
               )}
               {tab === 'files' && <FilesByStage groups={filesByStage} users={index.users} />}
-              {tab === 'contract' && <ContractDetails row={row} />}
             </div>
           </Card>
         </div>

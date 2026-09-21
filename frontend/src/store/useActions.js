@@ -161,21 +161,6 @@ export function useActions() {
         });
       },
 
-      updateInteraction({ interactionId, patch }) {
-        const state = getState();
-        const interaction = findInteraction(state, interactionId);
-        const at = now();
-
-        return undoable({
-          type: ACTION.interactionUpdated,
-          payload: {
-            interactionId,
-            patch,
-            audit: { at, actorId, text: 'Изменены данные договора', target: interactionTarget(state, interaction) },
-          },
-        });
-      },
-
       createInteraction({ universityId, newUniversityName, directionId, productId, workflowId, managerId, comment = '', source = 'manual' }) {
         const state = getState();
         const at = now();

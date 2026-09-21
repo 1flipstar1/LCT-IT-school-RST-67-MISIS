@@ -9,7 +9,6 @@ export const ACTION = Object.freeze({
   interactionTransitioned: 'interaction/transitioned',
   interactionCommented: 'interaction/commented',
   interactionAssigned: 'interaction/assigned',
-  interactionUpdated: 'interaction/updated',
   workflowSaved: 'workflow/saved',
   userUpdated: 'user/updated',
   inboxResolved: 'inbox/resolved',
@@ -57,8 +56,7 @@ export function reducer(state, action) {
       return withAudit({ ...state, interactions, events: [...state.events, event] }, audit);
     }
 
-    case ACTION.interactionAssigned:
-    case ACTION.interactionUpdated: {
+    case ACTION.interactionAssigned: {
       const { interactionId, patch, event, audit } = payload;
       const interactions = replaceById(state.interactions, interactionId, (item) => ({ ...item, ...patch, updatedAt: audit.at }));
       const events = event ? [...state.events, event] : state.events;
