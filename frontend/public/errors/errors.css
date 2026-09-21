@@ -1,0 +1,139 @@
+/*
+ * Статические страницы ошибок веб-сервера (nginx error_page): их показывают, когда само
+ * приложение загрузить нельзя. Значения — те же токены, что в src/styles/tokens.css,
+ * шрифт — Rostelecom Basis из design/font (копия лежит рядом, в fonts/).
+ */
+@font-face {
+  font-family: 'RostelecomBasis';
+  src: url('fonts/RostelecomBasis-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RostelecomBasis';
+  src: url('fonts/RostelecomBasis-Medium.otf') format('opentype');
+  font-weight: 500 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RostelecomBasis';
+  src: url('fonts/RostelecomBasis-Bold.otf') format('opentype');
+  font-weight: 700 800;
+  font-display: swap;
+}
+
+:root {
+  --color-bg: #f4f4f5;
+  --color-surface: #ffffff;
+  --color-brand: #8300ff;
+  --color-brand-hover: #6f00db;
+  --color-border-strong: #d4d4d8;
+  --color-text: #1d1d22;
+  --color-text-secondary: #56565f;
+  --color-text-tertiary: #6e6e78;
+  --color-text-on-brand: #ffffff;
+  --space-2x: 8px;
+  --space-3x: 12px;
+  --space-4x: 16px;
+  --space-6x: 24px;
+  --space-8x: 32px;
+  --space-12x: 48px;
+  --radius-m: 8px;
+  --radius-xl: 16px;
+  --font-family: 'RostelecomBasis', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: var(--space-4x);
+  background: var(--color-bg);
+  font: 400 16px/24px var(--font-family);
+  color: var(--color-text);
+}
+
+main {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3x);
+  width: 100%;
+  max-width: 560px;
+  padding: var(--space-12x) var(--space-8x);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.logo {
+  width: 148px;
+  height: auto;
+  margin-bottom: var(--space-6x);
+}
+
+/* display-l-strong 48/52 — крупный номер ошибки */
+.number {
+  margin: 0;
+  font: 700 48px/52px var(--font-family);
+  color: var(--color-brand);
+}
+
+/* heading-h2 22/24 */
+h1 {
+  margin: 0;
+  font: 700 22px/24px var(--font-family);
+}
+
+/* body-m 16/24 */
+.hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3x);
+  margin-top: var(--space-4x);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-4x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  font: 500 14px/20px var(--font-family);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.button:hover {
+  border-color: var(--color-brand);
+}
+
+.primary {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+
+.primary:hover {
+  background: var(--color-brand-hover);
+}
+
+/* description-l 12/16 */
+.code {
+  margin: var(--space-4x) 0 0;
+  font: 400 12px/16px var(--font-family);
+  color: var(--color-text-tertiary);
+}

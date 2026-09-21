@@ -56,7 +56,77 @@ export const ERROR_CODES = {
     title: 'Что-то пошло не так',
     hint: 'Обновите страницу. Если ошибка повторяется, сообщите код в поддержку.',
   },
+  // Частые ошибки работы сайта: их показывает страница /error/:status и статические страницы сервера.
+  'REQUEST-400': {
+    title: 'Некорректный запрос',
+    hint: 'Сервер не понял запрос — возможно, ссылка повреждена. Вернитесь на главную и повторите действие.',
+  },
+  'TIMEOUT-408': {
+    title: 'Сервер не дождался запроса',
+    hint: 'Соединение было слишком медленным. Проверьте интернет и попробуйте ещё раз.',
+  },
+  'LIMIT-429': {
+    title: 'Слишком много запросов',
+    hint: 'Подождите минуту и попробуйте снова — так система защищается от перегрузки.',
+  },
+  'SERVER-500': {
+    title: 'Ошибка на сервере',
+    hint: 'Сервер не смог выполнить запрос. Попробуйте через несколько минут; если ошибка повторяется, сообщите код в поддержку.',
+  },
+  'GATEWAY-502': {
+    title: 'Сервер временно недоступен',
+    hint: 'Промежуточный сервер получил неверный ответ. Обычно это проходит за пару минут — обновите страницу.',
+  },
+  'UNAVAILABLE-503': {
+    title: 'Сервис временно недоступен',
+    hint: 'Идут технические работы или сервер перегружен. Зайдите через несколько минут — данные не потеряются.',
+  },
+  'GATEWAY-504': {
+    title: 'Сервер не ответил вовремя',
+    hint: 'Запрос обрабатывался слишком долго. Обновите страницу; если ошибка повторяется, сообщите код в поддержку.',
+  },
+  'PROTOCOL-505': {
+    title: 'Браузер устарел для этого сайта',
+    hint: 'Сервер не поддерживает версию протокола, которую использует браузер. Обновите браузер или откройте сайт в другом.',
+  },
+  'NETWORK-0': {
+    title: 'Нет подключения к интернету',
+    hint: 'Страница не загрузилась: пропала связь. Проверьте интернет и обновите страницу.',
+  },
 };
+
+/** HTTP-статус ответа сервера → код ошибки из каталога. 0 — запрос не дошёл до сервера (нет сети). */
+const STATUS_CODES = {
+  0: 'NETWORK-0',
+  400: 'REQUEST-400',
+  401: 'AUTH-401',
+  403: 'ACCESS-403',
+  404: 'NOT-FOUND-404',
+  408: 'TIMEOUT-408',
+  429: 'LIMIT-429',
+  500: 'SERVER-500',
+  502: 'GATEWAY-502',
+  503: 'UNAVAILABLE-503',
+  504: 'GATEWAY-504',
+  505: 'PROTOCOL-505',
+};
+
+export function errorCodeForStatus(status) {
+  if (STATUS_CODES[status]) return STATUS_CODES[status];
+  if (status >= 500 && status <= 599) return 'SERVER-500';
+  if (status >= 400 && status <= 499) return 'REQUEST-400';
+  return null;
+}
+
+/** Временные сбои: их имеет смысл просто повторить. */
+const RETRYABLE = new Set(['TIMEOUT-408', 'LIMIT-429', 'SERVER-500', 'GATEWAY-502', 'UNAVAILABLE-503', 'GATEWAY-504', 'NETWORK-0', 'APP-500']);
+export const isRetryable = (code) => RETRYABLE.has(code);
+
+/** Номер ошибки для крупной надписи на странице: «NOT-FOUND-404» → «404». У «NETWORK-0» номера нет. */
+export function errorNumber(code) {
+  const number = Number(code.split('-').at(-1));
+  return number > 0 ? String(number) : null;
+}
 
 export class AppError extends Error {
   constructor(code, details) {
@@ -70,4 +140,15 @@ export class AppError extends Error {
 export function describeError(error) {
   const code = error instanceof AppError ? error.code : 'APP-500';
   return { code, ...ERROR_CODES[code] };
+}
+
+/**
+ * Код для ошибки, из-за которой не отрисовалась страница. Если не догрузился файл страницы
+ * (пропала сеть или вышла новая версия), это не поломка интерфейса, а проблема связи.
+ */
+export function codeForRenderError(error) {
+  if (error instanceof AppError) return error.code;
+  const message = String(error?.message ?? '');
+  const isChunkLoad = error?.name === 'ChunkLoadError' || /dynamically imported module|Importing a module script failed/i.test(message);
+  return isChunkLoad ? 'NETWORK-0' : 'APP-500';
 }

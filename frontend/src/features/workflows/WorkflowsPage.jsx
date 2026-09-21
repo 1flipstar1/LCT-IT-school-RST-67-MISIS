@@ -108,11 +108,6 @@ export function WorkflowsPage() {
           />
         )}
 
-        <div className={styles.meta}>
-          <TextField label="Название набора этапов" required value={draft.name} onChange={(event) => updateDraft((workflow) => ({ ...workflow, name: event.target.value }))} />
-          <TextField label="Для кого эти этапы" value={draft.description} onChange={(event) => updateDraft((workflow) => ({ ...workflow, description: event.target.value }))} />
-        </div>
-
         <ol className={styles.stages}>
           {draft.stages.map((stage, index) => {
             const usage = usageByStage.get(stage.id) ?? 0;
