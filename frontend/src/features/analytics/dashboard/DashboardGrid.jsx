@@ -26,7 +26,7 @@ const RESIZE_HYSTERESIS = 8;
 const sizeSpan = (size, columns) => {
   if (size === 's') return 1;
   if (size === 'm') return Math.min(2, columns);
-  return columns;
+  return Math.min(3, columns);
 };
 
 /** Ближайшая реальная ячейка CSS Grid; transform-анимации соседей на расчёт не влияют. */
