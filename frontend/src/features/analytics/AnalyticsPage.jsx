@@ -87,8 +87,7 @@ export function AnalyticsPage() {
   return (
     <div ref={pageRef}>
       <PageHeader
-        title="Аналитика"
-        description="Востребованность ИТ-направлений по данным LMS и ход работы с вузами. Графики скачиваются в PNG, вся страница — в PDF."
+        title="Аналитика" hint="Востребованность ИТ-направлений по данным LMS и ход работы с вузами. Графики скачиваются в PNG, вся страница — в PDF."
         actions={
           <Button icon={DownloadIcon} onClick={exportPdf} disabled={exporting}>
             {exporting ? 'Формируем PDF…' : 'Скачать PDF'}
@@ -99,16 +98,17 @@ export function AnalyticsPage() {
       <FilterBar filters={filters} onChange={setFilters} show={{ search: false }} />
 
       <section className={styles.stats} aria-label="Итоги за период">
-        <StatTile label="Заявок на обучение" value={formatNumber(totals.applications)} hint="Сумма за выбранный период" icon={ReportIcon} />
-        <StatTile label="Обучающихся" value={formatNumber(totals.students)} hint={lastMonth ? `По данным LMS за ${formatMonth(lastMonth).toLowerCase()}` : 'Нет данных'} icon={EducationIcon} />
-        <StatTile label="Параллельных потоков" value={formatNumber(totals.streams)} hint="Идут одновременно сейчас" icon={UsersIcon} />
-        <StatTile label="Взаимодействий" value={rows.length} hint="С учётом фильтров" icon={InteractionsIcon} href="/interactions" />
+        <StatTile label="Заявок на обучение" hint="Сколько заявок на обучение пришло из LMS за выбранный период по выбранным вузам и направлениям." value={formatNumber(totals.applications)} caption="Сумма за выбранный период" icon={ReportIcon} />
+        <StatTile label="Обучающихся" hint="Сколько человек учится по программам ИТ Школы — по последним данным LMS." value={formatNumber(totals.students)} caption={lastMonth ? `По данным LMS за ${formatMonth(lastMonth).toLowerCase()}` : 'Нет данных'} icon={EducationIcon} />
+        <StatTile label="Параллельных потоков" hint="Сколько учебных потоков идёт одновременно прямо сейчас." value={formatNumber(totals.streams)} caption="Идут одновременно сейчас" icon={UsersIcon} />
+        <StatTile label="Взаимодействий" hint="Сколько взаимодействий с вузами попало под фильтры. Нажмите на плитку, чтобы открыть их списком." value={rows.length} caption="С учётом фильтров" icon={InteractionsIcon} href="/interactions" />
       </section>
 
       <div className={styles.grid}>
         <ChartCard
           id="analytics-applications"
           title="Заявки на обучение по месяцам"
+          hint="Сколько заявок на обучение пришло за каждый месяц по данным LMS."
           description="Все выбранные вузы и направления. Наведите на график, чтобы увидеть точное число."
           chart={
             <LineChart
@@ -130,6 +130,7 @@ export function AnalyticsPage() {
         <ChartCard
           id="analytics-ranking"
           title="Рейтинг ИТ-направлений"
+          hint="Какие программы востребованнее. Индекс от 0 до 100 складывается из заявок, обучающихся и потоков."
           description="Индекс востребованности от 0 до 100: чем выше, тем больше спрос на программу."
           chart={
             <BarChart
@@ -164,6 +165,7 @@ export function AnalyticsPage() {
         <ChartCard
           id="analytics-stages"
           title="Взаимодействия по этапам"
+          hint="На каком этапе сейчас работа с вузами: сколько взаимодействий на каждом этапе."
           description="Где сейчас находится работа с вузами. Нажмите на этап, чтобы открыть список."
           chart={
             <BarChart
@@ -190,6 +192,7 @@ export function AnalyticsPage() {
           <ChartCard
             id="analytics-workload"
             title="Нагрузка на менеджеров"
+            hint="Сколько взаимодействий ведёт каждый менеджер и сколько из них просрочено."
             description="Сколько взаимодействий ведёт каждый менеджер. В подсказке — сколько из них просрочено."
             chart={
               <BarChart

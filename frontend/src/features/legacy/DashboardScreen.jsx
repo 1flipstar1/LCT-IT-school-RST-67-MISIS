@@ -22,6 +22,7 @@ import {
 import { NewInteractionDialog } from '../interactions/NewInteractionDialog.jsx';
 import { describeEvent } from '../interactions/components/EventFeed.jsx';
 import { countCardsByStage, LEGACY_CARDS, LEGACY_UNIVERSITIES, sortableDate } from './legacyData.js';
+import { Hint } from '../../ui/Hint.jsx';
 import { Kpi, LegacyButton, LegacyScreen, PageHeader, UniversityCell } from './legacyUi.jsx';
 import './DashboardScreen.css';
 
@@ -111,7 +112,7 @@ export function DashboardScreen() {
 
   return (
     <LegacyScreen className="legacy-dashboard">
-      <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`}>
+      <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`} hint="Главная: сколько вузов в работе, распределение заявок по этапам, срочные взаимодействия и последние действия.">
         <LegacyButton icon={<FilterIcon size={16} fill="currentColor" />}>
           Все менеджеры
         </LegacyButton>
@@ -126,7 +127,9 @@ export function DashboardScreen() {
       <section ref={chartRef} className="panel stage-stats">
         <div className="panel-head">
           <div>
-            <h2>Распределение заявок по этапам</h2>
+            <Hint text="Сколько заявок на каждом из этапов обработки. Наведите на столбец или сектор, чтобы увидеть этап и число заявок.">
+              <h2>Распределение заявок по этапам</h2>
+            </Hint>
           </div>
           <button className="dots">
             <MoreIcon size={19} fill="currentColor" />
@@ -206,16 +209,18 @@ export function DashboardScreen() {
       <div className="dash-bottom">
         <div className="dash-left">
           <section className="kpi-grid">
-            <Kpi title="Вузов в работе" value={universitiesInProgress} icon={<UniversityIcon fill="currentColor" />} tone="indigo" />
-            <Kpi title="Контрактов подписано за этот месяц" value={contractsSignedThisMonth} icon={<DocumentIcon fill="currentColor" />} tone="orange" />
-            <Kpi title="Учебных программ актуализировано" value={updatedPrograms} icon={<EducationIcon fill="currentColor" />} tone="indigo" />
+            <Kpi title="Вузов в работе" hint="Сколько вузов сейчас в работе: у каждого есть незавершённое взаимодействие." value={universitiesInProgress} icon={<UniversityIcon fill="currentColor" />} tone="indigo" />
+            <Kpi title="Контрактов подписано за этот месяц" hint="Сколько договоров с вузами подписано в текущем месяце — по дате подписания лицензии." value={contractsSignedThisMonth} icon={<DocumentIcon fill="currentColor" />} tone="orange" />
+            <Kpi title="Учебных программ актуализировано" hint="Сколько программ (вуз + направление) уже прошли этап актуализации учебной программы." value={updatedPrograms} icon={<EducationIcon fill="currentColor" />} tone="indigo" />
           </section>
         </div>
         <div className="dash-right">
           <section className="panel dash-feed-panel dash-attention-panel" aria-labelledby="dash-attention-title">
             <div className="panel-head dash-feed-head">
               <div>
-                <h2 id="dash-attention-title">Требуют внимания <span className="dash-feed-count">{attentionRows.length}</span></h2>
+                <Hint text="Взаимодействия, у которых срок этапа истёк или истекает в ближайшие дни. Начните с верхних — у них меньше всего времени.">
+                  <h2 id="dash-attention-title">Требуют внимания <span className="dash-feed-count">{attentionRows.length}</span></h2>
+                </Hint>
               </div>
             </div>
             <div className="dash-feed-list">
@@ -240,7 +245,9 @@ export function DashboardScreen() {
           <section className="panel dash-feed-panel dash-activity-panel" aria-labelledby="dash-activity-title">
             <div className="panel-head dash-feed-head">
               <div>
-                <h2 id="dash-activity-title">Последние действия</h2>
+                <Hint text="Что происходило во взаимодействиях: смена этапа, комментарии и файлы. Сначала самые свежие.">
+                  <h2 id="dash-activity-title">Последние действия</h2>
+                </Hint>
               </div>
             </div>
             <div className="dash-feed-list">
@@ -264,7 +271,9 @@ export function DashboardScreen() {
 
       <section className="panel table-panel dashboard-universities">
         <div className="panel-head dashboard-universities-head">
-          <h2>Заявки</h2>
+          <Hint text="Последние заявки вузов: продукт и направление, текущий статус и ответственный менеджер.">
+            <h2>Заявки</h2>
+          </Hint>
         </div>
         <div className="dashboard-universities-table">
           <table>

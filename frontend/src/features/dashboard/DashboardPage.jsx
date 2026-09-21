@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { useRouter } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { filterInteractionRows } from '../../domain/filters.js';
-import { formatRelativeDateTime, plural } from '../../domain/format.js';
+import { formatRelativeDateTime } from '../../domain/format.js';
 import { PERMISSION } from '../../domain/roles.js';
-import { needsAttention, SLA_STATE } from '../../domain/workflow.js';
+import { needsAttention } from '../../domain/workflow.js';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { useManagers, useVisibleInteractionRows } from '../../store/selectors.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
@@ -51,7 +51,6 @@ export function DashboardPage() {
     () => rows.filter((row) => needsAttention(row.sla)).sort((a, b) => a.sla.daysLeft - b.sla.daysLeft),
     [rows],
   );
-  const overdue = attentionRows.filter((row) => row.sla.state === SLA_STATE.overdue).length;
 
   const recentRows = useMemo(() => [...rows].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, RECENT_LIMIT), [rows]);
   const lms = integrations.sources.find((source) => source.id === 'lms');
@@ -61,16 +60,9 @@ export function DashboardPage() {
   return (
     <>
       <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>
-            {greeting()}, {user.name.split(' ')[0]}
-          </h1>
-          <p className={styles.lead}>
-            {overdue > 0
-              ? `${overdue} ${plural(overdue, ['взаимодействие просрочено', 'взаимодействия просрочены', 'взаимодействий просрочено'])} — начните с них.`
-              : 'Просроченных этапов нет — всё идёт по плану.'}
-          </p>
-        </div>
+        <h1 className={styles.title}>
+          {greeting()}, {user.name.split(' ')[0]}
+        </h1>
         <div className={styles.actions}>
           {can(PERMISSION.importCatalogs) ? (
             <ButtonLink to="/catalogs/import" icon={UploadIcon}>

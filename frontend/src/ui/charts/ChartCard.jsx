@@ -18,7 +18,7 @@ const VIEWS = [
  * Карточка графика: у каждого графика есть табличный вид (точные числа, доступность)
  * и выгрузка в PNG (ТЗ: визуализация статистики в форматах png, pdf).
  */
-export function ChartCard({ id, title, description, chart, table, footer }) {
+export function ChartCard({ id, title, description, hint, chart, table, footer }) {
   const [view, setView] = usePersistentState(`chart-view:${id}`, 'chart');
   const chartRef = useRef(null);
 
@@ -31,6 +31,7 @@ export function ChartCard({ id, title, description, chart, table, footer }) {
       <CardHeader
         title={title}
         description={description}
+        hint={hint}
         actions={
           <>
             <SegmentedControl label={`Вид: ${title}`} options={VIEWS} value={view} onChange={setView} />

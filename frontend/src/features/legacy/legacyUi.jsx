@@ -1,4 +1,5 @@
 import { Button as AtomaroButton } from '@atomaro/ui-kit';
+import { Hint } from '../../ui/Hint.jsx';
 import { universityLogo } from './legacyData.js';
 import './legacy.css';
 
@@ -15,10 +16,13 @@ export function LegacyScreen({ children, className = '' }) {
   return <div className={`legacy ${className}`.trim()}>{children}</div>;
 }
 
-export function PageHeader({ title, children }) {
+/** hint — что это за раздел, всплывает при наведении на заголовок. */
+export function PageHeader({ title, hint, children }) {
   return (
     <div className="page-header">
-      <h1>{title}</h1>
+      <Hint text={hint} placement="bottomRight">
+        <h1>{title}</h1>
+      </Hint>
       <div className="page-actions">{children}</div>
     </div>
   );
@@ -37,12 +41,18 @@ export function LegacyButton({ children, primary = false, icon, className = '', 
   );
 }
 
-export function Kpi({ title, value, icon, tone }) {
+/** hint — что это за показатель, всплывает при наведении на название. */
+export function Kpi({ title, value, icon, tone, hint }) {
   return (
     <div className="kpi">
       <div className={`kpi-icon ${tone}`}>{icon}</div>
       <div className="kpi-body">
-        <span>{title}</span>
+        {/* Сетку плитки задаёт правило «.kpi-body > span», поэтому span остаётся снаружи, а подсказка — внутри. */}
+        <span>
+          <Hint text={hint}>
+            <span>{title}</span>
+          </Hint>
+        </span>
         <strong>{value}</strong>
       </div>
     </div>

@@ -36,12 +36,6 @@
   overflow-wrap: anywhere;
 }
 
-.description {
-  font: var(--font-body-m);
-  color: var(--color-text-secondary);
-  max-width: 72ch;
-}
-
 .meta {
   display: flex;
   flex-wrap: wrap;
@@ -67,10 +61,6 @@
 
   .title {
     font: var(--font-h2);
-  }
-
-  .description {
-    font: var(--font-body-s);
   }
 
   .actions {

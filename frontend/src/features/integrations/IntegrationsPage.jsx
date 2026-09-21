@@ -10,6 +10,7 @@ import { useActions } from '../../store/useActions.js';
 import { Badge } from '../../ui/Badge.jsx';
 import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
+import { Hint } from '../../ui/Hint.jsx';
 import { DataTable } from '../../ui/DataTable.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
 import { AddIcon, ErrorIcon, LinkIcon, SuccessIcon, SyncIcon } from '../../ui/icons.js';
@@ -29,8 +30,7 @@ export function IntegrationsPage() {
   return (
     <>
       <PageHeader
-        title="Интеграции"
-        description="LMS и сайт ИТ Школы передают данные по API в формате JSON. Новые записи разберите: добавьте к существующему взаимодействию или создайте новое."
+        title="Интеграции" hint="LMS и сайт ИТ Школы передают данные по API в формате JSON. Новые записи разберите: добавьте к существующему взаимодействию или создайте новое."
       />
 
       <section className={styles.sources} aria-label="Источники данных">
@@ -40,7 +40,7 @@ export function IntegrationsPage() {
       </section>
 
       <Card className={styles.inbox}>
-        <CardHeader title="Входящие записи" description="Всё, что пришло из внешних систем и ещё не привязано к работе с вузом." />
+        <CardHeader title="Входящие записи" hint="Данные из LMS и с сайта ИТ Школы, которые ещё не привязаны к работе с вузом. Добавьте запись к существующему взаимодействию или создайте новое." description="Всё, что пришло из внешних систем и ещё не привязано к работе с вузом." />
         <Tabs
           label="Входящие записи"
           value={tab}
@@ -59,7 +59,7 @@ export function IntegrationsPage() {
       </Card>
 
       <Card padding="none">
-        <CardHeader title="Журнал синхронизаций" description="Последние обмены данными с внешними системами." />
+        <CardHeader title="Журнал синхронизаций" hint="Когда система обменивалась данными с LMS и сайтом по API и чем закончился каждый обмен." description="Последние обмены данными с внешними системами." />
         <SyncLog log={integrations.log} sources={integrations.sources} />
       </Card>
     </>
@@ -88,7 +88,9 @@ function SourceCard({ source }) {
     <Card>
       <div className={styles.sourceHead}>
         <div>
-          <h2 className={styles.sourceName}>{source.name}</h2>
+          <Hint text="Внешняя система: передаёт данные в CRM по API в формате JSON. Здесь видно, когда был последний обмен и всё ли прошло успешно.">
+            <h2 className={styles.sourceName}>{source.name}</h2>
+          </Hint>
           <p className={styles.sourceDescription}>{source.description}</p>
         </div>
         {failed ? (
@@ -182,7 +184,9 @@ function InboxItem({ item }) {
         <Badge tone="brand">{SOURCE_LABEL[item.source]}</Badge>
         <span className={styles.itemTime}>{formatRelativeDateTime(item.receivedAt)}</span>
       </div>
-      <h3 className={styles.itemTitle}>{item.title}</h3>
+      <Hint text="Запись, пришедшая из LMS или с сайта ИТ Школы: что в ней и к какому вузу она относится.">
+        <h3 className={styles.itemTitle}>{item.title}</h3>
+      </Hint>
       <p className={styles.itemMessage}>{payload.message}</p>
       <dl className={styles.itemFacts}>
         <div>

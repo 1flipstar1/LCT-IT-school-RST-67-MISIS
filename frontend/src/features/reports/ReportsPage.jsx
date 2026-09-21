@@ -10,6 +10,7 @@ import { useActions } from '../../store/useActions.js';
 import { Badge } from '../../ui/Badge.jsx';
 import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
+import { Hint } from '../../ui/Hint.jsx';
 import { DataTable } from '../../ui/DataTable.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
 import { Checkbox, TextField } from '../../ui/Field.jsx';
@@ -75,15 +76,15 @@ export function ReportsPage() {
 
   return (
     <>
-      <PageHeader title="Отчёты" description="Выгрузка взаимодействий с вузами за период в XLSX, XLS или PDF. Выберите фильтры, колонки и формат." />
+      <PageHeader title="Отчёты" hint="Выгрузка взаимодействий с вузами за период в XLSX, XLS или PDF. Выберите фильтры, колонки и формат." />
 
       <div className={styles.layout}>
         <Card className={styles.builder}>
-          <Step number={1} title="Период и фильтры" description={`Подходит ${rows.length} ${plural(rows.length, ['взаимодействие', 'взаимодействия', 'взаимодействий'])}`}>
+          <Step number={1} title="Период и фильтры" hint="Какие взаимодействия попадут в отчёт: период, вузы, направления, продукты и ответственные." description={`Подходит ${rows.length} ${plural(rows.length, ['взаимодействие', 'взаимодействия', 'взаимодействий'])}`}>
             <FilterBar filters={filters} onChange={setFilters} show={{ search: false }} />
           </Step>
 
-          <Step number={2} title="Колонки" description="Первые пять — стандартный набор отчёта.">
+          <Step number={2} title="Колонки" hint="Какие данные будут в отчёте и в каком порядке." description="Первые пять — стандартный набор отчёта.">
             <div className={styles.columns}>
               {REPORT_COLUMNS.map((column) => (
                 <Checkbox key={column.id} label={column.label} checked={columns.includes(column.id)} onChange={(checked) => toggleColumn(column.id, checked)} />
@@ -91,7 +92,7 @@ export function ReportsPage() {
             </div>
           </Step>
 
-          <Step number={3} title="Формат файла">
+          <Step number={3} title="Формат файла" hint="В каком файле скачать отчёт: XLSX или XLS — для работы в таблицах, PDF — для печати и отправки.">
             <div className={styles.formats} role="radiogroup" aria-label="Формат файла">
               {REPORT_FORMATS.map((item) => (
                 <label key={item.id} className={cn(styles.format, format === item.id && styles.formatChecked)}>
@@ -120,7 +121,7 @@ export function ReportsPage() {
         </Card>
 
         <Card padding="none" className={styles.preview}>
-          <CardHeader title="Предпросмотр" description={`${summary}. Показаны первые ${Math.min(PREVIEW_ROWS, rows.length)} из ${rows.length}.`} />
+          <CardHeader title="Предпросмотр" hint="Первые строки отчёта с выбранными колонками — так он будет выглядеть в файле." description={`${summary}. Показаны первые ${Math.min(PREVIEW_ROWS, rows.length)} из ${rows.length}.`} />
           {selectedColumns.length === 0 || rows.length === 0 ? (
             <EmptyState icon={ReportIcon} title="Нечего показать" description={selectedColumns.length === 0 ? 'Отметьте хотя бы одну колонку.' : 'Под фильтры не попало ни одного взаимодействия.'} />
           ) : (
@@ -134,7 +135,7 @@ export function ReportsPage() {
       </div>
 
       <Card padding="none">
-        <CardHeader title="История отчётов" description="Отчёт можно сформировать заново — с теми же фильтрами и колонками, но по актуальным данным." />
+        <CardHeader title="История отчётов" hint="Отчёты, которые уже формировали. Любой можно собрать заново по актуальным данным." description="Отчёт можно сформировать заново — с теми же фильтрами и колонками, но по актуальным данным." />
         <DataTable
           caption="История отчётов"
           rows={reports}
@@ -172,13 +173,15 @@ export function ReportsPage() {
   );
 }
 
-function Step({ number, title, description, children }) {
+function Step({ number, title, description, hint, children }) {
   return (
     <section className={styles.step}>
       <header className={styles.stepHeader}>
         <span className={styles.stepNumber}>{number}</span>
         <div>
-          <h2 className={styles.stepTitle}>{title}</h2>
+          <Hint text={hint}>
+            <h2 className={styles.stepTitle}>{title}</h2>
+          </Hint>
           {description && <p className={styles.stepDescription}>{description}</p>}
         </div>
       </header>

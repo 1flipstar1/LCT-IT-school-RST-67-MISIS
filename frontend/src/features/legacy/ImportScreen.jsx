@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { useToast } from '../../ui/Toast.jsx';
 import { ArrowRightIcon, CheckIcon, CheckLargeIcon, HelpIcon, UploadIcon, XlsxIcon } from '../../ui/icons.js';
+import { Hint } from '../../ui/Hint.jsx';
 import { LegacyButton, LegacyScreen, PageHeader } from './legacyUi.jsx';
 
 const STEPS = ['Загрузка файла', 'Сопоставление полей', 'Проверка', 'Результат'];
@@ -22,7 +23,7 @@ export function ImportScreen() {
 
   return (
     <LegacyScreen>
-      <PageHeader title="Импорт данных">
+      <PageHeader title="Импорт данных" hint="Загрузка данных о вузах из файла Excel в четыре шага: файл, сопоставление полей, проверка и результат.">
         <LegacyButton icon={<HelpIcon size={16} fill="currentColor" />}>Инструкция</LegacyButton>
       </PageHeader>
 
@@ -41,7 +42,9 @@ export function ImportScreen() {
               <div className="upload-icon">
                 <UploadIcon size={26} fill="currentColor" />
               </div>
-              <h2>Перетащите файл сюда</h2>
+              <Hint text="Первый шаг импорта: загрузите файл Excel с данными о вузах. В первой строке файла должны быть заголовки колонок.">
+                <h2>Перетащите файл сюда</h2>
+              </Hint>
               <p>или выберите его на компьютере</p>
               <LegacyButton primary onClick={() => setStep(1)} icon={<XlsxIcon size={16} fill="currentColor" />}>
                 Выбрать файл
@@ -66,7 +69,9 @@ export function ImportScreen() {
             <div className="success-icon">
               <CheckLargeIcon size={32} fill="currentColor" />
             </div>
-            <h2>Импорт завершён</h2>
+            <Hint text="Результат импорта: сколько записей добавлено, сколько пропущено и сколько с ошибками.">
+              <h2>Импорт завершён</h2>
+            </Hint>
             <p>Данные успешно добавлены в систему.</p>
             <div className="result-numbers">
               <div>
@@ -103,7 +108,9 @@ function FieldMapping({ onNext }) {
     <>
       <div className="import-title">
         <div>
-          <h2>Сопоставление полей</h2>
+          <Hint text="Проверьте, в какое поле системы попадёт каждая колонка файла. Лишние колонки можно не импортировать.">
+            <h2>Сопоставление полей</h2>
+          </Hint>
           <p>Проверьте, как колонки файла будут импортированы в систему.</p>
         </div>
         <span className="file-pill">
@@ -141,7 +148,9 @@ function Validation({ onNext }) {
           <CheckLargeIcon size={20} fill="currentColor" />
         </div>
         <div>
-          <h2>Файл готов к импорту</h2>
+          <Hint text="Итог проверки файла: сколько строк готово к загрузке и в скольких есть предупреждения.">
+            <h2>Файл готов к импорту</h2>
+          </Hint>
           <p>Проверка завершена без критических ошибок.</p>
         </div>
       </div>

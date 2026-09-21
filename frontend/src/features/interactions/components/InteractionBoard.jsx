@@ -4,6 +4,7 @@ import { getTransitionTargets, PHASES } from '../../../domain/workflow.js';
 import { cn } from '../../../lib/cn.js';
 import { useOffsetTop } from '../../../lib/useOffsetTop.js';
 import { Avatar } from '../../../ui/Avatar.jsx';
+import { Hint } from '../../../ui/Hint.jsx';
 import { TransitionDialog } from '../TransitionDialog.jsx';
 import { SlaBadge } from './SlaBadge.jsx';
 import styles from './InteractionBoard.module.css';
@@ -76,7 +77,9 @@ export function InteractionBoard({ workflow, rows }) {
                       onDrop={() => handleDrop(stage.id)}
                     >
                       <header className={styles.columnHeader}>
-                        <h3 className={styles.columnTitle}>{stage.name}</h3>
+                        <Hint text={stage.hint}>
+                          <h3 className={styles.columnTitle}>{stage.name}</h3>
+                        </Hint>
                         <span className={styles.columnMeta}>
                           {stageRows.length} · срок {stage.slaDays} дн.{stage.optional && ' · необязательный'}
                         </span>

@@ -21,6 +21,7 @@ export function AttentionPanel({ rows, limit, showManager }) {
     <Card className={styles.panel}>
       <CardHeader
         title="Требуют внимания"
+        hint="Взаимодействия, у которых срок этапа истёк или истекает в ближайшие дни. Начните с верхних — у них меньше всего времени."
         className={styles.header}
         description={
           rows.length === 0

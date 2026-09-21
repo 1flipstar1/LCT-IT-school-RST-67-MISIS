@@ -49,6 +49,7 @@ export function StageDistribution({ workflow, rows, onStageSelect }) {
     <Card className={styles.card}>
       <CardHeader
         title="Распределение взаимодействий по этапам"
+        hint="Сколько взаимодействий сейчас на каждом этапе работы с вузами. Кольцо показывает доли, столбцы — количество по порядку этапов."
         description={`${total} ${plural(total, ['взаимодействие', 'взаимодействия', 'взаимодействий'])} · ${workflow.name}. Нажмите на этап, чтобы открыть список.`}
         actions={
           <DropdownMenu

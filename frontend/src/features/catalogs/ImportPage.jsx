@@ -79,8 +79,7 @@ export function ImportPage() {
     <>
       <PageHeader
         back={{ to: '/catalogs', label: 'Справочники' }}
-        title="Загрузка из Excel"
-        description="Обновите справочники и данные договоров из файла. Перед записью вы увидите, что именно изменится."
+        title="Загрузка из Excel" hint="Обновите справочники и данные договоров из файла. Перед записью вы увидите, что именно изменится."
       />
 
       <ol className={styles.steps} aria-label="Шаги импорта">

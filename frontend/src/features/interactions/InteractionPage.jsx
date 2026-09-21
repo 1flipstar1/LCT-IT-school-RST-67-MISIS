@@ -9,6 +9,7 @@ import { Person } from '../../ui/Avatar.jsx';
 import { Badge } from '../../ui/Badge.jsx';
 import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
+import { Hint } from '../../ui/Hint.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
 import { AttachmentIcon, DocumentIcon, MailIcon, PhoneIcon, WorkflowIcon } from '../../ui/icons.js';
 import { PageHeader } from '../../ui/PageHeader.jsx';
@@ -56,7 +57,7 @@ function InteractionView({ row }) {
     <>
       <PageHeader
         back={{ to: '/interactions', label: 'Все взаимодействия' }}
-        title={university.name}
+        title={university.name} hint="Карточка взаимодействия с вузом: текущий этап и его срок, ответственные, история, файлы и данные договора."
         meta={
           <>
             <Badge tone="brand">{row.direction.name}</Badge>
@@ -79,7 +80,9 @@ function InteractionView({ row }) {
             <p className={styles.eyebrow}>
               {row.completedAt ? 'Взаимодействие завершено' : `Текущий этап · ${progress.step} из ${progress.total}`}
             </p>
-            <h2 className={styles.stageName}>{stage.name}</h2>
+            <Hint text="Этап, на котором сейчас работа с вузом, и сколько времени на него осталось. Перейти дальше — кнопкой «Сменить этап».">
+              <h2 className={styles.stageName}>{stage.name}</h2>
+            </Hint>
             {!row.completedAt && stage.hint && <p className={styles.stageHint}>{stage.hint}</p>}
             <div className={styles.progressTrack} aria-hidden="true">
               <span style={{ width: `${progress.percent}%` }} />
@@ -133,6 +136,7 @@ function InteractionView({ row }) {
           <Card>
             <CardHeader
               title="Ответственные"
+              hint="Кто ведёт работу с вузом со стороны ИТ Школы и кто контактное лицо со стороны вуза."
               actions={
                 session.can(PERMISSION.assignManager) && (
                   <Button variant="ghost" size="s" onClick={() => setAssignOpen(true)}>
@@ -172,7 +176,7 @@ function InteractionView({ row }) {
           </Card>
 
           <Card>
-            <CardHeader title="Путь взаимодействия" description={row.workflow.name} />
+            <CardHeader title="Путь взаимодействия" hint="Все этапы работы с вузом по порядку: пройденные отмечены, текущий выделен." description={row.workflow.name} />
             <StageStepper row={row} events={events} />
           </Card>
 
@@ -222,7 +226,9 @@ function FilesByStage({ groups, users }) {
     <div className={styles.fileGroups}>
       {groups.map(({ stage, files }) => (
         <section key={stage.id}>
-          <h3 className={styles.fileGroupTitle}>{stage.name}</h3>
+          <Hint text={`Файлы, приложенные на этапе «${stage.name}»: при переходе на этап и в комментариях к нему.`}>
+            <h3 className={styles.fileGroupTitle}>{stage.name}</h3>
+          </Hint>
           <ul className={styles.fileList}>
             {files.map((file) => (
               <li key={`${file.name}-${file.at}`} className={styles.fileRow}>

@@ -81,7 +81,7 @@ export function CatalogsPage() {
     <>
       <PageHeader
         title="Справочники"
-        description={`Единые списки для всей системы. Обновляются загрузкой Excel-файла с полями: ${IMPORT_FIELDS.map((field) => field.label).join(', ')}.`}
+        hint={`Единые списки для всей системы. Обновляются загрузкой Excel-файла с полями: ${IMPORT_FIELDS.map((field) => field.label).join(', ')}.`}
         actions={
           can(PERMISSION.importCatalogs) && (
             <>

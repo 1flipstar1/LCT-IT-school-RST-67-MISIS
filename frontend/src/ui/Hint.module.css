@@ -1,0 +1,12 @@
+/* Курсор-«?» над заголовком: сразу видно, что можно навести и прочитать пояснение. */
+.target {
+  cursor: help;
+}
+
+.text {
+  display: block;
+  max-width: 300px;
+  font: var(--font-body-s);
+  color: var(--color-text);
+  white-space: normal;
+}

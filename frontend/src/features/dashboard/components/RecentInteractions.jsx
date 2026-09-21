@@ -49,6 +49,7 @@ export function RecentInteractions({ rows, total, showManager }) {
     <Card padding="none">
       <CardHeader
         title="Последние изменения"
+        hint="Взаимодействия, в которых недавно что-то менялось: этап, комментарии или файлы. Сначала самые свежие."
         description={`Показаны ${rows.length} из ${total} · сначала недавно изменённые`}
         actions={
           <ButtonLink to="/interactions" variant="ghost" size="s">

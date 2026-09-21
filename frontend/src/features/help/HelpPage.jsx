@@ -5,6 +5,7 @@ import { PERMISSION } from '../../domain/roles.js';
 import { resetState } from '../../store/persistence.js';
 import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
+import { Hint } from '../../ui/Hint.jsx';
 import { DataTable } from '../../ui/DataTable.jsx';
 import { RefreshIcon } from '../../ui/icons.js';
 import { PageHeader } from '../../ui/PageHeader.jsx';
@@ -28,7 +29,7 @@ export function HelpPage() {
 
   return (
     <>
-      <PageHeader title="Справка" description="Короткие инструкции по основным задачам. Если что-то не получается — найдите код ошибки ниже или напишите в поддержку." />
+      <PageHeader title="Справка" hint="Короткие инструкции по основным задачам. Если что-то не получается — найдите код ошибки или напишите в поддержку." />
 
       <Tabs label="Разделы справки" tabs={sections} value={section} onChange={(value) => navigate(`${pathname}?section=${value}`)} className={styles.tabs} />
 
@@ -37,7 +38,7 @@ export function HelpPage() {
 
       {section === 'errors' && (
         <Card padding="none">
-          <CardHeader title="Коды ошибок" description="Код показывается рядом с сообщением об ошибке. Назовите его поддержке — так проблему найдут быстрее." />
+          <CardHeader title="Коды ошибок" hint="Все коды ошибок системы: что означает каждый и что делать дальше." description="Код показывается рядом с сообщением об ошибке. Назовите его поддержке — так проблему найдут быстрее." />
           <DataTable
             caption="Коды ошибок"
             rows={ERROR_ROWS}
@@ -53,7 +54,7 @@ export function HelpPage() {
 
       {section === 'about' && (
         <Card className={styles.about}>
-          <CardHeader title="CRM ИТ Школы Ростелекома" description="Система контроля взаимодействия с вузами по ИТ-направлениям." />
+          <CardHeader title="CRM ИТ Школы Ростелекома" hint="О системе: куда писать в поддержку, как защищены данные и как вернуть демо-данные." description="Система контроля взаимодействия с вузами по ИТ-направлениям." />
           <dl className={styles.facts}>
             <div>
               <dt>Поддержка</dt>
@@ -107,7 +108,9 @@ function Guide({ articles }) {
       <div className={styles.articles}>
         {articles.map((article) => (
           <Card as="article" key={article.id} id={`help-${article.id}`} className={styles.article}>
-            <h2 className={styles.articleTitle}>{article.title}</h2>
+            <Hint text={article.hint}>
+              <h2 className={styles.articleTitle}>{article.title}</h2>
+            </Hint>
             <ol className={styles.steps}>
               {article.steps.map((step) => (
                 <li key={step}>{step}</li>
