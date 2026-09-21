@@ -8,7 +8,7 @@ import { BASE_WORKFLOW } from './workflows.js';
  * поэтому сроки, «просрочено» и графики выглядят живыми в любой день показа.
  */
 
-// [id, вуз, направление, продукт, менеджер, № этапа (1…14), дней с начала, дней на текущем этапе]
+// [id, вуз, направление, продукт, менеджер, № этапа (1…14), дней с начала, дней на текущем этапе, завершено дней назад]
 const INTERACTIONS_TABLE = [
   ['i1', 'u1', 'd3', 'p3', 'usr-1', 6, 60, 9],
   ['i2', 'u2', 'd5', 'p5', 'usr-2', 3, 20, 4],
@@ -33,8 +33,21 @@ const INTERACTIONS_TABLE = [
   ['i21', 'u11', 'd1', 'p2', 'usr-5', 8, 140, 32],
   ['i22', 'u12', 'd6', 'p4', 'usr-3', 3, 22, 9],
   ['i23', 'u7', 'd2', 'p5', 'usr-2', 5, 45, 6],
-  ['i24', 'u10', 'd7', 'p7', 'usr-4', 14, 420, 35],
+  ['i24', 'u10', 'd7', 'p7', 'usr-4', 14, 420, 35, 20],
+  ['i25', 'u3', 'd7', 'p7', 'usr-5', 14, 360, 25, 5],
+  ['i26', 'u12', 'd3', 'p3', 'usr-1', 14, 300, 30, 12],
 ];
+
+/**
+ * Возвраты на доработку: на каком этапе вуз вернул работу на предыдущий этап.
+ * Этап — не текущий: после возврата карточку снова перевели вперёд.
+ */
+const RETURNS = {
+  i7: { stageId: 'st-documents', comment: 'Вуз запросил другую форму договора — вернули на встречу.' },
+  i12: { stageId: 'st-rollout', comment: 'Продукт не встал на стенд вуза — повторная передача лицензий.' },
+  i16: { stageId: 'st-classes', comment: 'Учебный совет не утвердил программу — дорабатываем.' },
+  i21: { stageId: 'st-handover', comment: 'Вуз не получил ключи лицензий — переподписываем акт.' },
+};
 
 /** Комментарий, с которым карточку переводили НА этап. */
 const TRANSITION_COMMENTS = {
@@ -64,6 +77,24 @@ const STAGE_FILES = {
   'st-curriculum': [{ name: 'Учебная программа.pdf', size: 612_000 }],
 };
 
+/**
+ * Отклонения от «идеальной» карточки, чтобы аналитика показывала реальные ситуации:
+ * истекающие лицензии, пробелы в данных договора, незагруженные документы, пропавший контакт.
+ * licenseSignedDaysAgo + licenseYears задают срок лицензии относительно даты показа.
+ */
+const DATA_QUIRKS = {
+  i8: { licenseSignedDaysAgo: 380, licenseYears: 1 },
+  i9: { licenseSignedDaysAgo: 350, licenseYears: 1 },
+  i14: { licenseSignedDaysAgo: 330, licenseYears: 1 },
+  i24: { licenseSignedDaysAgo: 395, licenseYears: 1 },
+  i13: { contractNumber: '' },
+  i6: { licenseYears: null },
+  i15: { missingFilesFor: ['st-signing'] },
+  i21: { missingFilesFor: ['st-meeting', 'st-teacher-training'] },
+  i16: { missingFilesFor: ['st-curriculum'] },
+  i22: { noContacts: true },
+};
+
 /** Стабильное псевдослучайное число 0…1 из строки — чтобы демо-данные не менялись между запусками. */
 function seededRandom(key) {
   let hash = 2166136261;
@@ -71,7 +102,36 @@ function seededRandom(key) {
   return ((hash >>> 0) % 10_000) / 10_000;
 }
 
-function buildInteraction([id, universityId, directionId, productId, managerId, stageNo, startedDaysAgo, stageDaysAgo], now) {
+/**
+ * Вставляет в историю возврат: с этапа stageId на предыдущий этап процесса и обратно.
+ * Оба события — между входом на этап и следующим переходом, чтобы история оставалась последовательной.
+ */
+function insertReturn(events, id, { stageId, comment }) {
+  const enteredIndex = events.findIndex((event) => event.toStageId === stageId);
+  const entered = events[enteredIndex];
+  const next = events[enteredIndex + 1];
+  if (!entered || !next) return events;
+
+  const stages = BASE_WORKFLOW.stages;
+  const previous = stages[stages.findIndex((stage) => stage.id === stageId) - 1];
+  const from = new Date(entered.at).getTime();
+  const span = new Date(next.at).getTime() - from;
+  const base = { interactionId: id, type: 'transition', userId: entered.userId, files: [] };
+
+  const back = { ...base, id: `${id}-r1`, at: new Date(from + span * 0.4).toISOString(), fromStageId: stageId, toStageId: previous.id, stageId, comment };
+  const forward = {
+    ...base,
+    id: `${id}-r2`,
+    at: new Date(from + span * 0.7).toISOString(),
+    fromStageId: previous.id,
+    toStageId: stageId,
+    stageId: previous.id,
+    comment: 'Замечания устранены.',
+  };
+  return [...events.slice(0, enteredIndex + 1), back, forward, ...events.slice(enteredIndex + 1)];
+}
+
+function buildInteraction([id, universityId, directionId, productId, managerId, stageNo, startedDaysAgo, stageDaysAgo, completedDaysAgo], now) {
   const stages = BASE_WORKFLOW.stages;
   const startedAt = addDays(now, -startedDaysAgo);
   const stageEnteredAt = addDays(now, -stageDaysAgo);
@@ -79,11 +139,18 @@ function buildInteraction([id, universityId, directionId, productId, managerId, 
   const skipCorrections = Number(id.slice(1)) % 2 === 1;
   const path = stages.slice(0, stageNo).filter((stage) => !(stage.optional && skipCorrections && stageNo - 1 > stages.indexOf(stage)));
 
-  const events = [{ id: `${id}-e0`, interactionId: id, type: 'created', userId: managerId, at: startedAt.toISOString(), toStageId: stages[0].id }];
+  let events = [{ id: `${id}-e0`, interactionId: id, type: 'created', userId: managerId, at: startedAt.toISOString(), toStageId: stages[0].id }];
+  const quirks = DATA_QUIRKS[id] ?? {};
+  // Время на этапе пропорционально его нормативному сроку с разбросом; иногда один этап затягивается втрое.
+  const slowStage = seededRandom(`${id}-slow`) < 0.3 ? Math.floor(seededRandom(`${id}-which`) * (path.length - 1)) : -1;
+  const weights = path.slice(0, -1).map((stage, index) => stage.slaDays * (0.5 + seededRandom(id + stage.id) * 1.2) * (index === slowStage ? 3 : 1));
+  const totalWeight = weights.reduce((total, weight) => total + weight, 0);
+  let elapsedWeight = 0;
   const transitions = path.length - 1;
   path.slice(1).forEach((stage, index) => {
     const from = path[index];
-    const at = addDays(startedAt, Math.round(((startedDaysAgo - stageDaysAgo) * (index + 1)) / transitions));
+    elapsedWeight += weights[index];
+    const at = addDays(startedAt, Math.round(((startedDaysAgo - stageDaysAgo) * elapsedWeight) / totalWeight));
     events.push({
       id: `${id}-e${index + 1}`,
       interactionId: id,
@@ -94,9 +161,17 @@ function buildInteraction([id, universityId, directionId, productId, managerId, 
       toStageId: stage.id,
       stageId: from.id,
       comment: TRANSITION_COMMENTS[stage.id],
-      files: STAGE_FILES[from.id] ?? [],
+      files: quirks.missingFilesFor?.includes(from.id) ? [] : (STAGE_FILES[from.id] ?? []),
     });
   });
+
+  if (RETURNS[id]) events = insertReturn(events, id, RETURNS[id]);
+
+  const completedAt = completedDaysAgo === undefined ? null : addDays(now, -completedDaysAgo).toISOString();
+  if (completedAt) {
+    const last = stages[stageNo - 1];
+    events.push({ id: `${id}-done`, interactionId: id, type: 'completed', userId: managerId, at: completedAt, fromStageId: last.id, toStageId: last.id, stageId: last.id, comment: 'Все этапы выполнены, взаимодействие закрыто.', files: [] });
+  }
 
   const stageIndex = stageNo - 1;
   const signed = stageIndex >= 6;
@@ -112,11 +187,11 @@ function buildInteraction([id, universityId, directionId, productId, managerId, 
       managerId,
       workflowId: BASE_WORKFLOW.id,
       stageId: stages[stageIndex].id,
-      contactIds: university.contacts.slice(0, 1).map((item) => item.id),
+      contactIds: quirks.noContacts ? [] : university.contacts.slice(0, 1).map((item) => item.id),
       contract: {
-        number: signed ? `РТК-ИТШ-2026/${String(Number(id.slice(1)) * 7).padStart(3, '0')}` : '',
-        licenseSignedAt: signed ? toIsoDate(signedEvent?.at ?? startedAt) : '',
-        licenseYears: signed ? 1 + Math.floor(seededRandom(id) * 3) : null,
+        number: signed ? (quirks.contractNumber ?? `РТК-ИТШ-2026/${String(Number(id.slice(1)) * 7).padStart(3, '0')}`) : '',
+        licenseSignedAt: signed ? toIsoDate(quirks.licenseSignedDaysAgo ? addDays(now, -quirks.licenseSignedDaysAgo) : (signedEvent?.at ?? startedAt)) : '',
+        licenseYears: signed ? ('licenseYears' in quirks ? quirks.licenseYears : 1 + Math.floor(seededRandom(id) * 3)) : null,
         transferStatus: TRANSFER_STATUSES[stageIndex > 6 ? 2 : stageIndex === 6 ? 1 : 0],
       },
       comment: '',
@@ -124,7 +199,7 @@ function buildInteraction([id, universityId, directionId, productId, managerId, 
       startedAt: startedAt.toISOString(),
       stageEnteredAt: stageEnteredAt.toISOString(),
       updatedAt: events.at(-1).at,
-      completedAt: null,
+      completedAt,
     },
     events,
   };
@@ -271,7 +346,7 @@ function buildReports(now) {
   ];
 }
 
-export const SEED_VERSION = 3;
+export const SEED_VERSION = 4;
 
 export function createSeedState(now = new Date()) {
   const built = INTERACTIONS_TABLE.map((row) => buildInteraction(row, now));

@@ -1,26 +1,21 @@
 import { useState } from 'react';
 import { useElementWidth } from '../../lib/useElementWidth.js';
 import styles from './charts.module.css';
+import { truncate } from './scale.js';
 
 const ROW_HEIGHT = 32;
 const BAR_HEIGHT = 14;
 const GROUP_HEADER_HEIGHT = 32;
 const VALUE_WIDTH = 44;
-const CHAR_WIDTH = 7.4;
 /** Ограничение длины столбца: на широком экране короткие значения не растягиваются на весь монитор. */
 const MAX_PLOT_WIDTH = 560;
-
-const truncate = (text, maxWidth) => {
-  const maxChars = Math.floor(maxWidth / CHAR_WIDTH);
-  return text.length > maxChars ? `${text.slice(0, maxChars - 1)}…` : text;
-};
 
 /**
  * Горизонтальные столбцы, сгруппированные по смыслу (например, этапы по фазам).
  * Одна величина — один цвет; подписи и значения всегда видны, подробности — в подсказке.
  * groups: [{ id, label?, items: [{ id, label, value }] }] — без label группа выводится без заголовка.
  */
-export function BarChart({ groups, ariaLabel, formatTooltip, onBarClick }) {
+export function BarChart({ groups, ariaLabel, formatTooltip, onBarClick, formatValue = String }) {
   const [containerRef, width] = useElementWidth();
   const [hovered, setHovered] = useState(null);
 
@@ -77,7 +72,7 @@ export function BarChart({ groups, ariaLabel, formatTooltip, onBarClick }) {
                     />
                   )}
                   <text x={labelWidth + item.barWidth + 8} y={item.y + ROW_HEIGHT / 2} className={styles.valueLabel} dominantBaseline="middle">
-                    {item.value}
+                    {formatValue(item.value)}
                   </text>
                 </g>
               ))}

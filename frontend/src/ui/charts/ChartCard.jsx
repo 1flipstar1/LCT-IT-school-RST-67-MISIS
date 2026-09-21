@@ -17,8 +17,9 @@ const VIEWS = [
 /**
  * Карточка графика: у каждого графика есть табличный вид (точные числа, доступность)
  * и выгрузка в PNG (ТЗ: визуализация статистики в форматах png, pdf).
+ * toolbar — элементы управления самим графиком (например, выбор вуза), выводятся над ним.
  */
-export function ChartCard({ id, title, description, hint, chart, table, footer }) {
+export function ChartCard({ id, title, description, hint, chart, table, toolbar, footer }) {
   const [view, setView] = usePersistentState(`chart-view:${id}`, 'chart');
   const chartRef = useRef(null);
 
@@ -39,6 +40,7 @@ export function ChartCard({ id, title, description, hint, chart, table, footer }
           </>
         }
       />
+      {toolbar && <div className={styles.toolbar}>{toolbar}</div>}
       {view === 'chart' ? (
         // data-chart-title — по нему экспорт страницы в PDF находит графики и их названия.
         <div ref={chartRef} data-chart-title={title}>

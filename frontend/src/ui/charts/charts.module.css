@@ -118,3 +118,112 @@
     margin: 0 calc(var(--space-4x) * -1);
   }
 }
+
+/* ---------- Общие элементы новых графиков ---------- */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1x) var(--space-4x);
+  margin-bottom: var(--space-3x);
+  list-style: none;
+}
+
+.legendLabel {
+  font-size: 12px;
+  fill: var(--color-text-secondary);
+}
+
+.mark {
+  transition: opacity var(--duration-fast);
+}
+
+.dimmed {
+  opacity: 0.35;
+}
+
+.cellValue {
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--color-text);
+  pointer-events: none;
+}
+
+.cellValueOnDark {
+  fill: var(--color-text-on-brand);
+}
+
+.surfaceStroke {
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.softFill {
+  fill: var(--color-brand-soft);
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+}
+
+.medianLine {
+  stroke: var(--color-brand-active);
+  stroke-width: 2;
+}
+
+.whisker {
+  stroke: var(--color-text-tertiary);
+  stroke-width: 1.5;
+}
+
+.outlier {
+  fill: var(--color-accent);
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.todayRing {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: 1.5;
+}
+
+.emptyCell {
+  fill: var(--color-surface-muted);
+}
+
+.centerValue {
+  font: var(--font-h2);
+  fill: var(--color-text);
+}
+
+.centerLabel {
+  font-size: 12px;
+  fill: var(--color-text-tertiary);
+}
+
+.scrollX {
+  overflow-x: auto;
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  padding: var(--space-4x);
+  border-radius: var(--radius-m);
+  background: var(--color-surface-muted);
+  font: var(--font-body-s);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+/* Область графика под легендой: подсказки позиционируются от неё, а не от всей карточки. */
+.plot {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2x);
+  margin-bottom: var(--space-4x);
+}

@@ -2,16 +2,9 @@ import { useState } from 'react';
 import { formatNumber } from '../../domain/format.js';
 import { useElementWidth } from '../../lib/useElementWidth.js';
 import styles from './charts.module.css';
+import { niceTicks } from './scale.js';
 
 const MARGIN = { top: 16, right: 16, bottom: 32, left: 48 };
-
-/** «Красивые» деления оси: 0, 50, 100, 150 вместо 0, 47, 94, 141. */
-function niceTicks(max, count = 4) {
-  const rawStep = max / count;
-  const magnitude = 10 ** Math.floor(Math.log10(rawStep || 1));
-  const step = [1, 2, 2.5, 5, 10].map((factor) => factor * magnitude).find((candidate) => candidate >= rawStep);
-  return Array.from({ length: count + 1 }, (_, index) => index * step);
-}
 
 /**
  * Линейный график одной величины во времени. Наведение показывает вертикальную линию и точное значение.
