@@ -7,10 +7,11 @@ import styles from './SelectMenu.module.css';
 /**
  * Выбор одного значения: компактный — для ячеек таблицы, fullWidth — для полей формы (см. SelectMenuField).
  */
-export function SelectMenu({ id, label, value, options, onChange, disabled, title, fullWidth = false }) {
+export function SelectMenu({ id, label, value, options, onChange, disabled, title, icon: Icon, fullWidth = false, className }) {
   return (
     <Select.Root value={value} onValueChange={onChange} disabled={disabled} items={options} modal={false}>
-      <Select.Trigger id={id} className={cn(styles.trigger, fullWidth && styles.fullWidth)} aria-label={label} title={title}>
+      <Select.Trigger id={id} className={cn(styles.trigger, fullWidth && styles.fullWidth, className)} aria-label={label} title={title}>
+        {Icon && <Icon size={18} fill="currentColor" aria-hidden="true" />}
         <Select.Value className={styles.value} />
         <ChevronDownIcon size={16} fill="currentColor" aria-hidden="true" />
       </Select.Trigger>

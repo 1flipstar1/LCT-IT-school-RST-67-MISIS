@@ -1,69 +1,28 @@
-.field {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: var(--control-height-m);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-m);
-  background: var(--color-surface);
+.root {
+  display: block;
+  width: 100%;
 }
 
-.field:focus-within {
-  border-color: var(--color-brand);
-  box-shadow: var(--focus-ring);
+.range {
+  min-width: 280px;
 }
 
-.invalid,
-.invalid:focus-within {
-  border-color: var(--color-danger);
+.root :global(.popover__root),
+.root :global(.popover__trigger) {
+  width: 100%;
+  max-width: none;
 }
 
-.input {
-  flex: 1;
+.control:global(.input) {
   width: 100%;
   min-width: 0;
-  height: 100%;
-  padding: 0 0 0 var(--space-3x);
-  border: 0;
-  outline: none;
-  background: transparent;
-  font: var(--font-body-s);
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text);
+  height: var(--control-height-m);
+  margin-top: 0;
+  font-family: var(--font-family);
 }
 
-/* Кольцо фокуса рисует рамка поля — у самого input оно лишнее. */
-.input:focus-visible {
+/* Фокус отображает внешний контейнер Atomaro; внутреннему input второе кольцо не нужно. */
+.control :global(.input__field:focus-visible) {
+  border-radius: 0;
   box-shadow: none;
-}
-
-.input::placeholder {
-  color: var(--color-text-tertiary);
-}
-
-.calendar {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 36px;
-  height: 100%;
-  border-radius: 0 var(--radius-m) var(--radius-m) 0;
-  color: var(--color-text-secondary);
-}
-
-.calendar:hover {
-  color: var(--color-brand);
-}
-
-/* Системный календарь раскрывается от этого поля, поэтому оно прижато к низу рамки. */
-.picker {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 1px;
-  padding: 0;
-  border: 0;
-  opacity: 0;
-  pointer-events: none;
 }

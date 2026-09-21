@@ -6,10 +6,11 @@ import { cn } from '../../lib/cn.js';
 import { useManagers } from '../../store/selectors.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
 import { Button } from '../../ui/Button.jsx';
-import { DateInput } from '../../ui/DateInput.jsx';
+import { DateRangeInput } from '../../ui/DateInput.jsx';
 import { SearchField, Switch } from '../../ui/Field.jsx';
-import { CalendarIcon, ChevronDownIcon, FilterIcon } from '../../ui/icons.js';
+import { CalendarIcon, FilterIcon } from '../../ui/icons.js';
 import { MultiSelectFilter } from '../../ui/MultiSelectFilter.jsx';
+import { SelectMenu } from '../../ui/SelectMenu.jsx';
 import { SidePanel } from '../../ui/SidePanel.jsx';
 import styles from './FilterBar.module.css';
 
@@ -121,24 +122,23 @@ export function PeriodFilter({ period, onChange, className }) {
   const isCustom = period.preset === 'custom';
   return (
     <div className={cn(styles.period, className)}>
-      <label className={styles.periodSelect}>
-        <CalendarIcon size={18} fill="currentColor" aria-hidden="true" />
-        <span className="visually-hidden">Период</span>
-        <select value={period.preset} onChange={(event) => onChange({ ...period, preset: event.target.value })}>
-          {PERIOD_PRESETS.map((preset) => (
-            <option key={preset.id} value={preset.id}>
-              {preset.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDownIcon size={16} fill="currentColor" aria-hidden="true" />
-      </label>
+      <SelectMenu
+        className={styles.periodSelect}
+        label="Период"
+        value={period.preset}
+        options={PERIOD_PRESETS.map(({ id, label }) => ({ value: id, label }))}
+        icon={CalendarIcon}
+        fullWidth={Boolean(className)}
+        onChange={(preset) => onChange({ ...period, preset })}
+      />
       {isCustom && (
-        <span className={styles.dates}>
-          <DateInput className={styles.date} aria-label="Начало периода" value={period.from} max={period.to || undefined} onChange={(from) => onChange({ ...period, from })} />
-          <span aria-hidden="true">—</span>
-          <DateInput className={styles.date} aria-label="Конец периода" value={period.to} min={period.from || undefined} onChange={(to) => onChange({ ...period, to })} />
-        </span>
+        <DateRangeInput
+          className={styles.dateRange}
+          aria-label="Диапазон дат"
+          from={period.from}
+          to={period.to}
+          onChange={({ from, to }) => onChange({ ...period, from, to })}
+        />
       )}
     </div>
   );

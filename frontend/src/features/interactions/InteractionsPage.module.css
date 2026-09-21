@@ -6,11 +6,6 @@
   margin: var(--space-5x) 0 var(--space-3x);
 }
 
-.count {
-  font: var(--font-body-s-strong);
-  color: var(--color-text-secondary);
-}
-
 .toolbarControls {
   display: flex;
   align-items: center;

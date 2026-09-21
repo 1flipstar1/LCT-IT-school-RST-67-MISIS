@@ -65,7 +65,7 @@ export function InteractionsPage() {
   return (
     <>
       <PageHeader
-        title="Взаимодействия" hint="Работа с вузами по ИТ-направлениям. Откройте карточку, чтобы сменить этап, оставить комментарий или приложить файлы."
+        title={`Взаимодействия ${filtered.length}`} hint="Работа с вузами по ИТ-направлениям. Откройте карточку, чтобы сменить этап, оставить комментарий или приложить файлы."
         actions={
           <Button variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>
             Новое взаимодействие
@@ -83,9 +83,6 @@ export function InteractionsPage() {
       />
 
       <div className={styles.toolbar}>
-        <p className={styles.count} aria-live="polite">
-          {countLabel}
-        </p>
         <div className={styles.toolbarControls}>
           {view === 'table' ? (
             <SelectField
