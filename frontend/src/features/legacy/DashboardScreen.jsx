@@ -74,7 +74,7 @@ export function DashboardScreen() {
     const indexes = stats.map((stage, index) => (stage.phase === phase.id ? index : -1)).filter((index) => index !== -1);
     return indexes.length ? { ...phase, from: indexes[0], to: indexes.at(-1) } : null;
   }).filter(Boolean);
-  const dashboardUniversities = LEGACY_UNIVERSITIES.slice(0, 4).sort((a, b) =>
+  const dashboardUniversities = LEGACY_UNIVERSITIES.slice(0, 5).sort((a, b) =>
     sortableDate(a.updatedAt).localeCompare(sortableDate(b.updatedAt)),
   );
 
@@ -263,41 +263,45 @@ export function DashboardScreen() {
       </div>
 
       <section className="panel table-panel dashboard-universities">
-        <div className="table-meta">
-          <span>
-            <b>Заявки</b> · Первые 4 в списке
-          </span>
-          <span>По времени последнего обновления</span>
+        <div className="panel-head dashboard-universities-head">
+          <h2>Заявки</h2>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>ВУЗ</th>
-              <th>ПРОДУКТ / НАПРАВЛЕНИЕ</th>
-              <th>СТАТУС WORKFLOW</th>
-              <th>МЕНЕДЖЕР</th>
-              <th>ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dashboardUniversities.map((university) => (
-              <tr key={university.name}>
-                <td>
-                  <UniversityCell name={university.name} />
-                </td>
-                <td>
-                  <b>{university.product}</b>
-                  <span className="subtext">{university.direction}</span>
-                </td>
-                <td>
-                  <span className="status-tag purple">{university.status}</span>
-                </td>
-                <td>{university.manager}</td>
-                <td className="muted">{university.updatedAt}</td>
+        <div className="dashboard-universities-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ВУЗ</th>
+                <th>ПРОДУКТ / НАПРАВЛЕНИЕ</th>
+                <th>СТАТУС WORKFLOW</th>
+                <th>МЕНЕДЖЕР</th>
+                <th>ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {dashboardUniversities.map((university) => (
+                <tr key={university.name}>
+                  <td>
+                    <UniversityCell name={university.name} />
+                  </td>
+                  <td>
+                    <b>{university.product}</b>
+                    <span className="subtext">{university.direction}</span>
+                  </td>
+                  <td>
+                    <span className="status-tag purple">{university.status}</span>
+                  </td>
+                  <td>{university.manager}</td>
+                  <td className="muted">{university.updatedAt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="dashboard-universities-fade">
+            <Link className="dashboard-universities-all" to="/interactions">
+              Все заявки <ArrowRightIcon size={16} fill="currentColor" />
+            </Link>
+          </div>
+        </div>
       </section>
 
       <NewInteractionDialog open={creating} onOpenChange={setCreating} />

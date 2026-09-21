@@ -25,6 +25,11 @@
   color: var(--color-brand-hover);
 }
 
+.accent {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
 .success {
   background: var(--color-success-soft);
   color: var(--color-success);

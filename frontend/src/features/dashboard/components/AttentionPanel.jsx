@@ -21,6 +21,7 @@ export function AttentionPanel({ rows, limit, showManager }) {
     <Card className={styles.panel}>
       <CardHeader
         title="Требуют внимания"
+        className={styles.header}
         description={
           rows.length === 0
             ? 'Все этапы идут в срок'
@@ -48,7 +49,7 @@ export function AttentionPanel({ rows, limit, showManager }) {
                     {row.direction.name} · Этап {row.progress.step} из {row.progress.total}: {row.stage.name}
                   </span>
                 </span>
-                <SlaBadge sla={row.sla} />
+                <SlaBadge sla={row.sla} tone="accent" />
                 {showManager && row.manager && (
                   <span className={styles.manager} title={row.manager.name}>
                     <Avatar name={row.manager.name} size="s" />
