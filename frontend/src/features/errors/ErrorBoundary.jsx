@@ -1,8 +1,10 @@
 import { Component } from 'react';
+import { codeForRenderError } from '../../domain/errors.js';
 import { ErrorPage } from './ErrorPage.jsx';
 
 /**
- * Перехватывает непредвиденные ошибки рендера: вместо белого экрана — страница с кодом APP-500.
+ * Перехватывает ошибки рендера: вместо белого экрана — страница ошибки. Если не догрузился файл
+ * страницы (пропала сеть), показывается «Нет подключения к интернету», иначе — APP-500.
  * В продуктиве здесь же отправка ошибки в систему мониторинга.
  */
 export class ErrorBoundary extends Component {
@@ -13,11 +15,11 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('[APP-500]', error, info.componentStack);
+    console.error(`[${codeForRenderError(error)}]`, error, info.componentStack);
   }
 
   render() {
-    if (this.state.error) return <ErrorPage code="APP-500" onRetry={() => window.location.reload()} />;
+    if (this.state.error) return <ErrorPage code={codeForRenderError(this.state.error)} onRetry={() => window.location.reload()} />;
     return this.props.children;
   }
 }

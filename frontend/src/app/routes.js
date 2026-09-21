@@ -40,6 +40,8 @@ export const ROUTES = [
     component: page(() => import('../features/admin/AuditPage.jsx'), 'AuditPage'),
   },
   { path: '/help', component: page(() => import('../features/help/HelpPage.jsx'), 'HelpPage') },
+  // Страницы ошибок по HTTP-статусу: «#/error/404», «#/error/503». Сюда переводит приложение при ответе сервера с ошибкой.
+  { path: '/error/:status', component: page(() => import('../features/errors/ErrorStatusPage.jsx'), 'ErrorStatusPage') },
 
   // Экраны прежнего дизайна (ветка main): дашборд и импорт, см. features/legacy.
   { path: '/main/dashboard', component: page(() => import('../features/legacy/DashboardScreen.jsx'), 'DashboardScreen') },

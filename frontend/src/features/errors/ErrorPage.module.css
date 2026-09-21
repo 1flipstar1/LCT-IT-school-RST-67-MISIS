@@ -2,10 +2,16 @@
   display: grid;
   justify-items: center;
   gap: var(--space-3x);
-  max-width: 520px;
+  max-width: 560px;
   margin: var(--space-16x) auto;
   padding: 0 var(--space-4x);
   text-align: center;
+}
+
+/* Номер ошибки — самое заметное на странице: по нему человек сразу понимает, что случилось. */
+.number {
+  font: var(--font-display-l);
+  color: var(--color-brand);
 }
 
 .icon {
@@ -16,11 +22,6 @@
   border-radius: 50%;
   background: var(--color-danger-soft);
   color: var(--color-danger);
-}
-
-.code {
-  font: var(--font-caption-strong);
-  color: var(--color-text-tertiary);
 }
 
 .title {
@@ -38,4 +39,10 @@
   justify-content: center;
   gap: var(--space-3x);
   margin-top: var(--space-4x);
+}
+
+.code {
+  margin-top: var(--space-4x);
+  font: var(--font-caption);
+  color: var(--color-text-tertiary);
 }

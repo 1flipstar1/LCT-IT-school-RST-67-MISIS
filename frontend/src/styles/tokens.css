@@ -45,6 +45,7 @@
 
   /* ---------- Типографика (design/типография.md) ---------- */
   --font-family: 'RostelecomBasis', system-ui, sans-serif;
+  --font-display-l: 700 48px/52px var(--font-family);
   --font-display: 700 42px/44px var(--font-family);
   --font-h1: 700 28px/32px var(--font-family);
   --font-h2: 700 22px/24px var(--font-family);
