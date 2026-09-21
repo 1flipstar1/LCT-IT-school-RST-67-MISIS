@@ -8,20 +8,12 @@
   text-align: center;
 }
 
-/* Номер ошибки — самое заметное на странице: по нему человек сразу понимает, что случилось. */
-.number {
-  font: var(--font-display-l);
-  color: var(--color-brand);
-}
-
-.icon {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--color-danger-soft);
-  color: var(--color-danger);
+/* Иллюстрация — самое заметное на странице: по номеру человек сразу понимает, что случилось. */
+/* Высота постоянная, ширина — по числу знаков: «404» шире, чем одиночный круг «нет связи». */
+.art {
+  height: 160px;
+  max-width: 100%;
+  margin-bottom: var(--space-4x);
 }
 
 .title {

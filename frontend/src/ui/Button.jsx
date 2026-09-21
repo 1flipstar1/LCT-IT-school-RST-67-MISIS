@@ -34,12 +34,16 @@ export function Button({ variant = 'outline', tone = 'brand', size = 'm', icon: 
   );
 }
 
-/** Ссылка, которая выглядит как кнопка Атомаро: для переходов между страницами (семантически это <a>). */
-export function ButtonLink({ to, variant = 'outline', size = 'm', icon: Icon, children, fullWidth, className }) {
+/**
+ * Ссылка, которая выглядит как кнопка Атомаро: для переходов между страницами (семантически это <a>).
+ * to — адрес внутри приложения, href — внешний адрес, он открывается в новой вкладке.
+ */
+export function ButtonLink({ to, href, variant = 'outline', size = 'm', icon: Icon, children, fullWidth, className }) {
   const iconSize = ICON_SIZE[size];
   return (
     <a
-      href={`#${to}`}
+      href={href ?? `#${to}`}
+      {...(href && { target: '_blank', rel: 'noreferrer' })}
       className={cn('button', `button--${variant}`, 'button--accent', `button--size-${size}`, styles.button, styles.link, fullWidth && styles.fullWidth, className)}
     >
       {Icon && <Icon size={iconSize} fill="currentColor" />}

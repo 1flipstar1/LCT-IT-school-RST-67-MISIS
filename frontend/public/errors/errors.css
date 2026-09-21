@@ -78,11 +78,39 @@ main {
   margin-bottom: var(--space-6x);
 }
 
-/* display-l-strong 48/52 — крупный номер ошибки */
-.number {
-  margin: 0;
-  font: 700 48px/52px var(--font-family);
-  color: var(--color-brand);
+/* Фирменная иллюстрация: номер, где каждый ноль — круглая картинка Ростелекома. */
+.art {
+  height: 144px;
+  max-width: 100%;
+  margin-bottom: var(--space-4x);
+}
+
+.art text {
+  font-family: var(--font-family);
+  font-weight: 700;
+  fill: var(--color-brand);
+}
+
+.disc {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: float 4.8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4%) rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc {
+    animation: none;
+  }
 }
 
 /* heading-h2 22/24 */

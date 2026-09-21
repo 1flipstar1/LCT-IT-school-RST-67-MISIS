@@ -118,6 +118,9 @@ export function errorCodeForStatus(status) {
   return null;
 }
 
+/** Для каких статусов есть статические страницы веб-сервера (public/errors/<статус>.html). */
+export const SERVER_ERROR_PAGES = [403, 404, 500, 502, 503, 504, 505];
+
 /** Временные сбои: их имеет смысл просто повторить. */
 const RETRYABLE = new Set(['TIMEOUT-408', 'LIMIT-429', 'SERVER-500', 'GATEWAY-502', 'UNAVAILABLE-503', 'GATEWAY-504', 'NETWORK-0', 'APP-500']);
 export const isRetryable = (code) => RETRYABLE.has(code);

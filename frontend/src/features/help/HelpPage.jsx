@@ -3,7 +3,7 @@ import { useSession } from '../../auth/SessionProvider.jsx';
 import { ERROR_CODES } from '../../domain/errors.js';
 import { PERMISSION } from '../../domain/roles.js';
 import { resetState } from '../../store/persistence.js';
-import { Button } from '../../ui/Button.jsx';
+import { Button, ButtonLink } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
 import { Hint } from '../../ui/Hint.jsx';
 import { DataTable } from '../../ui/DataTable.jsx';
@@ -38,7 +38,13 @@ export function HelpPage() {
 
       {section === 'errors' && (
         <Card padding="none">
-          <CardHeader title="Коды ошибок" hint="Все коды ошибок системы: что означает каждый и что делать дальше." description="Код показывается рядом с сообщением об ошибке. Назовите его поддержке — так проблему найдут быстрее." />
+          <CardHeader title="Коды ошибок" hint="Все коды ошибок системы: что означает каждый и что делать дальше." description="Код показывается рядом с сообщением об ошибке. Назовите его поддержке — так проблему найдут быстрее."
+            actions={
+              <ButtonLink to="/errors" size="s">
+                Посмотреть страницы ошибок
+              </ButtonLink>
+            }
+          />
           <DataTable
             caption="Коды ошибок"
             rows={ERROR_ROWS}

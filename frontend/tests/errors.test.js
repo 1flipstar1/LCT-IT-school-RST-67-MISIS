@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
-import { AppError, codeForRenderError, ERROR_CODES, errorCodeForStatus, errorNumber, isRetryable } from '../src/domain/errors.js';
+import { AppError, codeForRenderError, ERROR_CODES, errorCodeForStatus, errorNumber, isRetryable, SERVER_ERROR_PAGES } from '../src/domain/errors.js';
+import { layoutErrorArt } from '../src/features/errors/errorArtLayout.js';
 
 describe('страницы ошибок', () => {
   it('сопоставляет частые HTTP-статусы с кодами каталога', () => {
@@ -36,8 +37,15 @@ describe('страницы ошибок', () => {
     assert.equal(codeForRenderError(new AppError('ACCESS-403')), 'ACCESS-403');
   });
 
+  it('в иллюстрации каждый ноль — картинка, остальные знаки — цифры', () => {
+    const art = layoutErrorArt('500', 8);
+    assert.deepEqual(art.items.map((item) => item.kind), ['digit', 'disc', 'disc']);
+    assert.notEqual(art.items[1].artIndex, art.items[2].artIndex);
+    assert.deepEqual(layoutErrorArt(null, 8).items.map((item) => item.kind), ['disc']);
+  });
+
   it('статические страницы сервера совпадают с каталогом', () => {
-    for (const status of [404, 500, 502, 503, 504]) {
+    for (const status of SERVER_ERROR_PAGES) {
       const html = readFileSync(new URL(`../public/errors/${status}.html`, import.meta.url), 'utf8');
       const code = errorCodeForStatus(status);
       assert.ok(html.includes(ERROR_CODES[code].title), `${status}.html: заголовок не совпадает с каталогом`);

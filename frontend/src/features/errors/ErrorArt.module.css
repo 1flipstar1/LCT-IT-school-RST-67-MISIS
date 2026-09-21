@@ -1,0 +1,28 @@
+.digit {
+  font-family: var(--font-family);
+  font-weight: 700;
+  fill: var(--color-brand);
+}
+
+/* Фирменный круг вместо нуля слегка покачивается — страница не выглядит «замершей». */
+.disc {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: float 4.8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4%) rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc {
+    animation: none;
+  }
+}
