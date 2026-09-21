@@ -62,7 +62,7 @@ export function InteractionTable({ rows, onReset, hiddenColumns = [] }) {
           icon={SearchIcon}
           title="Ничего не нашлось"
           description="Попробуйте изменить поиск или сбросить фильтры."
-          action={onReset && <Button onClick={onReset}>Сбросить фильтры</Button>}
+          action={onReset && <Button tone="warning" onClick={onReset}>Сбросить фильтры</Button>}
         />
       }
     />

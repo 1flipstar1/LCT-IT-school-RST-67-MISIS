@@ -102,7 +102,7 @@ function FilterPanelBar({ search, fields, activeCount, onReset, resultLabel }) {
         description="Изменения применяются сразу."
         footer={
           <>
-            <Button variant="ghost" onClick={onReset} disabled={activeCount === 0}>
+            <Button variant="ghost" tone="warning" onClick={onReset} disabled={activeCount === 0}>
               Сбросить
             </Button>
             <Button variant="primary" onClick={() => setOpen(false)}>

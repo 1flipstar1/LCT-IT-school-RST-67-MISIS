@@ -14,7 +14,7 @@ const ICON_SIZE = { s: 16, m: 18, l: 20 };
  * variant: primary — главное действие экрана (одно на экран), outline — второстепенное,
  * ghost — действие внутри карточки или таблицы.
  */
-export function Button({ variant = 'outline', size = 'm', icon: Icon, iconAfter: IconAfter, children, fullWidth, className, type = 'button', id, ...rest }) {
+export function Button({ variant = 'outline', tone = 'brand', size = 'm', icon: Icon, iconAfter: IconAfter, children, fullWidth, className, type = 'button', id, ...rest }) {
   // Атомаро по умолчанию ставит всем кнопкам id="button" — задаём уникальный, чтобы id не дублировались.
   const generatedId = useId();
   const iconSize = ICON_SIZE[size];
@@ -28,7 +28,7 @@ export function Button({ variant = 'outline', size = 'm', icon: Icon, iconAfter:
       label={children}
       iconPrefix={Icon ? <Icon size={iconSize} fill="currentColor" /> : undefined}
       iconSuffix={IconAfter ? <IconAfter size={iconSize} fill="currentColor" /> : undefined}
-      className={cn(styles.button, fullWidth && styles.fullWidth, className)}
+      className={cn(styles.button, tone === 'warning' && styles.warning, fullWidth && styles.fullWidth, className)}
       {...rest}
     />
   );

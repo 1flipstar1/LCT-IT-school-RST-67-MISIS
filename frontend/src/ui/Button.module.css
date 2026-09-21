@@ -3,6 +3,30 @@
   white-space: nowrap;
 }
 
+/* Оранжевый — для действий, которые сбрасывают или очищают данные. */
+.warning {
+  --button-outline-accent-bg-color-default: var(--color-surface);
+  --button-outline-accent-bg-color-hover: var(--color-warning-soft);
+  --button-outline-accent-bg-color-active: var(--color-warning-soft);
+  --button-outline-accent-border-color-default: var(--color-border-strong);
+  --button-outline-accent-border-color-hover: var(--color-accent);
+  --button-outline-accent-border-color-active: var(--color-warning-text);
+  --button-outline-accent-label-color-default: var(--color-accent);
+  --button-outline-accent-label-color-hover: var(--color-accent);
+  --button-outline-accent-label-color-active: var(--color-accent);
+  --button-outline-accent-icon-color-default: var(--color-accent);
+  --button-outline-accent-icon-color-hover: var(--color-accent);
+  --button-outline-accent-icon-color-active: var(--color-accent);
+  --button-ghost-accent-bg-color-hover: var(--color-warning-soft);
+  --button-ghost-accent-bg-color-active: var(--color-warning-soft);
+  --button-ghost-accent-label-color-default: var(--color-accent);
+  --button-ghost-accent-label-color-hover: var(--color-accent);
+  --button-ghost-accent-label-color-active: var(--color-accent);
+  --button-ghost-accent-icon-color-default: var(--color-accent);
+  --button-ghost-accent-icon-color-hover: var(--color-accent);
+  --button-ghost-accent-icon-color-active: var(--color-accent);
+}
+
 .link {
   display: inline-flex;
   align-items: center;

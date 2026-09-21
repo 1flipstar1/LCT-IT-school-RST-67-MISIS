@@ -26,20 +26,3 @@ export const BASE_WORKFLOW = {
     { id: 'st-control', phase: 'teaching', slaDays: 30, name: 'Контроль исполнения', hint: 'Проверьте, что все этапы выполнены, и закройте взаимодействие.' },
   ],
 };
-
-export const SCHOOL_WORKFLOW = {
-  id: 'wf-school',
-  name: 'Этапы работы со школами',
-  description: 'Упрощённый цикл без корректировки документов и актуализации программы.',
-  version: 1,
-  updatedAt: '2026-03-15T12:00:00',
-  stages: [
-    { id: 'sc-contacts', phase: 'acquaintance', slaDays: 7, name: 'Поиск контактов в школе', hint: 'Найдите ответственного за ИТ-направление в школе.' },
-    { id: 'sc-meeting', phase: 'acquaintance', slaDays: 14, name: 'Встреча с администрацией', hint: 'Презентуйте программу и договоритесь о пилоте.' },
-    { id: 'sc-signing', phase: 'contract', slaDays: 21, name: 'Подписание соглашения', hint: 'Приложите подписанное соглашение.' },
-    { id: 'sc-handover', phase: 'rollout', slaDays: 10, name: 'Передача материалов', hint: 'Передайте материалы и лицензии.' },
-    { id: 'sc-training', phase: 'rollout', slaDays: 21, name: 'Обучение учителей', hint: 'Проведите обучение учителей.' },
-    { id: 'sc-classes', phase: 'teaching', slaDays: 120, name: 'Ведение занятий', hint: 'Занятия идут по расписанию школы.' },
-    { id: 'sc-control', phase: 'teaching', slaDays: 30, name: 'Контроль исполнения', hint: 'Подведите итоги и закройте взаимодействие.' },
-  ],
-};

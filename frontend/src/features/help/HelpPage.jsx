@@ -71,6 +71,7 @@ export function HelpPage() {
             </div>
           </dl>
           <Button
+            tone="warning"
             icon={RefreshIcon}
             onClick={() => {
               resetState();

@@ -1,7 +1,7 @@
 import { TRANSFER_STATUSES } from '../domain/contract.js';
 import { addDays, toIsoDate } from '../domain/format.js';
 import { DIRECTIONS, PRODUCTS, UNIVERSITIES, USERS } from './catalogs.js';
-import { BASE_WORKFLOW, SCHOOL_WORKFLOW } from './workflows.js';
+import { BASE_WORKFLOW } from './workflows.js';
 
 /**
  * Демо-данные строятся детерминированно относительно текущей даты,
@@ -245,7 +245,7 @@ function buildIntegrations(now) {
       {
         id: 'site',
         name: 'Сайт ИТ Школы',
-        description: 'Заявки вузов и школ с формы на сайте (Laravel)',
+        description: 'Заявки вузов с формы на сайте (Laravel)',
         endpoint: 'https://it-school.demo/api/v1/leads',
         schedule: 'Каждые 15 минут',
         enabled: true,
@@ -271,7 +271,7 @@ function buildReports(now) {
   ];
 }
 
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 3;
 
 export function createSeedState(now = new Date()) {
   const built = INTERACTIONS_TABLE.map((row) => buildInteraction(row, now));
@@ -284,7 +284,7 @@ export function createSeedState(now = new Date()) {
     directions: DIRECTIONS,
     products: PRODUCTS,
     users: USERS,
-    workflows: [BASE_WORKFLOW, SCHOOL_WORKFLOW],
+    workflows: [BASE_WORKFLOW],
     interactions,
     events,
     metrics: buildMetrics(interactions, now),

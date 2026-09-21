@@ -17,11 +17,11 @@
 .reset {
   padding: var(--space-2x);
   font: var(--font-body-s-strong);
-  color: var(--color-brand);
+  color: var(--color-accent);
 }
 
 .reset:hover {
-  color: var(--color-brand-hover);
+  color: var(--color-accent);
 }
 
 .period {
