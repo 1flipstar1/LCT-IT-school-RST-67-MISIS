@@ -161,10 +161,49 @@ export function useActions() {
         });
       },
 
-      createInteraction({ universityId, newUniversityName, directionId, productId, workflowId, managerId, comment = '', source = 'manual' }) {
+      updateInteraction({ interactionId, universityId, directionId, programId, productId, managerId, contactIds = [] }) {
+        const state = getState();
+        const interaction = findInteraction(state, interactionId);
+        const university = state.universities.find((item) => item.id === universityId);
+        const direction = state.directions.find((item) => item.id === directionId);
+        const program = state.programs.find((item) => item.id === programId && item.directionId === directionId);
+        const product = state.products.find((item) => item.id === productId);
+        const manager = state.users.find((item) => item.id === managerId);
+        if (!university || !direction || !program || !product || !manager || !program.productIds.includes(productId)) throw new AppError('NOT-FOUND-404');
+        if (managerId !== interaction.managerId) requirePermission(PERMISSION.assignManager);
+
+        const requestedContactIds = new Set(contactIds);
+        const normalizedContactIds = university.contacts.filter((contact) => requestedContactIds.has(contact.id)).map((contact) => contact.id);
+        const patch = { universityId, directionId, programId, productId, managerId, contactIds: normalizedContactIds };
+        const labels = [];
+        if (universityId !== interaction.universityId) labels.push('вуз');
+        if (directionId !== interaction.directionId) labels.push('ИТ-направление');
+        if (programId !== interaction.programId) labels.push('ИТ-программа');
+        if (productId !== interaction.productId) labels.push('ИТ-продукт');
+        if (managerId !== interaction.managerId) labels.push('ответственный');
+        const previousContactIds = interaction.contactIds ?? [];
+        if (normalizedContactIds.length !== previousContactIds.length || normalizedContactIds.some((id) => !previousContactIds.includes(id))) labels.push('контактные лица');
+        if (labels.length === 0) return { undo: null };
+
+        const at = now();
+        const text = `Изменены параметры: ${labels.join(', ')}`;
+        return undoable({
+          type: ACTION.interactionUpdated,
+          payload: {
+            interactionId,
+            patch,
+            event: { id: createId('ev'), interactionId, type: 'updated', userId: actorId, at, comment: text },
+            audit: { at, actorId, text, target: interactionTarget(state, interaction) },
+          },
+        });
+      },
+
+      createInteraction({ universityId, newUniversityName, directionId, programId, productId, workflowId, managerId, comment = '', source = 'manual' }) {
         const state = getState();
         const at = now();
         const workflow = state.workflows.find((item) => item.id === workflowId);
+        const program = state.programs.find((item) => item.id === programId && item.directionId === directionId);
+        if (!program || !program.productIds.includes(productId)) throw new AppError('NOT-FOUND-404');
 
         const universityToAdd = newUniversityName
           ? { id: createId('u'), name: newUniversityName.trim(), shortName: newUniversityName.trim(), city: '', contacts: [] }
@@ -174,6 +213,7 @@ export function useActions() {
           id: createId('i'),
           universityId: universityToAdd?.id ?? universityId,
           directionId,
+          programId,
           productId,
           managerId,
           workflowId,
@@ -286,12 +326,12 @@ export function useActions() {
         });
       },
 
-      applyImport({ universities, products, interactions, summary }) {
+      applyImport({ universities, programs, products, interactions, summary }) {
         requirePermission(PERMISSION.importCatalogs);
         const at = now();
         dispatch({
           type: ACTION.catalogImported,
-          payload: { universities, products, interactions, audit: { at, actorId, text: summary, target: { type: 'import', label: 'Импорт каталога' } } },
+          payload: { universities, programs, products, interactions, audit: { at, actorId, text: summary, target: { type: 'import', label: 'Импорт каталога' } } },
         });
       },
     };

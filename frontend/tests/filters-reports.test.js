@@ -12,6 +12,7 @@ const row = (overrides) => ({
   id: 'i1',
   universityId: 'u1',
   directionId: 'd1',
+  programId: 'pr1',
   productId: 'p1',
   managerId: 'usr-1',
   stageId: 'st-contacts',
@@ -21,6 +22,7 @@ const row = (overrides) => ({
   searchText: 'казанский федеральный университет devops',
   university: { name: 'Казанский федеральный университет' },
   direction: { name: 'DevOps' },
+  program: { name: 'DevOps-инженер' },
   product: { name: 'Astra Linux', vendor: 'Группа Астра' },
   stage: { name: 'Поиск контактов в вузе' },
   manager: { name: 'Алина Воронова' },
@@ -31,7 +33,7 @@ const row = (overrides) => ({
 describe('filterInteractionRows', () => {
   const rows = [
     row({ id: 'recent' }),
-    row({ id: 'old', startedAt: addDays(now, -400).toISOString(), completedAt: addDays(now, -200).toISOString(), directionId: 'd2' }),
+    row({ id: 'old', startedAt: addDays(now, -400).toISOString(), completedAt: addDays(now, -200).toISOString(), directionId: 'd2', programId: 'pr2' }),
     row({ id: 'overdue', sla: { state: SLA_STATE.overdue }, searchText: 'итмо backend' }),
   ];
   const ids = (filters) => filterInteractionRows(rows, { ...EMPTY_FILTERS, ...filters }, now).map((item) => item.id);
@@ -46,6 +48,7 @@ describe('filterInteractionRows', () => {
 
   it('фильтрует по направлению, срочности и поиску', () => {
     assert.deepEqual(ids({ directionIds: ['d2'] }), ['old']);
+    assert.deepEqual(ids({ programIds: ['pr1'] }), ['recent', 'overdue']);
     assert.deepEqual(ids({ onlyAttention: true }), ['overdue']);
     assert.deepEqual(ids({ query: 'ИТМО' }), ['overdue']);
   });
@@ -58,8 +61,8 @@ describe('filterInteractionRows', () => {
 describe('buildReportTable', () => {
   it('строит таблицу со стандартными колонками из ТЗ', () => {
     const table = buildReportTable([row({})], DEFAULT_REPORT_COLUMNS);
-    assert.deepEqual(table.header, ['Наименование вуза', 'ИТ-направление', 'ИТ-продукт', 'Статус работы с вузом', 'Ответственный']);
-    assert.deepEqual(table.body[0], ['Казанский федеральный университет', 'DevOps', 'Astra Linux', 'Поиск контактов в вузе', 'Алина Воронова']);
+    assert.deepEqual(table.header, ['Наименование вуза', 'ИТ-направление', 'ИТ-программа', 'ИТ-продукт', 'Статус работы с вузом', 'Ответственный']);
+    assert.deepEqual(table.body[0], ['Казанский федеральный университет', 'DevOps', 'DevOps-инженер', 'Astra Linux', 'Поиск контактов в вузе', 'Алина Воронова']);
   });
 
   it('без колонок — REPORT-400, без строк — REPORT-204', () => {

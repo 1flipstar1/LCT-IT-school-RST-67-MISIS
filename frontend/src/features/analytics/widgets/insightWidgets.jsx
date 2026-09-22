@@ -25,12 +25,12 @@ function RankingWidget({ data }) {
   return (
     <ChartCard
       id="analytics-chart-ranking"
-      title="Рейтинг ИТ-программ"
-      hint="Востребованность программ по заявкам, обучающимся и параллельным потокам. Все три показателя имеют одинаковый вес."
-      description="Индекс от 0 до 100: чем выше, тем больше спрос на программу."
+      title="Рейтинг ИТ-направлений"
+      hint="Востребованность направлений по заявкам, обучающимся и параллельным потокам. Все три показателя имеют одинаковый вес."
+      description="Индекс от 0 до 100: чем выше, тем больше спрос на направление."
       chart={
         <BarChart
-          ariaLabel="Рейтинг ИТ-программ по востребованности"
+          ariaLabel="Рейтинг ИТ-направлений по востребованности"
           groups={[{ id: 'ranking', items: data.ranking.map((item) => ({ id: item.direction.id, label: item.direction.name, value: item.index, source: item })) }]}
           formatTooltip={(item) => (
             <>
@@ -47,7 +47,7 @@ function RankingWidget({ data }) {
         rowKey: (item) => item.direction.id,
         rows: data.ranking,
         columns: [
-          { id: 'direction', header: 'Программа', primary: true, cell: (item) => item.direction.name },
+          { id: 'direction', header: 'Направление', primary: true, cell: (item) => item.direction.name },
           { id: 'applications', header: 'Заявок', align: 'right', cell: (item) => formatNumber(item.applications) },
           { id: 'students', header: 'Обучающихся', align: 'right', cell: (item) => formatNumber(item.students) },
           { id: 'streams', header: 'Потоков', align: 'right', cell: (item) => item.streams },
@@ -64,15 +64,15 @@ function PopularityBubbleWidget({ data }) {
   return (
     <ChartCard
       id="analytics-chart-popularity-bubble"
-      title="Спрос на ИТ-программы"
+      title="Спрос на ИТ-направления"
       hint="Положение показывает заявки и обучающихся, площадь пузыря — число параллельных потоков."
       description="Правее — больше заявок, выше — больше обучающихся, крупнее — больше потоков."
-      chart={<BubbleChart ariaLabel="Спрос на ИТ-программы" points={points} xLabel="Заявки" yLabel="Обучающиеся" sizeLabel="Потоки" />}
+      chart={<BubbleChart ariaLabel="Спрос на ИТ-направления" points={points} xLabel="Заявки" yLabel="Обучающиеся" sizeLabel="Потоки" />}
       table={{
         rowKey: (item) => item.id,
         rows: points,
         columns: [
-          { id: 'program', header: 'Программа', primary: true, cell: (item) => item.label },
+          { id: 'direction', header: 'Направление', primary: true, cell: (item) => item.label },
           { id: 'applications', header: 'Заявок', align: 'right', cell: (item) => formatNumber(item.x) },
           { id: 'students', header: 'Обучающихся', align: 'right', cell: (item) => formatNumber(item.y) },
           { id: 'streams', header: 'Потоков', align: 'right', cell: (item) => item.size },
@@ -83,14 +83,18 @@ function PopularityBubbleWidget({ data }) {
 }
 
 function UniversitiesByWidget({ data, kind }) {
-  const source = kind === 'direction' ? data.directionsByUniversity : data.productsByUniversity;
-  const title = kind === 'direction' ? 'Вузы по ИТ-направлениям' : 'Вузы по продуктам и ПО';
+  const config = {
+    direction: { source: data.directionsByUniversity, title: 'Вузы по ИТ-направлениям', header: 'Направление' },
+    program: { source: data.programsByUniversity, title: 'Вузы по ИТ-программам', header: 'Программа' },
+    product: { source: data.productsByUniversity, title: 'Вузы по продуктам и ПО', header: 'Продукт / ПО' },
+  }[kind];
+  const { source, title, header } = config;
   const items = toBarItems(source, (item) => item.item.name, (item) => item.universities);
   return (
     <ChartCard
       id={`analytics-chart-universities-${kind}`}
       title={title}
-      hint="Количество уникальных вузов, где используется направление или продукт."
+      hint="Количество уникальных вузов, где используется выбранная сущность."
       description="В подсказке также показано число взаимодействий."
       chart={
         <BarChart
@@ -109,7 +113,7 @@ function UniversitiesByWidget({ data, kind }) {
         rowKey: (item) => item.item.id,
         rows: source,
         columns: [
-          { id: 'name', header: kind === 'direction' ? 'Направление' : 'Продукт / ПО', primary: true, cell: (item) => item.item.name },
+          { id: 'name', header, primary: true, cell: (item) => item.item.name },
           { id: 'universities', header: 'Вузов', align: 'right', cell: (item) => item.universities },
           { id: 'interactions', header: 'Взаимодействий', align: 'right', cell: (item) => item.interactions },
         ],
@@ -122,16 +126,17 @@ function PortfolioWidget({ data }) {
   return (
     <ChartCard
       id="analytics-chart-portfolio"
-      title="Программы и продукты по вузам"
-      hint="Сколько уникальных ИТ-направлений и продуктов используется в каждом вузе."
+      title="Направления, программы и продукты по вузам"
+      hint="Сколько уникальных ИТ-направлений, ИТ-программ и продуктов используется в каждом вузе."
       description="Столбец — сумма программ и продуктов; подробная разбивка доступна в таблице."
-      chart={<BarChart ariaLabel="Количество программ и продуктов по вузам" groups={[{ id: 'portfolio', items: toBarItems(data.universityPortfolio, (item) => item.university.shortName ?? item.university.name, (item) => item.directions + item.products) }]} />}
+      chart={<BarChart ariaLabel="Количество программ и продуктов по вузам" groups={[{ id: 'portfolio', items: toBarItems(data.universityPortfolio, (item) => item.university.shortName ?? item.university.name, (item) => item.programs + item.products) }]} />}
       table={{
         rowKey: (item) => item.university.id,
         rows: data.universityPortfolio,
         columns: [
           { id: 'university', header: 'Вуз', primary: true, cell: (item) => item.university.name },
-          { id: 'directions', header: 'Программ', align: 'right', cell: (item) => item.directions },
+          { id: 'directions', header: 'Направлений', align: 'right', cell: (item) => item.directions },
+          { id: 'programs', header: 'Программ', align: 'right', cell: (item) => item.programs },
           { id: 'products', header: 'Продуктов', align: 'right', cell: (item) => item.products },
           { id: 'interactions', header: 'Взаимодействий', align: 'right', cell: (item) => item.interactions },
         ],
@@ -145,14 +150,16 @@ function UniversityHeatmapWidget({ data, kind }) {
     const ids = new Set(data.rows.map((row) => row.universityId));
     return data.catalogs.universities.filter((item) => ids.has(item.id)).map((item) => ({ id: item.id, label: item.shortName ?? item.name }));
   }, [data]);
-  const catalog = kind === 'direction' ? data.catalogs.directions : data.catalogs.products;
+  const config = {
+    direction: { catalog: data.catalogs.directions, key: 'directionId', getValue: data.universityDirectionCount, title: 'Вузы × ИТ-направления', header: 'Направление' },
+    program: { catalog: data.catalogs.programs, key: 'programId', getValue: data.universityProgramCount, title: 'Вузы × ИТ-программы', header: 'Программа' },
+    product: { catalog: data.catalogs.products, key: 'productId', getValue: data.universityProductCount, title: 'Вузы × продукты и ПО', header: 'Продукт / ПО' },
+  }[kind];
+  const { catalog, key, getValue, title, header } = config;
   const usedColumns = useMemo(() => {
-    const key = kind === 'direction' ? 'directionId' : 'productId';
     const ids = new Set(data.rows.map((row) => row[key]));
     return catalog.filter((item) => ids.has(item.id)).map((item) => ({ id: item.id, label: item.name }));
-  }, [catalog, data.rows, kind]);
-  const getValue = kind === 'direction' ? data.universityDirectionCount : data.universityProductCount;
-  const title = kind === 'direction' ? 'Вузы × ИТ-направления' : 'Вузы × продукты и ПО';
+  }, [catalog, data.rows, key]);
   const tableRows = usedRows.flatMap((row) => usedColumns.map((column) => ({ id: `${row.id}-${column.id}`, row, column, value: getValue(row.id, column.id) })).filter((item) => item.value > 0));
   return (
     <ChartCard
@@ -166,7 +173,7 @@ function UniversityHeatmapWidget({ data, kind }) {
         rows: tableRows,
         columns: [
           { id: 'university', header: 'Вуз', primary: true, cell: (item) => item.row.label },
-          { id: 'item', header: kind === 'direction' ? 'Направление' : 'Продукт / ПО', cell: (item) => item.column.label },
+          { id: 'item', header, cell: (item) => item.column.label },
           { id: 'value', header: 'Взаимодействий', align: 'right', cell: (item) => item.value },
         ],
       }}
@@ -376,12 +383,14 @@ function QualityTableWidget({ data }) {
 }
 
 export const INSIGHT_WIDGETS = [
-  chart({ id: 'chart-ranking', title: 'Рейтинг ИТ-программ', description: 'Востребованность по заявкам, обучающимся и потокам.', category: WIDGET_CATEGORY.programs, chartType: 'Столбцы', icon: EducationIcon, Component: RankingWidget }),
-  chart({ id: 'chart-popularity-bubble', title: 'Спрос на ИТ-программы', description: 'Сравнение заявок, обучающихся и потоков.', category: WIDGET_CATEGORY.programs, chartType: 'Пузырьковая диаграмма', icon: EducationIcon, Component: PopularityBubbleWidget }),
+  chart({ id: 'chart-ranking', title: 'Рейтинг ИТ-направлений', description: 'Востребованность по заявкам, обучающимся и потокам.', category: WIDGET_CATEGORY.programs, chartType: 'Столбцы', icon: EducationIcon, Component: RankingWidget }),
+  chart({ id: 'chart-popularity-bubble', title: 'Спрос на ИТ-направления', description: 'Сравнение заявок, обучающихся и потоков.', category: WIDGET_CATEGORY.programs, chartType: 'Пузырьковая диаграмма', icon: EducationIcon, Component: PopularityBubbleWidget }),
   chart({ id: 'chart-universities-directions', title: 'Вузы по ИТ-направлениям', description: 'Количество вузов по каждому направлению.', category: WIDGET_CATEGORY.programs, chartType: 'Столбцы', icon: UniversityIcon, Component: (props) => <UniversitiesByWidget {...props} kind="direction" /> }),
+  chart({ id: 'chart-universities-programs', title: 'Вузы по ИТ-программам', description: 'Количество вузов по каждой программе.', category: WIDGET_CATEGORY.programs, chartType: 'Столбцы', icon: UniversityIcon, Component: (props) => <UniversitiesByWidget {...props} kind="program" /> }),
   chart({ id: 'chart-universities-products', title: 'Вузы по продуктам и ПО', description: 'Количество вузов по каждому продукту.', category: WIDGET_CATEGORY.programs, chartType: 'Столбцы', icon: UniversityIcon, Component: (props) => <UniversitiesByWidget {...props} kind="product" /> }),
   chart({ id: 'chart-portfolio', title: 'Программы и продукты по вузам', description: 'Портфель каждого вуза.', category: WIDGET_CATEGORY.programs, chartType: 'Столбцы и таблица', icon: UniversityIcon, Component: PortfolioWidget }),
   fullChart({ id: 'chart-heatmap-directions', title: 'Вузы × ИТ-направления', description: 'Матрица взаимодействий по направлениям.', category: WIDGET_CATEGORY.programs, chartType: 'Тепловая карта', icon: AnalyticsIcon, Component: (props) => <UniversityHeatmapWidget {...props} kind="direction" /> }),
+  fullChart({ id: 'chart-heatmap-programs', title: 'Вузы × ИТ-программы', description: 'Матрица взаимодействий по программам.', category: WIDGET_CATEGORY.programs, chartType: 'Тепловая карта', icon: AnalyticsIcon, Component: (props) => <UniversityHeatmapWidget {...props} kind="program" /> }),
   fullChart({ id: 'chart-heatmap-products', title: 'Вузы × продукты и ПО', description: 'Матрица взаимодействий по продуктам.', category: WIDGET_CATEGORY.programs, chartType: 'Тепловая карта', icon: AnalyticsIcon, Component: (props) => <UniversityHeatmapWidget {...props} kind="product" /> }),
   chart({ id: 'chart-licenses', title: 'Состояние лицензий', description: 'Действующие, истекающие и просроченные лицензии.', category: WIDGET_CATEGORY.licenses, chartType: 'Кольцевая диаграмма', icon: ShieldIcon, Component: LicenseWidget }),
   chart({ id: 'chart-transfers', title: 'Передача продукта', description: 'Статусы передачи материалов и лицензий.', category: WIDGET_CATEGORY.licenses, chartType: 'Кольцевая диаграмма', icon: ShieldIcon, Component: TransferWidget }),

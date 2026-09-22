@@ -31,7 +31,7 @@ export function FilterBar({
   variant = 'inline',
   resultLabel,
   actions,
-  searchPlaceholder = 'Вуз, направление, продукт или менеджер',
+  searchPlaceholder = 'Вуз, направление, программа, продукт или менеджер',
 }) {
   const set = (patch) => onChange({ ...filters, ...patch });
   const reset = () => onChange({ ...EMPTY_FILTERS, query: filters.query });
@@ -65,7 +65,7 @@ export function FilterBar({
 
 /** Сами поля фильтров: строкой под поиском или столбиком в боковой панели. */
 function FilterFields({ filters, set, show, stages, fieldClassName }) {
-  const { universities, directions, products } = useStoreState();
+  const { universities, directions, programs, products } = useStoreState();
   const managers = useManagers();
   const { can } = useSession();
 
@@ -74,6 +74,7 @@ function FilterFields({ filters, set, show, stages, fieldClassName }) {
       <PeriodFilter className={fieldClassName} period={filters.period} onChange={(period) => set({ period })} />
       <MultiSelectFilter className={fieldClassName} label="Вузы" options={toOptions(universities)} value={filters.universityIds} onChange={(universityIds) => set({ universityIds })} />
       <MultiSelectFilter className={fieldClassName} label="Направления" options={toOptions(directions)} value={filters.directionIds} onChange={(directionIds) => set({ directionIds })} />
+      <MultiSelectFilter className={fieldClassName} label="Программы" options={toOptions(programs)} value={filters.programIds} onChange={(programIds) => set({ programIds })} />
       <MultiSelectFilter className={fieldClassName} label="Продукты" options={toOptions(products)} value={filters.productIds} onChange={(productIds) => set({ productIds })} />
       {can(PERMISSION.viewAllInteractions) && (
         <MultiSelectFilter className={fieldClassName} label="Ответственные" options={toOptions(managers)} value={filters.managerIds} onChange={(managerIds) => set({ managerIds })} />

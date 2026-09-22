@@ -1,6 +1,6 @@
 import { TRANSFER_STATUSES } from '../domain/contract.js';
 import { addDays, toIsoDate } from '../domain/format.js';
-import { DIRECTIONS, PRODUCTS, UNIVERSITIES, USERS } from './catalogs.js';
+import { DIRECTIONS, PRODUCTS, PROGRAMS, UNIVERSITIES, USERS } from './catalogs.js';
 import { BASE_WORKFLOW } from './workflows.js';
 
 /**
@@ -177,12 +177,14 @@ function buildInteraction([id, universityId, directionId, productId, managerId, 
   const signed = stageIndex >= 6;
   const signedEvent = events.find((event) => event.toStageId === 'st-handover');
   const university = UNIVERSITIES.find((item) => item.id === universityId);
+  const program = PROGRAMS.find((item) => item.directionId === directionId && item.productIds.includes(productId)) ?? PROGRAMS.find((item) => item.directionId === directionId);
 
   return {
     interaction: {
       id,
       universityId,
       directionId,
+      programId: program.id,
       productId,
       managerId,
       workflowId: BASE_WORKFLOW.id,
@@ -251,6 +253,7 @@ function buildInbox(now) {
         universityName: 'Санкт-Петербургский политехнический университет Петра Великого',
         universityId: null,
         directionId: 'd1',
+        programId: 'pr1',
         productId: 'p1',
         contact: { name: 'Сергей Павлов', position: 'Заведующий кафедрой', email: 's.pavlov@demo-spbstu.ru' },
         message: 'Хотим внедрить курс DevOps на Astra Linux для 3-го курса с сентября.',
@@ -265,6 +268,7 @@ function buildInbox(now) {
       payload: {
         universityId: 'u1',
         directionId: 'd3',
+        programId: 'pr3',
         productId: 'p3',
         suggestedInteractionId: 'i1',
         message: 'Открыто 3 параллельных потока, зачислено 86 обучающихся.',
@@ -280,6 +284,7 @@ function buildInbox(now) {
         universityId: 'u2',
         universityName: 'Университет ИТМО',
         directionId: 'd5',
+        programId: 'pr5',
         productId: 'p5',
         suggestedInteractionId: 'i2',
         contact: { name: 'Анна Григорьева', position: 'Методист', email: 'a.grigoreva@demo-itmo.ru' },
@@ -295,6 +300,7 @@ function buildInbox(now) {
       payload: {
         universityId: 'u9',
         directionId: 'd2',
+        programId: 'pr2',
         productId: 'p5',
         suggestedInteractionId: 'i9',
         linkedInteractionId: 'i9',
@@ -346,7 +352,7 @@ function buildReports(now) {
   ];
 }
 
-export const SEED_VERSION = 4;
+export const SEED_VERSION = 5;
 
 export function createSeedState(now = new Date()) {
   const built = INTERACTIONS_TABLE.map((row) => buildInteraction(row, now));
@@ -357,6 +363,7 @@ export function createSeedState(now = new Date()) {
     version: SEED_VERSION,
     universities: UNIVERSITIES,
     directions: DIRECTIONS,
+    programs: PROGRAMS,
     products: PRODUCTS,
     users: USERS,
     workflows: [BASE_WORKFLOW],

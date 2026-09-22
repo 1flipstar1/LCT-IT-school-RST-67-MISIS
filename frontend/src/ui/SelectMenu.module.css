@@ -1,4 +1,4 @@
-.trigger {
+.trigger.trigger {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -17,7 +17,7 @@
 }
 
 /* В форме список растягивается на всю ширину поля, как соседние поля ввода. */
-.fullWidth {
+.trigger.fullWidth {
   max-width: none;
 }
 
@@ -27,10 +27,12 @@
 
 .trigger[data-popup-open] {
   border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
 }
 
 .trigger:focus-visible {
   border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
 }
 
 .trigger:disabled {
@@ -40,6 +42,14 @@
 
 .trigger svg {
   color: var(--color-text-secondary);
+}
+
+.trigger[data-placeholder] .value {
+  color: var(--color-text-tertiary);
+}
+
+.invalid {
+  border-color: var(--color-danger);
 }
 
 .value {

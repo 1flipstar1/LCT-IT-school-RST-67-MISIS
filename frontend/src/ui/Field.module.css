@@ -63,26 +63,6 @@
   min-height: 96px;
 }
 
-.selectWrap {
-  position: relative;
-  display: block;
-}
-
-.select {
-  appearance: none;
-  padding-right: var(--space-10x);
-  cursor: pointer;
-}
-
-.selectIcon {
-  position: absolute;
-  top: 50%;
-  right: var(--space-3x);
-  transform: translateY(-50%);
-  color: var(--color-text-secondary);
-  pointer-events: none;
-}
-
 /* ---------- Поиск ---------- */
 .search {
   display: flex;

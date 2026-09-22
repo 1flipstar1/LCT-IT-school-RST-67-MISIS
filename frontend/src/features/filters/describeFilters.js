@@ -14,6 +14,7 @@ export function describeFilters(filters, index) {
     periodText,
     names(filters.universityIds, index.universities, 'shortName'),
     names(filters.directionIds, index.directions),
+    names(filters.programIds, index.programs),
     names(filters.productIds, index.products),
     names(filters.managerIds, index.users),
   ]

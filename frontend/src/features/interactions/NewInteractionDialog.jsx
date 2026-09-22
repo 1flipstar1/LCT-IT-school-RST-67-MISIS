@@ -16,7 +16,7 @@ const toOptions = (items, label = (item) => item.name) => items.map((item) => ({
 
 /** Создание взаимодействия: пять обязательных полей и сразу переход в карточку. */
 export function NewInteractionDialog({ open, onOpenChange, defaults = {} }) {
-  const { universities, directions, products, workflows } = useStoreState();
+  const { universities, directions, programs, products, workflows } = useStoreState();
   const managers = useManagers();
   const { user, role } = useSession();
   const actions = useActions();
@@ -27,6 +27,7 @@ export function NewInteractionDialog({ open, onOpenChange, defaults = {} }) {
     universityId: defaults.universityId ?? '',
     newUniversityName: '',
     directionId: defaults.directionId ?? '',
+    programId: defaults.programId ?? '',
     productId: defaults.productId ?? '',
     workflowId: workflows[0].id,
     managerId: role === ROLE.manager ? user.id : '',
@@ -35,13 +36,22 @@ export function NewInteractionDialog({ open, onOpenChange, defaults = {} }) {
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
 
-  const update = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
+  const update = (field) => (event) => setForm((current) => ({
+    ...current,
+    [field]: event.target.value,
+    ...(field === 'directionId' ? { programId: '', productId: '' } : null),
+    ...(field === 'programId' ? { productId: '' } : null),
+  }));
   const isNewUniversity = form.universityId === NEW_UNIVERSITY;
+  const availablePrograms = programs.filter((program) => program.directionId === form.directionId);
+  const selectedProgram = programs.find((program) => program.id === form.programId);
+  const availableProducts = products.filter((product) => selectedProgram?.productIds.includes(product.id));
 
   const errors = {
     universityId: !form.universityId && 'Выберите вуз',
     newUniversityName: isNewUniversity && !form.newUniversityName.trim() && 'Введите название вуза',
     directionId: !form.directionId && 'Выберите ИТ-направление',
+    programId: !form.programId && 'Выберите ИТ-программу',
     productId: !form.productId && 'Выберите ИТ-продукт',
     managerId: !form.managerId && 'Назначьте ответственного',
   };
@@ -69,7 +79,7 @@ export function NewInteractionDialog({ open, onOpenChange, defaults = {} }) {
       open={open}
       onOpenChange={onOpenChange}
       title="Новое взаимодействие"
-      description="Взаимодействие — это работа с одним вузом по одному ИТ-направлению и продукту."
+      description="Выберите направление обучения, программу с материалами и практикой, а также используемый ИТ-продукт."
       footer={
         <>
           <Button onClick={() => onOpenChange(false)}>Отмена</Button>
@@ -109,12 +119,23 @@ export function NewInteractionDialog({ open, onOpenChange, defaults = {} }) {
           error={visibleError('directionId')}
         />
         <SelectField
+          label="ИТ-программа"
+          required
+          placeholder={form.directionId ? 'Выберите программу' : 'Сначала выберите направление'}
+          value={form.programId}
+          onChange={update('programId')}
+          options={toOptions(availablePrograms)}
+          disabled={!form.directionId}
+          error={visibleError('programId')}
+        />
+        <SelectField
           label="ИТ-продукт"
           required
-          placeholder="Выберите продукт"
+          placeholder={form.programId ? 'Выберите продукт' : 'Сначала выберите программу'}
           value={form.productId}
           onChange={update('productId')}
-          options={toOptions(products, (product) => `${product.name} — ${product.vendor}`)}
+          options={toOptions(availableProducts, (product) => `${product.name} — ${product.vendor}`)}
+          disabled={!form.programId}
           error={visibleError('productId')}
         />
         <SelectField

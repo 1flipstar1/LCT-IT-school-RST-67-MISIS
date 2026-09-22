@@ -7,12 +7,36 @@ import styles from './SelectMenu.module.css';
 /**
  * Выбор одного значения: компактный — для ячеек таблицы, fullWidth — для полей формы (см. SelectMenuField).
  */
-export function SelectMenu({ id, label, value, options, onChange, disabled, title, icon: Icon, fullWidth = false, className }) {
+export function SelectMenu({
+  id,
+  label,
+  value,
+  options,
+  onChange,
+  disabled,
+  required,
+  name,
+  form,
+  placeholder,
+  invalid,
+  describedBy,
+  title,
+  icon: Icon,
+  fullWidth = false,
+  className,
+}) {
   return (
-    <Select.Root value={value} onValueChange={onChange} disabled={disabled} items={options} modal={false}>
-      <Select.Trigger id={id} className={cn(styles.trigger, fullWidth && styles.fullWidth, className)} aria-label={label} title={title}>
+    <Select.Root value={value || null} onValueChange={onChange} disabled={disabled} required={required} name={name} form={form} items={options} modal={false}>
+      <Select.Trigger
+        id={id}
+        className={cn(styles.trigger, fullWidth && styles.fullWidth, invalid && styles.invalid, className)}
+        aria-label={label}
+        aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
+        title={title}
+      >
         {Icon && <Icon size={18} fill="currentColor" aria-hidden="true" />}
-        <Select.Value className={styles.value} />
+        <Select.Value className={styles.value} placeholder={placeholder} />
         <ChevronDownIcon size={16} fill="currentColor" aria-hidden="true" />
       </Select.Trigger>
       <Select.Portal>

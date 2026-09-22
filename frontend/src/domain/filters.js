@@ -3,7 +3,7 @@ import { needsAttention } from './workflow.js';
 
 /**
  * Единая модель фильтров: одинаково работает в списке взаимодействий, аналитике и отчётах
- * (ТЗ: фильтрация за период по вузам, ИТ-направлениям, ИТ-продуктам и ответственным).
+ * Фильтрация за период по вузам, ИТ-направлениям, ИТ-программам, ИТ-продуктам и ответственным.
  */
 export const PERIOD_PRESETS = [
   { id: 'all', label: 'За всё время' },
@@ -18,6 +18,7 @@ export const EMPTY_FILTERS = Object.freeze({
   period: { preset: 'all', from: '', to: '' },
   universityIds: [],
   directionIds: [],
+  programIds: [],
   productIds: [],
   managerIds: [],
   stageIds: [],
@@ -53,6 +54,7 @@ export function countActiveFilters(filters) {
     (filters.period.preset !== 'all' ? 1 : 0) +
     filters.universityIds.length +
     filters.directionIds.length +
+    filters.programIds.length +
     filters.productIds.length +
     filters.managerIds.length +
     filters.stageIds.length +
@@ -70,6 +72,7 @@ export function filterInteractionRows(rows, filters, now = new Date()) {
       isActiveInPeriod(row, range) &&
       includesOrAny(filters.universityIds, row.universityId) &&
       includesOrAny(filters.directionIds, row.directionId) &&
+      includesOrAny(filters.programIds, row.programId) &&
       includesOrAny(filters.productIds, row.productId) &&
       includesOrAny(filters.managerIds, row.managerId) &&
       includesOrAny(filters.stageIds, row.stageId) &&

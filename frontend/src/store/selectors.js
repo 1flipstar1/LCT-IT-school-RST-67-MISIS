@@ -7,16 +7,17 @@ import { useStoreState } from './StoreProvider.jsx';
 const indexById = (items) => new Map(items.map((item) => [item.id, item]));
 
 export function useCatalogIndex() {
-  const { universities, directions, products, users, workflows } = useStoreState();
+  const { universities, directions, programs, products, users, workflows } = useStoreState();
   return useMemo(
     () => ({
       universities: indexById(universities),
       directions: indexById(directions),
+      programs: indexById(programs),
       products: indexById(products),
       users: indexById(users),
       workflows: indexById(workflows),
     }),
-    [universities, directions, products, users, workflows],
+    [universities, directions, programs, products, users, workflows],
   );
 }
 
@@ -25,6 +26,7 @@ export function toInteractionRow(interaction, index, now = new Date()) {
   const workflow = index.workflows.get(interaction.workflowId);
   const university = index.universities.get(interaction.universityId);
   const direction = index.directions.get(interaction.directionId);
+  const program = index.programs.get(interaction.programId);
   const product = index.products.get(interaction.productId);
   const manager = index.users.get(interaction.managerId);
   const stage = getStage(workflow, interaction.stageId);
@@ -34,12 +36,13 @@ export function toInteractionRow(interaction, index, now = new Date()) {
     workflow,
     university,
     direction,
+    program,
     product,
     manager,
     stage,
     sla: getSla(interaction, workflow, now),
     progress: getProgress(workflow, interaction.stageId),
-    searchText: [university.name, university.shortName, direction.name, product.name, product.vendor, manager?.name, stage.name]
+    searchText: [university.name, university.shortName, direction.name, program?.name, product.name, product.vendor, manager?.name, stage.name]
       .join(' ')
       .toLowerCase(),
   };

@@ -99,7 +99,7 @@ export function InteractionBoard({ workflow, rows }) {
                             >
                               <span className={styles.cardTitle}>{row.university.shortName}</span>
                               <span className={styles.cardMeta}>
-                                {row.direction.name} · {row.product.name}
+                                {row.program.name} · {row.product.name}
                               </span>
                               <span className={styles.cardFooter}>
                                 <SlaBadge sla={row.sla} compact />

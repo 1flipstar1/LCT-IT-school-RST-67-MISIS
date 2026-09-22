@@ -168,6 +168,7 @@ function InboxItem({ item }) {
       universityId: payload.universityId,
       newUniversityName: payload.universityId ? '' : payload.universityName,
       directionId: payload.directionId,
+      programId: payload.programId,
       productId: payload.productId,
       workflowId: state.workflows[0].id,
       managerId: pickManagerId(state, payload.universityId, user),
@@ -199,6 +200,10 @@ function InboxItem({ item }) {
         <div>
           <dt>Направление</dt>
           <dd>{index.directions.get(payload.directionId)?.name ?? '—'}</dd>
+        </div>
+        <div>
+          <dt>Программа</dt>
+          <dd>{index.programs.get(payload.programId)?.name ?? '—'}</dd>
         </div>
         <div>
           <dt>Продукт</dt>
