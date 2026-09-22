@@ -7,10 +7,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.models.base import Base
-from app.models.university import UniversityModel
-from app.models.direction import ITDirectionModel
-from app.models.product import ITProductModel
+from app.models import Base, StateSnapshotModel  # noqa: F401
 
 
 # this is the Alembic Config object, which provides
@@ -46,7 +43,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = settings.database_url
     context.configure(
         url=url,
         target_metadata=target_metadata,

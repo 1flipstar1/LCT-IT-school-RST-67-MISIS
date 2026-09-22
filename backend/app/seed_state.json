@@ -1,0 +1,5237 @@
+{
+  "version": 5,
+  "universities": [
+    {
+      "id": "u1",
+      "name": "Казанский федеральный университет",
+      "shortName": "КФУ",
+      "city": "Казань",
+      "contacts": [
+        {
+          "id": "u1-c1",
+          "name": "Ирина Петрова",
+          "position": "Проректор по цифровой трансформации",
+          "email": "i.petrova@demo-kfu.ru",
+          "phone": "+7 843 200-10-01"
+        }
+      ]
+    },
+    {
+      "id": "u2",
+      "name": "Университет ИТМО",
+      "shortName": "ИТМО",
+      "city": "Санкт-Петербург",
+      "contacts": [
+        {
+          "id": "u2-c1",
+          "name": "Сергей Лавров",
+          "position": "Директор ИТ-мегафакультета",
+          "email": "s.lavrov@demo-itmo.ru",
+          "phone": "+7 812 300-20-02"
+        },
+        {
+          "id": "u2-c2",
+          "name": "Анна Григорьева",
+          "position": "Методист",
+          "email": "a.grigoreva@demo-itmo.ru",
+          "phone": "+7 812 300-20-03"
+        }
+      ]
+    },
+    {
+      "id": "u3",
+      "name": "Уральский федеральный университет",
+      "shortName": "УрФУ",
+      "city": "Екатеринбург",
+      "contacts": [
+        {
+          "id": "u3-c1",
+          "name": "Павел Никитин",
+          "position": "Заведующий кафедрой ИТ",
+          "email": "p.nikitin@demo-urfu.ru",
+          "phone": "+7 343 400-30-04"
+        }
+      ]
+    },
+    {
+      "id": "u4",
+      "name": "Томский политехнический университет",
+      "shortName": "ТПУ",
+      "city": "Томск",
+      "contacts": [
+        {
+          "id": "u4-c1",
+          "name": "Марина Зайцева",
+          "position": "Руководитель центра компетенций",
+          "email": "m.zaytseva@demo-tpu.ru",
+          "phone": "+7 382 500-40-05"
+        }
+      ]
+    },
+    {
+      "id": "u5",
+      "name": "НИУ «Высшая школа экономики»",
+      "shortName": "НИУ ВШЭ",
+      "city": "Москва",
+      "contacts": [
+        {
+          "id": "u5-c1",
+          "name": "Кирилл Андреев",
+          "position": "Академический руководитель программы",
+          "email": "k.andreev@demo-hse.ru",
+          "phone": "+7 495 600-50-06"
+        }
+      ]
+    },
+    {
+      "id": "u6",
+      "name": "Дальневосточный федеральный университет",
+      "shortName": "ДВФУ",
+      "city": "Владивосток",
+      "contacts": [
+        {
+          "id": "u6-c1",
+          "name": "Виктор Ли",
+          "position": "Директор школы цифровой экономики",
+          "email": "v.li@demo-dvfu.ru",
+          "phone": "+7 423 700-60-07"
+        }
+      ]
+    },
+    {
+      "id": "u7",
+      "name": "Московский политехнический университет",
+      "shortName": "Московский Политех",
+      "city": "Москва",
+      "contacts": [
+        {
+          "id": "u7-c1",
+          "name": "Татьяна Орехова",
+          "position": "Декан факультета ИТ",
+          "email": "t.orehova@demo-mospolytech.ru",
+          "phone": "+7 495 800-70-08"
+        }
+      ]
+    },
+    {
+      "id": "u8",
+      "name": "Южный федеральный университет",
+      "shortName": "ЮФУ",
+      "city": "Ростов-на-Дону",
+      "contacts": [
+        {
+          "id": "u8-c1",
+          "name": "Роман Белов",
+          "position": "Директор института компьютерных технологий",
+          "email": "r.belov@demo-sfedu.ru",
+          "phone": "+7 863 900-80-09"
+        }
+      ]
+    },
+    {
+      "id": "u9",
+      "name": "Новосибирский государственный университет",
+      "shortName": "НГУ",
+      "city": "Новосибирск",
+      "contacts": [
+        {
+          "id": "u9-c1",
+          "name": "Екатерина Фомина",
+          "position": "Заместитель декана ФИТ",
+          "email": "e.fomina@demo-nsu.ru",
+          "phone": "+7 383 100-90-10"
+        }
+      ]
+    },
+    {
+      "id": "u10",
+      "name": "Самарский университет им. С. П. Королёва",
+      "shortName": "Самарский университет",
+      "city": "Самара",
+      "contacts": [
+        {
+          "id": "u10-c1",
+          "name": "Олег Сорокин",
+          "position": "Заведующий кафедрой программных систем",
+          "email": "o.sorokin@demo-ssau.ru",
+          "phone": "+7 846 110-11-11"
+        }
+      ]
+    },
+    {
+      "id": "u11",
+      "name": "Нижегородский государственный университет им. Н. И. Лобачевского",
+      "shortName": "ННГУ",
+      "city": "Нижний Новгород",
+      "contacts": [
+        {
+          "id": "u11-c1",
+          "name": "Юлия Медведева",
+          "position": "Руководитель ИТ-академии",
+          "email": "y.medvedeva@demo-unn.ru",
+          "phone": "+7 831 120-12-12"
+        }
+      ]
+    },
+    {
+      "id": "u12",
+      "name": "Сибирский федеральный университет",
+      "shortName": "СФУ",
+      "city": "Красноярск",
+      "contacts": [
+        {
+          "id": "u12-c1",
+          "name": "Андрей Волков",
+          "position": "Директор института космических и информационных технологий",
+          "email": "a.volkov@demo-sfu.ru",
+          "phone": "+7 391 130-13-13"
+        }
+      ]
+    }
+  ],
+  "directions": [
+    {
+      "id": "d1",
+      "name": "DevOps"
+    },
+    {
+      "id": "d2",
+      "name": "Тестирование (QA)"
+    },
+    {
+      "id": "d3",
+      "name": "Аналитика данных"
+    },
+    {
+      "id": "d4",
+      "name": "Кибербезопасность"
+    },
+    {
+      "id": "d5",
+      "name": "Backend-разработка"
+    },
+    {
+      "id": "d6",
+      "name": "Frontend-разработка"
+    },
+    {
+      "id": "d7",
+      "name": "Машинное обучение"
+    },
+    {
+      "id": "d8",
+      "name": "Системное администрирование"
+    }
+  ],
+  "programs": [
+    {
+      "id": "pr1",
+      "directionId": "d1",
+      "name": "DevOps-инженер",
+      "description": "Практика CI/CD, контейнеризации и эксплуатации инфраструктуры.",
+      "productIds": [
+        "p1",
+        "p2"
+      ]
+    },
+    {
+      "id": "pr2",
+      "directionId": "d2",
+      "name": "Инженер по тестированию",
+      "description": "Методические материалы по ручному и автоматизированному тестированию.",
+      "productIds": [
+        "p5"
+      ]
+    },
+    {
+      "id": "pr3",
+      "directionId": "d3",
+      "name": "Аналитик данных",
+      "description": "Практика сбора, обработки и визуализации данных.",
+      "productIds": [
+        "p3",
+        "p7"
+      ]
+    },
+    {
+      "id": "pr4",
+      "directionId": "d4",
+      "name": "Специалист по информационной безопасности",
+      "description": "Материалы и лабораторные работы по защите ИТ-инфраструктуры.",
+      "productIds": [
+        "p6"
+      ]
+    },
+    {
+      "id": "pr5",
+      "directionId": "d5",
+      "name": "Backend-разработчик",
+      "description": "Практика серверной разработки, баз данных и бизнес-логики.",
+      "productIds": [
+        "p5",
+        "p8"
+      ]
+    },
+    {
+      "id": "pr6",
+      "directionId": "d6",
+      "name": "Frontend-разработчик",
+      "description": "Методические материалы и практика разработки пользовательских интерфейсов.",
+      "productIds": [
+        "p4"
+      ]
+    },
+    {
+      "id": "pr7",
+      "directionId": "d7",
+      "name": "Инженер машинного обучения",
+      "description": "Практика подготовки данных, обучения и оценки моделей.",
+      "productIds": [
+        "p7"
+      ]
+    },
+    {
+      "id": "pr8",
+      "directionId": "d8",
+      "name": "Системный администратор Linux",
+      "description": "Практика установки, настройки и сопровождения операционных систем.",
+      "productIds": [
+        "p1"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Astra Linux",
+      "vendor": "Группа Астра"
+    },
+    {
+      "id": "p2",
+      "name": "РЕД ОС",
+      "vendor": "РЕД СОФТ"
+    },
+    {
+      "id": "p3",
+      "name": "МойОфис",
+      "vendor": "МойОфис"
+    },
+    {
+      "id": "p4",
+      "name": "Р7-Офис",
+      "vendor": "Р7"
+    },
+    {
+      "id": "p5",
+      "name": "Postgres Pro",
+      "vendor": "Postgres Professional"
+    },
+    {
+      "id": "p6",
+      "name": "Kaspersky Endpoint Security",
+      "vendor": "Лаборатория Касперского"
+    },
+    {
+      "id": "p7",
+      "name": "DataLens",
+      "vendor": "Яндекс"
+    },
+    {
+      "id": "p8",
+      "name": "1С:Предприятие",
+      "vendor": "1С"
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-1",
+      "name": "Алина Воронова",
+      "email": "a.voronova@rt.ru",
+      "role": "manager",
+      "leadId": "usr-6",
+      "active": true,
+      "access": {
+        "scope": "own",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-2",
+      "name": "Михаил Орлов",
+      "email": "m.orlov@rt.ru",
+      "role": "manager",
+      "leadId": "usr-6",
+      "active": true,
+      "access": {
+        "scope": "own",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-3",
+      "name": "Елена Ким",
+      "email": "e.kim@rt.ru",
+      "role": "manager",
+      "leadId": "usr-7",
+      "active": true,
+      "access": {
+        "scope": "own",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-4",
+      "name": "Дмитрий Соколов",
+      "email": "d.sokolov@rt.ru",
+      "role": "manager",
+      "leadId": "usr-7",
+      "active": true,
+      "access": {
+        "scope": "own",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-5",
+      "name": "Ольга Лебедева",
+      "email": "o.lebedeva@rt.ru",
+      "role": "manager",
+      "leadId": "usr-6",
+      "active": true,
+      "access": {
+        "scope": "own",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-6",
+      "name": "Алексей Козлов",
+      "email": "a.kozlov@rt.ru",
+      "role": "lead",
+      "leadId": null,
+      "active": true,
+      "access": {
+        "scope": "team",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-7",
+      "name": "Наталья Белова",
+      "email": "n.belova@rt.ru",
+      "role": "lead",
+      "leadId": null,
+      "active": true,
+      "access": {
+        "scope": "team",
+        "directionIds": []
+      }
+    },
+    {
+      "id": "usr-8",
+      "name": "Ирина Смирнова",
+      "email": "i.smirnova@rt.ru",
+      "role": "admin",
+      "leadId": null,
+      "active": true,
+      "access": {
+        "scope": "all",
+        "directionIds": []
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "id": "wf-base",
+      "name": "Этапы работы с вузами",
+      "description": "Полный цикл: от поиска контактов до контроля исполнения.",
+      "version": 3,
+      "updatedAt": "2026-04-02T10:00:00",
+      "stages": [
+        {
+          "id": "st-contacts",
+          "phase": "acquaintance",
+          "slaDays": 7,
+          "name": "Поиск контактов в вузе",
+          "hint": "Найдите ответственного в вузе и добавьте его контакты в карточку вуза."
+        },
+        {
+          "id": "st-communication",
+          "phase": "acquaintance",
+          "slaDays": 10,
+          "name": "Коммуникация и уточнение программ",
+          "hint": "Уточните, какие ИТ-программы актуальны для вуза, и зафиксируйте итоги в комментарии."
+        },
+        {
+          "id": "st-meeting",
+          "expectsFiles": true,
+          "phase": "acquaintance",
+          "slaDays": 14,
+          "name": "Встреча с представителями вуза",
+          "hint": "Проведите встречу, приложите протокол или презентацию."
+        },
+        {
+          "id": "st-documents",
+          "expectsFiles": true,
+          "phase": "contract",
+          "slaDays": 10,
+          "name": "Обмен документами",
+          "hint": "Отправьте вузу пакет документов для подписания и приложите его к этапу."
+        },
+        {
+          "id": "st-corrections",
+          "phase": "contract",
+          "slaDays": 7,
+          "optional": true,
+          "name": "Корректировка документов",
+          "hint": "Этап необязательный: нужен, только если вуз прислал правки."
+        },
+        {
+          "id": "st-signing",
+          "expectsFiles": true,
+          "phase": "contract",
+          "slaDays": 14,
+          "name": "Подписание документов",
+          "hint": "Приложите подписанный договор и заполните номер договора в данных."
+        },
+        {
+          "id": "st-handover",
+          "expectsFiles": true,
+          "phase": "rollout",
+          "slaDays": 7,
+          "name": "Передача материалов и лицензий",
+          "hint": "Передайте вузу обучающие материалы, лицензию ИТ-продукта и документацию."
+        },
+        {
+          "id": "st-rollout",
+          "phase": "rollout",
+          "slaDays": 30,
+          "name": "Сопровождение внедрения",
+          "hint": "Помогите вузу развернуть ИТ-продукт. Фиксируйте вопросы и решения в комментариях."
+        },
+        {
+          "id": "st-teacher-training",
+          "expectsFiles": true,
+          "phase": "rollout",
+          "slaDays": 21,
+          "name": "Обучение преподавателей",
+          "hint": "Проведите обучение и приложите список преподавателей, прошедших курс."
+        },
+        {
+          "id": "st-curriculum",
+          "expectsFiles": true,
+          "phase": "rollout",
+          "slaDays": 30,
+          "name": "Актуализация учебной программы",
+          "hint": "Согласуйте с вузом обновлённую программу с учётом ИТ-продукта."
+        },
+        {
+          "id": "st-classes",
+          "phase": "teaching",
+          "slaDays": 120,
+          "name": "Ведение занятий",
+          "hint": "Занятия идут. Данные об обучающихся и потоках подтягиваются из LMS автоматически."
+        },
+        {
+          "id": "st-docs-update",
+          "phase": "teaching",
+          "slaDays": 30,
+          "name": "Актуализация документации",
+          "hint": "Обновите документацию по продукту и обучающие материалы по итогам семестра."
+        },
+        {
+          "id": "st-qualification",
+          "phase": "teaching",
+          "slaDays": 60,
+          "name": "Повышение квалификации преподавателей",
+          "hint": "Запланируйте курс повышения квалификации и приложите программу."
+        },
+        {
+          "id": "st-control",
+          "phase": "teaching",
+          "slaDays": 30,
+          "name": "Контроль исполнения",
+          "hint": "Проверьте, что все этапы выполнены, и закройте взаимодействие."
+        }
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "i1",
+      "universityId": "u1",
+      "directionId": "d3",
+      "programId": "pr3",
+      "productId": "p3",
+      "managerId": "usr-1",
+      "workflowId": "wf-base",
+      "stageId": "st-signing",
+      "contactIds": [
+        "u1-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-07-24T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-13T06:00:00.000Z",
+      "updatedAt": "2026-09-13T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i2",
+      "universityId": "u2",
+      "directionId": "d5",
+      "programId": "pr5",
+      "productId": "p5",
+      "managerId": "usr-2",
+      "workflowId": "wf-base",
+      "stageId": "st-meeting",
+      "contactIds": [
+        "u2-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-09-02T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-18T06:00:00.000Z",
+      "updatedAt": "2026-09-18T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i3",
+      "universityId": "u3",
+      "directionId": "d1",
+      "programId": "pr1",
+      "productId": "p2",
+      "managerId": "usr-3",
+      "workflowId": "wf-base",
+      "stageId": "st-documents",
+      "contactIds": [
+        "u3-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-08-19T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-10T06:00:00.000Z",
+      "updatedAt": "2026-09-10T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i4",
+      "universityId": "u4",
+      "directionId": "d4",
+      "programId": "pr4",
+      "productId": "p6",
+      "managerId": "usr-1",
+      "workflowId": "wf-base",
+      "stageId": "st-meeting",
+      "contactIds": [
+        "u4-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-08-28T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-06T06:00:00.000Z",
+      "updatedAt": "2026-09-06T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i5",
+      "universityId": "u5",
+      "directionId": "d7",
+      "programId": "pr7",
+      "productId": "p7",
+      "managerId": "usr-2",
+      "workflowId": "wf-base",
+      "stageId": "st-corrections",
+      "contactIds": [
+        "u5-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-08-13T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-19T06:00:00.000Z",
+      "updatedAt": "2026-09-19T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i6",
+      "universityId": "u6",
+      "directionId": "d3",
+      "programId": "pr3",
+      "productId": "p7",
+      "managerId": "usr-3",
+      "workflowId": "wf-base",
+      "stageId": "st-rollout",
+      "contactIds": [
+        "u6-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/042",
+        "licenseSignedAt": "2026-08-29",
+        "licenseYears": null,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-05-25T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-04T06:00:00.000Z",
+      "updatedAt": "2026-09-04T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i7",
+      "universityId": "u7",
+      "directionId": "d6",
+      "programId": "pr6",
+      "productId": "p4",
+      "managerId": "usr-1",
+      "workflowId": "wf-base",
+      "stageId": "st-signing",
+      "contactIds": [
+        "u7-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-07-29T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-10T06:00:00.000Z",
+      "updatedAt": "2026-09-10T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i8",
+      "universityId": "u8",
+      "directionId": "d1",
+      "programId": "pr1",
+      "productId": "p1",
+      "managerId": "usr-4",
+      "workflowId": "wf-base",
+      "stageId": "st-control",
+      "contactIds": [
+        "u8-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/056",
+        "licenseSignedAt": "2025-09-07",
+        "licenseYears": 1,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2025-08-18T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-12T06:00:00.000Z",
+      "updatedAt": "2026-09-12T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i9",
+      "universityId": "u9",
+      "directionId": "d2",
+      "programId": "pr2",
+      "productId": "p5",
+      "managerId": "usr-4",
+      "workflowId": "wf-base",
+      "stageId": "st-classes",
+      "contactIds": [
+        "u9-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/063",
+        "licenseSignedAt": "2025-10-07",
+        "licenseYears": 1,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-02-24T06:00:00.000Z",
+      "stageEnteredAt": "2026-08-13T06:00:00.000Z",
+      "updatedAt": "2026-08-13T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i10",
+      "universityId": "u10",
+      "directionId": "d8",
+      "programId": "pr8",
+      "productId": "p1",
+      "managerId": "usr-5",
+      "workflowId": "wf-base",
+      "stageId": "st-contacts",
+      "contactIds": [
+        "u10-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-09-17T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-17T06:00:00.000Z",
+      "updatedAt": "2026-09-17T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i11",
+      "universityId": "u11",
+      "directionId": "d5",
+      "programId": "pr5",
+      "productId": "p8",
+      "managerId": "usr-5",
+      "workflowId": "wf-base",
+      "stageId": "st-communication",
+      "contactIds": [
+        "u11-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-09-10T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-14T06:00:00.000Z",
+      "updatedAt": "2026-09-14T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i12",
+      "universityId": "u12",
+      "directionId": "d4",
+      "programId": "pr4",
+      "productId": "p6",
+      "managerId": "usr-3",
+      "workflowId": "wf-base",
+      "stageId": "st-teacher-training",
+      "contactIds": [
+        "u12-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/084",
+        "licenseSignedAt": "2026-07-07",
+        "licenseYears": 3,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-04-25T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-10T06:00:00.000Z",
+      "updatedAt": "2026-09-10T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i13",
+      "universityId": "u1",
+      "directionId": "d1",
+      "programId": "pr1",
+      "productId": "p2",
+      "managerId": "usr-1",
+      "workflowId": "wf-base",
+      "stageId": "st-curriculum",
+      "contactIds": [
+        "u1-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "2026-06-18",
+        "licenseYears": 3,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-03-16T06:00:00.000Z",
+      "stageEnteredAt": "2026-08-31T06:00:00.000Z",
+      "updatedAt": "2026-08-31T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i14",
+      "universityId": "u2",
+      "directionId": "d7",
+      "programId": "pr7",
+      "productId": "p7",
+      "managerId": "usr-2",
+      "workflowId": "wf-base",
+      "stageId": "st-classes",
+      "contactIds": [
+        "u2-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/098",
+        "licenseSignedAt": "2025-10-27",
+        "licenseYears": 1,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-01-05T06:00:00.000Z",
+      "stageEnteredAt": "2026-07-24T06:00:00.000Z",
+      "updatedAt": "2026-07-24T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i15",
+      "universityId": "u3",
+      "directionId": "d6",
+      "programId": "pr6",
+      "productId": "p4",
+      "managerId": "usr-3",
+      "workflowId": "wf-base",
+      "stageId": "st-handover",
+      "contactIds": [
+        "u3-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/105",
+        "licenseSignedAt": "2026-09-19",
+        "licenseYears": 2,
+        "transferStatus": "Передано частично"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-06-24T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-19T06:00:00.000Z",
+      "updatedAt": "2026-09-19T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i16",
+      "universityId": "u5",
+      "directionId": "d2",
+      "programId": "pr2",
+      "productId": "p5",
+      "managerId": "usr-4",
+      "workflowId": "wf-base",
+      "stageId": "st-docs-update",
+      "contactIds": [
+        "u5-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/112",
+        "licenseSignedAt": "2025-12-29",
+        "licenseYears": 3,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2025-10-27T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-10T06:00:00.000Z",
+      "updatedAt": "2026-09-10T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i17",
+      "universityId": "u6",
+      "directionId": "d8",
+      "programId": "pr8",
+      "productId": "p1",
+      "managerId": "usr-5",
+      "workflowId": "wf-base",
+      "stageId": "st-communication",
+      "contactIds": [
+        "u6-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-09-07T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-19T06:00:00.000Z",
+      "updatedAt": "2026-09-19T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i18",
+      "universityId": "u8",
+      "directionId": "d3",
+      "programId": "pr3",
+      "productId": "p3",
+      "managerId": "usr-4",
+      "workflowId": "wf-base",
+      "stageId": "st-documents",
+      "contactIds": [
+        "u8-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-08-23T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-20T06:00:00.000Z",
+      "updatedAt": "2026-09-20T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i19",
+      "universityId": "u9",
+      "directionId": "d4",
+      "programId": "pr4",
+      "productId": "p6",
+      "managerId": "usr-2",
+      "workflowId": "wf-base",
+      "stageId": "st-qualification",
+      "contactIds": [
+        "u9-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/133",
+        "licenseSignedAt": "2025-11-11",
+        "licenseYears": 2,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2025-09-07T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-02T06:00:00.000Z",
+      "updatedAt": "2026-09-02T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i20",
+      "universityId": "u4",
+      "directionId": "d5",
+      "programId": "pr5",
+      "productId": "p8",
+      "managerId": "usr-1",
+      "workflowId": "wf-base",
+      "stageId": "st-contacts",
+      "contactIds": [
+        "u4-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-09-19T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-19T06:00:00.000Z",
+      "updatedAt": "2026-09-19T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i21",
+      "universityId": "u11",
+      "directionId": "d1",
+      "programId": "pr1",
+      "productId": "p2",
+      "managerId": "usr-5",
+      "workflowId": "wf-base",
+      "stageId": "st-rollout",
+      "contactIds": [
+        "u11-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/147",
+        "licenseSignedAt": "2026-08-08",
+        "licenseYears": 2,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-05-05T06:00:00.000Z",
+      "stageEnteredAt": "2026-08-21T06:00:00.000Z",
+      "updatedAt": "2026-08-21T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i22",
+      "universityId": "u12",
+      "directionId": "d6",
+      "programId": "pr6",
+      "productId": "p4",
+      "managerId": "usr-3",
+      "workflowId": "wf-base",
+      "stageId": "st-meeting",
+      "contactIds": [],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-08-31T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-13T06:00:00.000Z",
+      "updatedAt": "2026-09-13T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i23",
+      "universityId": "u7",
+      "directionId": "d2",
+      "programId": "pr2",
+      "productId": "p5",
+      "managerId": "usr-2",
+      "workflowId": "wf-base",
+      "stageId": "st-corrections",
+      "contactIds": [
+        "u7-c1"
+      ],
+      "contract": {
+        "number": "",
+        "licenseSignedAt": "",
+        "licenseYears": null,
+        "transferStatus": "Не передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2026-08-08T06:00:00.000Z",
+      "stageEnteredAt": "2026-09-16T06:00:00.000Z",
+      "updatedAt": "2026-09-16T06:00:00.000Z",
+      "completedAt": null
+    },
+    {
+      "id": "i24",
+      "universityId": "u10",
+      "directionId": "d7",
+      "programId": "pr7",
+      "productId": "p7",
+      "managerId": "usr-4",
+      "workflowId": "wf-base",
+      "stageId": "st-control",
+      "contactIds": [
+        "u10-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/168",
+        "licenseSignedAt": "2025-08-23",
+        "licenseYears": 1,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2025-07-29T06:00:00.000Z",
+      "stageEnteredAt": "2026-08-18T06:00:00.000Z",
+      "updatedAt": "2026-09-02T06:00:00.000Z",
+      "completedAt": "2026-09-02T06:00:00.000Z"
+    },
+    {
+      "id": "i25",
+      "universityId": "u3",
+      "directionId": "d7",
+      "programId": "pr7",
+      "productId": "p7",
+      "managerId": "usr-5",
+      "workflowId": "wf-base",
+      "stageId": "st-control",
+      "contactIds": [
+        "u3-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/175",
+        "licenseSignedAt": "2025-11-25",
+        "licenseYears": 2,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2025-09-27T06:00:00.000Z",
+      "stageEnteredAt": "2026-08-28T06:00:00.000Z",
+      "updatedAt": "2026-09-17T06:00:00.000Z",
+      "completedAt": "2026-09-17T06:00:00.000Z"
+    },
+    {
+      "id": "i26",
+      "universityId": "u12",
+      "directionId": "d3",
+      "programId": "pr3",
+      "productId": "p3",
+      "managerId": "usr-1",
+      "workflowId": "wf-base",
+      "stageId": "st-control",
+      "contactIds": [
+        "u12-c1"
+      ],
+      "contract": {
+        "number": "РТК-ИТШ-2026/182",
+        "licenseSignedAt": "2026-01-29",
+        "licenseYears": 1,
+        "transferStatus": "Передано"
+      },
+      "comment": "",
+      "source": "manual",
+      "startedAt": "2025-11-26T06:00:00.000Z",
+      "stageEnteredAt": "2026-08-23T06:00:00.000Z",
+      "updatedAt": "2026-09-10T06:00:00.000Z",
+      "completedAt": "2026-09-10T06:00:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "i1-e0",
+      "interactionId": "i1",
+      "type": "created",
+      "userId": "usr-1",
+      "at": "2026-07-24T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i1-e1",
+      "interactionId": "i1",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-01T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i1-e2",
+      "interactionId": "i1",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-13T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i1-e3",
+      "interactionId": "i1",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-09-04T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i1-e4",
+      "interactionId": "i1",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-09-13T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i2-e0",
+      "interactionId": "i2",
+      "type": "created",
+      "userId": "usr-2",
+      "at": "2026-09-02T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i2-e1",
+      "interactionId": "i2",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-12T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i2-e2",
+      "interactionId": "i2",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-18T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i3-e0",
+      "interactionId": "i3",
+      "type": "created",
+      "userId": "usr-3",
+      "at": "2026-08-19T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i3-e1",
+      "interactionId": "i3",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-08-21T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i3-e2",
+      "interactionId": "i3",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-08-28T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i3-e3",
+      "interactionId": "i3",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-10T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i4-e0",
+      "interactionId": "i4",
+      "type": "created",
+      "userId": "usr-1",
+      "at": "2026-08-28T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i4-e1",
+      "interactionId": "i4",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-09-01T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i4-e2",
+      "interactionId": "i4",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-09-06T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i5-e0",
+      "interactionId": "i5",
+      "type": "created",
+      "userId": "usr-2",
+      "at": "2026-08-13T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i5-e1",
+      "interactionId": "i5",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-08-18T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i5-e2",
+      "interactionId": "i5",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-08-29T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i5-e3",
+      "interactionId": "i5",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-09T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i5-e4",
+      "interactionId": "i5",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-19T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i6-e0",
+      "interactionId": "i6",
+      "type": "created",
+      "userId": "usr-3",
+      "at": "2026-05-25T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i6-e1",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-05-30T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i6-e2",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-06-24T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i6-e3",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-07-09T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i6-e4",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-07-25T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i6-e5",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-08-03T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i6-e6",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-08-29T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i6-e7",
+      "interactionId": "i6",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-04T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i7-e0",
+      "interactionId": "i7",
+      "type": "created",
+      "userId": "usr-1",
+      "at": "2026-07-29T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i7-e1",
+      "interactionId": "i7",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-05T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i7-e2",
+      "interactionId": "i7",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-15T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i7-e3",
+      "interactionId": "i7",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-31T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "interactionId": "i7",
+      "type": "transition",
+      "userId": "usr-1",
+      "files": [],
+      "id": "i7-r1",
+      "at": "2026-09-04T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-meeting",
+      "stageId": "st-documents",
+      "comment": "Вуз запросил другую форму договора — вернули на встречу."
+    },
+    {
+      "interactionId": "i7",
+      "type": "transition",
+      "userId": "usr-1",
+      "files": [],
+      "id": "i7-r2",
+      "at": "2026-09-07T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Замечания устранены."
+    },
+    {
+      "id": "i7-e4",
+      "interactionId": "i7",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-09-10T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i8-e0",
+      "interactionId": "i8",
+      "type": "created",
+      "userId": "usr-4",
+      "at": "2025-08-18T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i8-e1",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-08-22T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i8-e2",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-08-29T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i8-e3",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-09-14T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i8-e4",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-09-23T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i8-e5",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-10-01T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i8-e6",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-10-19T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i8-e7",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-10-28T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i8-e8",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-11-20T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i8-e9",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-12-06T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i8-e10",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-01-01T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i8-e11",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-05-28T06:00:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-docs-update",
+      "stageId": "st-classes",
+      "comment": "Семестр завершён, собрали обратную связь.",
+      "files": []
+    },
+    {
+      "id": "i8-e12",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-06-28T06:00:00.000Z",
+      "fromStageId": "st-docs-update",
+      "toStageId": "st-qualification",
+      "stageId": "st-docs-update",
+      "comment": "Документация и материалы обновлены.",
+      "files": []
+    },
+    {
+      "id": "i8-e13",
+      "interactionId": "i8",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-09-12T06:00:00.000Z",
+      "fromStageId": "st-qualification",
+      "toStageId": "st-control",
+      "stageId": "st-qualification",
+      "comment": "Курс повышения квалификации пройден.",
+      "files": []
+    },
+    {
+      "id": "i9-e0",
+      "interactionId": "i9",
+      "type": "created",
+      "userId": "usr-4",
+      "at": "2026-02-24T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i9-e1",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-03-04T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i9-e2",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-03-14T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i9-e3",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-04-13T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i9-e4",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-04-24T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i9-e5",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-04-30T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i9-e6",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-05-06T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i9-e7",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-06-02T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i9-e8",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-07-02T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i9-e9",
+      "interactionId": "i9",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-08-13T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i10-e0",
+      "interactionId": "i10",
+      "type": "created",
+      "userId": "usr-5",
+      "at": "2026-09-17T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i11-e0",
+      "interactionId": "i11",
+      "type": "created",
+      "userId": "usr-5",
+      "at": "2026-09-10T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i11-e1",
+      "interactionId": "i11",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-09-14T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i12-e0",
+      "interactionId": "i12",
+      "type": "created",
+      "userId": "usr-3",
+      "at": "2026-04-25T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i12-e1",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-05-03T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i12-e2",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-05-15T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i12-e3",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-06-03T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i12-e4",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-06-15T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i12-e5",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-06-23T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i12-e6",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-07-07T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i12-e7",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-07-13T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "files": [],
+      "id": "i12-r1",
+      "at": "2026-08-05T20:24:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-handover",
+      "stageId": "st-rollout",
+      "comment": "Продукт не встал на стенд вуза — повторная передача лицензий."
+    },
+    {
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "files": [],
+      "id": "i12-r2",
+      "at": "2026-08-23T13:12:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Замечания устранены."
+    },
+    {
+      "id": "i12-e8",
+      "interactionId": "i12",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-10T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i13-e0",
+      "interactionId": "i13",
+      "type": "created",
+      "userId": "usr-1",
+      "at": "2026-03-16T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i13-e1",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-03-26T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i13-e2",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-04-06T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i13-e3",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-05-04T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i13-e4",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-06-04T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i13-e5",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-06-18T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i13-e6",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-07-01T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i13-e7",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-04T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i13-e8",
+      "interactionId": "i13",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-31T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i14-e0",
+      "interactionId": "i14",
+      "type": "created",
+      "userId": "usr-2",
+      "at": "2026-01-05T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i14-e1",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-01-17T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i14-e2",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-01-26T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i14-e3",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-02-12T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i14-e4",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-02-28T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i14-e5",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-03-08T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i14-e6",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-03-27T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i14-e7",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-04-02T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i14-e8",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-05-19T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i14-e9",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-06-13T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i14-e10",
+      "interactionId": "i14",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-07-24T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i15-e0",
+      "interactionId": "i15",
+      "type": "created",
+      "userId": "usr-3",
+      "at": "2026-06-24T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i15-e1",
+      "interactionId": "i15",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-06-27T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i15-e2",
+      "interactionId": "i15",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-08-03T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i15-e3",
+      "interactionId": "i15",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-08-22T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i15-e4",
+      "interactionId": "i15",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-02T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i15-e5",
+      "interactionId": "i15",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-19T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": []
+    },
+    {
+      "id": "i16-e0",
+      "interactionId": "i16",
+      "type": "created",
+      "userId": "usr-4",
+      "at": "2025-10-27T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i16-e1",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-11-07T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i16-e2",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-11-19T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i16-e3",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-11-29T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i16-e4",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-12-11T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i16-e5",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-12-21T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i16-e6",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-12-29T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i16-e7",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-01-08T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i16-e8",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-02-18T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i16-e9",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-03-09T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i16-e10",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-04-24T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": []
+    },
+    {
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "files": [],
+      "id": "i16-r1",
+      "at": "2026-06-18T20:24:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-curriculum",
+      "stageId": "st-classes",
+      "comment": "Учебный совет не утвердил программу — дорабатываем."
+    },
+    {
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "files": [],
+      "id": "i16-r2",
+      "at": "2026-07-30T13:12:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Замечания устранены."
+    },
+    {
+      "id": "i16-e11",
+      "interactionId": "i16",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-09-10T06:00:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-docs-update",
+      "stageId": "st-classes",
+      "comment": "Семестр завершён, собрали обратную связь.",
+      "files": []
+    },
+    {
+      "id": "i17-e0",
+      "interactionId": "i17",
+      "type": "created",
+      "userId": "usr-5",
+      "at": "2026-09-07T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i17-e1",
+      "interactionId": "i17",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-09-19T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i18-e0",
+      "interactionId": "i18",
+      "type": "created",
+      "userId": "usr-4",
+      "at": "2026-08-23T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i18-e1",
+      "interactionId": "i18",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-08-27T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i18-e2",
+      "interactionId": "i18",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-09-12T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i18-e3",
+      "interactionId": "i18",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-09-20T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i19-e0",
+      "interactionId": "i19",
+      "type": "created",
+      "userId": "usr-2",
+      "at": "2025-09-07T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i19-e1",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-09-18T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i19-e2",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-10-02T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i19-e3",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-10-16T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i19-e4",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-10-28T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i19-e5",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-11-11T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i19-e6",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-11-17T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i19-e7",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2025-12-16T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i19-e8",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-01-24T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i19-e9",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-03-01T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i19-e10",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-07-10T06:00:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-docs-update",
+      "stageId": "st-classes",
+      "comment": "Семестр завершён, собрали обратную связь.",
+      "files": []
+    },
+    {
+      "id": "i19-e11",
+      "interactionId": "i19",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-02T06:00:00.000Z",
+      "fromStageId": "st-docs-update",
+      "toStageId": "st-qualification",
+      "stageId": "st-docs-update",
+      "comment": "Документация и материалы обновлены.",
+      "files": []
+    },
+    {
+      "id": "i20-e0",
+      "interactionId": "i20",
+      "type": "created",
+      "userId": "usr-1",
+      "at": "2026-09-19T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i21-e0",
+      "interactionId": "i21",
+      "type": "created",
+      "userId": "usr-5",
+      "at": "2026-05-05T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i21-e1",
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-05-21T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i21-e2",
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-05-29T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i21-e3",
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-06-27T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": []
+    },
+    {
+      "id": "i21-e4",
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-07-18T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i21-e5",
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-08-08T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "files": [],
+      "id": "i21-r1",
+      "at": "2026-08-13T10:48:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-signing",
+      "stageId": "st-handover",
+      "comment": "Вуз не получил ключи лицензий — переподписываем акт."
+    },
+    {
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "files": [],
+      "id": "i21-r2",
+      "at": "2026-08-17T08:24:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Замечания устранены."
+    },
+    {
+      "id": "i21-e6",
+      "interactionId": "i21",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-08-21T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i22-e0",
+      "interactionId": "i22",
+      "type": "created",
+      "userId": "usr-3",
+      "at": "2026-08-31T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i22-e1",
+      "interactionId": "i22",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-09T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i22-e2",
+      "interactionId": "i22",
+      "type": "transition",
+      "userId": "usr-3",
+      "at": "2026-09-13T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i23-e0",
+      "interactionId": "i23",
+      "type": "created",
+      "userId": "usr-2",
+      "at": "2026-08-08T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i23-e1",
+      "interactionId": "i23",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-08-16T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i23-e2",
+      "interactionId": "i23",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-08-23T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i23-e3",
+      "interactionId": "i23",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-05T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i23-e4",
+      "interactionId": "i23",
+      "type": "transition",
+      "userId": "usr-2",
+      "at": "2026-09-16T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i24-e0",
+      "interactionId": "i24",
+      "type": "created",
+      "userId": "usr-4",
+      "at": "2025-07-29T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i24-e1",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-08-06T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i24-e2",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-08-20T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i24-e3",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-09-16T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i24-e4",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-09-24T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i24-e5",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-10-01T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i24-e6",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-10-09T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i24-e7",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-10-17T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i24-e8",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-12-05T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i24-e9",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2025-12-23T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i24-e10",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-02-15T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i24-e11",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-05-05T06:00:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-docs-update",
+      "stageId": "st-classes",
+      "comment": "Семестр завершён, собрали обратную связь.",
+      "files": []
+    },
+    {
+      "id": "i24-e12",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-06-16T06:00:00.000Z",
+      "fromStageId": "st-docs-update",
+      "toStageId": "st-qualification",
+      "stageId": "st-docs-update",
+      "comment": "Документация и материалы обновлены.",
+      "files": []
+    },
+    {
+      "id": "i24-e13",
+      "interactionId": "i24",
+      "type": "transition",
+      "userId": "usr-4",
+      "at": "2026-08-18T06:00:00.000Z",
+      "fromStageId": "st-qualification",
+      "toStageId": "st-control",
+      "stageId": "st-qualification",
+      "comment": "Курс повышения квалификации пройден.",
+      "files": []
+    },
+    {
+      "id": "i24-done",
+      "interactionId": "i24",
+      "type": "completed",
+      "userId": "usr-4",
+      "at": "2026-09-02T06:00:00.000Z",
+      "fromStageId": "st-control",
+      "toStageId": "st-control",
+      "stageId": "st-control",
+      "comment": "Все этапы выполнены, взаимодействие закрыто.",
+      "files": []
+    },
+    {
+      "id": "i25-e0",
+      "interactionId": "i25",
+      "type": "created",
+      "userId": "usr-5",
+      "at": "2025-09-27T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i25-e1",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-10-02T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i25-e2",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-10-14T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i25-e3",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-10-31T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i25-e4",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-11-12T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-signing",
+      "stageId": "st-documents",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i25-e5",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-11-25T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i25-e6",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-12-02T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i25-e7",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2025-12-20T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i25-e8",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-01-03T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i25-e9",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-02-07T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i25-e10",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-06-21T06:00:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-docs-update",
+      "stageId": "st-classes",
+      "comment": "Семестр завершён, собрали обратную связь.",
+      "files": []
+    },
+    {
+      "id": "i25-e11",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-07-10T06:00:00.000Z",
+      "fromStageId": "st-docs-update",
+      "toStageId": "st-qualification",
+      "stageId": "st-docs-update",
+      "comment": "Документация и материалы обновлены.",
+      "files": []
+    },
+    {
+      "id": "i25-e12",
+      "interactionId": "i25",
+      "type": "transition",
+      "userId": "usr-5",
+      "at": "2026-08-28T06:00:00.000Z",
+      "fromStageId": "st-qualification",
+      "toStageId": "st-control",
+      "stageId": "st-qualification",
+      "comment": "Курс повышения квалификации пройден.",
+      "files": []
+    },
+    {
+      "id": "i25-done",
+      "interactionId": "i25",
+      "type": "completed",
+      "userId": "usr-5",
+      "at": "2026-09-17T06:00:00.000Z",
+      "fromStageId": "st-control",
+      "toStageId": "st-control",
+      "stageId": "st-control",
+      "comment": "Все этапы выполнены, взаимодействие закрыто.",
+      "files": []
+    },
+    {
+      "id": "i26-e0",
+      "interactionId": "i26",
+      "type": "created",
+      "userId": "usr-1",
+      "at": "2025-11-26T06:00:00.000Z",
+      "toStageId": "st-contacts"
+    },
+    {
+      "id": "i26-e1",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2025-12-06T06:00:00.000Z",
+      "fromStageId": "st-contacts",
+      "toStageId": "st-communication",
+      "stageId": "st-contacts",
+      "comment": "Контакт найден, отправили первое письмо.",
+      "files": []
+    },
+    {
+      "id": "i26-e2",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2025-12-13T06:00:00.000Z",
+      "fromStageId": "st-communication",
+      "toStageId": "st-meeting",
+      "stageId": "st-communication",
+      "comment": "Вуз подтвердил интерес к программе, согласуем дату встречи.",
+      "files": []
+    },
+    {
+      "id": "i26-e3",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2025-12-31T06:00:00.000Z",
+      "fromStageId": "st-meeting",
+      "toStageId": "st-documents",
+      "stageId": "st-meeting",
+      "comment": "Встреча прошла, договорились о пилоте на следующий семестр.",
+      "files": [
+        {
+          "name": "Протокол встречи.pdf",
+          "size": 428000
+        }
+      ]
+    },
+    {
+      "id": "i26-e4",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-01-04T06:00:00.000Z",
+      "fromStageId": "st-documents",
+      "toStageId": "st-corrections",
+      "stageId": "st-documents",
+      "comment": "Юристы вуза прислали правки в договор.",
+      "files": [
+        {
+          "name": "Договор (проект).docx",
+          "size": 86000
+        }
+      ]
+    },
+    {
+      "id": "i26-e5",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-01-11T06:00:00.000Z",
+      "fromStageId": "st-corrections",
+      "toStageId": "st-signing",
+      "stageId": "st-corrections",
+      "comment": "Документы согласованы и отправлены на подпись.",
+      "files": [
+        {
+          "name": "Договор — правки вуза.docx",
+          "size": 91000
+        }
+      ]
+    },
+    {
+      "id": "i26-e6",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-01-29T06:00:00.000Z",
+      "fromStageId": "st-signing",
+      "toStageId": "st-handover",
+      "stageId": "st-signing",
+      "comment": "Договор подписан обеими сторонами.",
+      "files": [
+        {
+          "name": "Договор подписанный.pdf",
+          "size": 1240000
+        }
+      ]
+    },
+    {
+      "id": "i26-e7",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-02-06T06:00:00.000Z",
+      "fromStageId": "st-handover",
+      "toStageId": "st-rollout",
+      "stageId": "st-handover",
+      "comment": "Материалы и лицензии переданы в вуз.",
+      "files": [
+        {
+          "name": "Лицензии и материалы.zip",
+          "size": 18400000
+        }
+      ]
+    },
+    {
+      "id": "i26-e8",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-02-26T06:00:00.000Z",
+      "fromStageId": "st-rollout",
+      "toStageId": "st-teacher-training",
+      "stageId": "st-rollout",
+      "comment": "Продукт развёрнут в учебных классах.",
+      "files": []
+    },
+    {
+      "id": "i26-e9",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-03-09T06:00:00.000Z",
+      "fromStageId": "st-teacher-training",
+      "toStageId": "st-curriculum",
+      "stageId": "st-teacher-training",
+      "comment": "Обучение преподавателей завершено, прошли 12 человек.",
+      "files": [
+        {
+          "name": "Список преподавателей.xlsx",
+          "size": 24000
+        }
+      ]
+    },
+    {
+      "id": "i26-e10",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-04-13T06:00:00.000Z",
+      "fromStageId": "st-curriculum",
+      "toStageId": "st-classes",
+      "stageId": "st-curriculum",
+      "comment": "Обновлённая программа утверждена учёным советом.",
+      "files": [
+        {
+          "name": "Учебная программа.pdf",
+          "size": 612000
+        }
+      ]
+    },
+    {
+      "id": "i26-e11",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-06-04T06:00:00.000Z",
+      "fromStageId": "st-classes",
+      "toStageId": "st-docs-update",
+      "stageId": "st-classes",
+      "comment": "Семестр завершён, собрали обратную связь.",
+      "files": []
+    },
+    {
+      "id": "i26-e12",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-07-04T06:00:00.000Z",
+      "fromStageId": "st-docs-update",
+      "toStageId": "st-qualification",
+      "stageId": "st-docs-update",
+      "comment": "Документация и материалы обновлены.",
+      "files": []
+    },
+    {
+      "id": "i26-e13",
+      "interactionId": "i26",
+      "type": "transition",
+      "userId": "usr-1",
+      "at": "2026-08-23T06:00:00.000Z",
+      "fromStageId": "st-qualification",
+      "toStageId": "st-control",
+      "stageId": "st-qualification",
+      "comment": "Курс повышения квалификации пройден.",
+      "files": []
+    },
+    {
+      "id": "i26-done",
+      "interactionId": "i26",
+      "type": "completed",
+      "userId": "usr-1",
+      "at": "2026-09-10T06:00:00.000Z",
+      "fromStageId": "st-control",
+      "toStageId": "st-control",
+      "stageId": "st-control",
+      "comment": "Все этапы выполнены, взаимодействие закрыто.",
+      "files": []
+    }
+  ],
+  "metrics": [
+    {
+      "universityId": "u1",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-07",
+      "applications": 8,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-08",
+      "applications": 22,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-09",
+      "applications": 30,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d5",
+      "productId": "p5",
+      "month": "2026-09",
+      "applications": 36,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-08",
+      "applications": 36,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-09",
+      "applications": 50,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u4",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-08",
+      "applications": 42,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u4",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-09",
+      "applications": 32,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-08",
+      "applications": 35,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-09",
+      "applications": 33,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u6",
+      "directionId": "d3",
+      "productId": "p7",
+      "month": "2026-05",
+      "applications": 25,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u6",
+      "directionId": "d3",
+      "productId": "p7",
+      "month": "2026-06",
+      "applications": 14,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u6",
+      "directionId": "d3",
+      "productId": "p7",
+      "month": "2026-07",
+      "applications": 16,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u6",
+      "directionId": "d3",
+      "productId": "p7",
+      "month": "2026-08",
+      "applications": 37,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u6",
+      "directionId": "d3",
+      "productId": "p7",
+      "month": "2026-09",
+      "applications": 42,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u7",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-07",
+      "applications": 19,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u7",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-08",
+      "applications": 41,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u7",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-09",
+      "applications": 38,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2025-10",
+      "applications": 18,
+      "students": 39,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2025-11",
+      "applications": 21,
+      "students": 46,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2025-12",
+      "applications": 24,
+      "students": 55,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-01",
+      "applications": 32,
+      "students": 49,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-02",
+      "applications": 24,
+      "students": 57,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-03",
+      "applications": 27,
+      "students": 64,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-04",
+      "applications": 31,
+      "students": 74,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-05",
+      "applications": 26,
+      "students": 62,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-06",
+      "applications": 22,
+      "students": 70,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-07",
+      "applications": 25,
+      "students": 77,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-08",
+      "applications": 48,
+      "students": 83,
+      "streams": 4
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d1",
+      "productId": "p1",
+      "month": "2026-09",
+      "applications": 39,
+      "students": 72,
+      "streams": 4
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-02",
+      "applications": 26,
+      "students": 58,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-03",
+      "applications": 25,
+      "students": 55,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-04",
+      "applications": 33,
+      "students": 75,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-05",
+      "applications": 31,
+      "students": 72,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-06",
+      "applications": 22,
+      "students": 69,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-07",
+      "applications": 21,
+      "students": 66,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-08",
+      "applications": 55,
+      "students": 86,
+      "streams": 5
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-09",
+      "applications": 52,
+      "students": 83,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d8",
+      "productId": "p1",
+      "month": "2026-09",
+      "applications": 31,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u11",
+      "directionId": "d5",
+      "productId": "p8",
+      "month": "2026-09",
+      "applications": 46,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-04",
+      "applications": 24,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-05",
+      "applications": 22,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-06",
+      "applications": 22,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-07",
+      "applications": 22,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-08",
+      "applications": 41,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-09",
+      "applications": 55,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-03",
+      "applications": 19,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-04",
+      "applications": 22,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-05",
+      "applications": 18,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-06",
+      "applications": 15,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-07",
+      "applications": 17,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-08",
+      "applications": 37,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u1",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-09",
+      "applications": 41,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-01",
+      "applications": 35,
+      "students": 48,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-02",
+      "applications": 20,
+      "students": 46,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-03",
+      "applications": 20,
+      "students": 45,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-04",
+      "applications": 19,
+      "students": 45,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-05",
+      "applications": 26,
+      "students": 61,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-06",
+      "applications": 19,
+      "students": 59,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-07",
+      "applications": 19,
+      "students": 58,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-08",
+      "applications": 43,
+      "students": 72,
+      "streams": 4
+    },
+    {
+      "universityId": "u2",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-09",
+      "applications": 41,
+      "students": 70,
+      "streams": 4
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-06",
+      "applications": 8,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-07",
+      "applications": 10,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-08",
+      "applications": 26,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-09",
+      "applications": 29,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2025-10",
+      "applications": 19,
+      "students": 42,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2025-11",
+      "applications": 19,
+      "students": 42,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2025-12",
+      "applications": 18,
+      "students": 41,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-01",
+      "applications": 27,
+      "students": 43,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-02",
+      "applications": 18,
+      "students": 42,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-03",
+      "applications": 24,
+      "students": 57,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-04",
+      "applications": 23,
+      "students": 56,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-05",
+      "applications": 23,
+      "students": 56,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-06",
+      "applications": 18,
+      "students": 55,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-07",
+      "applications": 22,
+      "students": 69,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-08",
+      "applications": 38,
+      "students": 69,
+      "streams": 3
+    },
+    {
+      "universityId": "u5",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-09",
+      "applications": 36,
+      "students": 68,
+      "streams": 3
+    },
+    {
+      "universityId": "u6",
+      "directionId": "d8",
+      "productId": "p1",
+      "month": "2026-09",
+      "applications": 47,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-08",
+      "applications": 24,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u8",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-09",
+      "applications": 23,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2025-10",
+      "applications": 14,
+      "students": 30,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2025-11",
+      "applications": 16,
+      "students": 37,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2025-12",
+      "applications": 19,
+      "students": 43,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-01",
+      "applications": 24,
+      "students": 38,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-02",
+      "applications": 19,
+      "students": 45,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-03",
+      "applications": 21,
+      "students": 52,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-04",
+      "applications": 24,
+      "students": 57,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-05",
+      "applications": 20,
+      "students": 50,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-06",
+      "applications": 18,
+      "students": 57,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-07",
+      "applications": 20,
+      "students": 63,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-08",
+      "applications": 40,
+      "students": 71,
+      "streams": 3
+    },
+    {
+      "universityId": "u9",
+      "directionId": "d4",
+      "productId": "p6",
+      "month": "2026-09",
+      "applications": 33,
+      "students": 64,
+      "streams": 3
+    },
+    {
+      "universityId": "u4",
+      "directionId": "d5",
+      "productId": "p8",
+      "month": "2026-09",
+      "applications": 49,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u11",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-05",
+      "applications": 18,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u11",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-06",
+      "applications": 12,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u11",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-07",
+      "applications": 17,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u11",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-08",
+      "applications": 35,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u11",
+      "directionId": "d1",
+      "productId": "p2",
+      "month": "2026-09",
+      "applications": 33,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-08",
+      "applications": 43,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d6",
+      "productId": "p4",
+      "month": "2026-09",
+      "applications": 48,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u7",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-08",
+      "applications": 48,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u7",
+      "directionId": "d2",
+      "productId": "p5",
+      "month": "2026-09",
+      "applications": 45,
+      "students": 0,
+      "streams": 0
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2025-10",
+      "applications": 25,
+      "students": 55,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2025-11",
+      "applications": 28,
+      "students": 64,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2025-12",
+      "applications": 32,
+      "students": 72,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-01",
+      "applications": 48,
+      "students": 72,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-02",
+      "applications": 35,
+      "students": 82,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-03",
+      "applications": 28,
+      "students": 66,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-04",
+      "applications": 31,
+      "students": 74,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-05",
+      "applications": 35,
+      "students": 83,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-06",
+      "applications": 30,
+      "students": 93,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-07",
+      "applications": 25,
+      "students": 77,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-08",
+      "applications": 53,
+      "students": 89,
+      "streams": 5
+    },
+    {
+      "universityId": "u10",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-09",
+      "applications": 58,
+      "students": 98,
+      "streams": 5
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2025-10",
+      "applications": 14,
+      "students": 31,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2025-11",
+      "applications": 14,
+      "students": 31,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2025-12",
+      "applications": 14,
+      "students": 32,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-01",
+      "applications": 22,
+      "students": 35,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-02",
+      "applications": 14,
+      "students": 35,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-03",
+      "applications": 19,
+      "students": 47,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-04",
+      "applications": 19,
+      "students": 46,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-05",
+      "applications": 19,
+      "students": 47,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-06",
+      "applications": 19,
+      "students": 58,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-07",
+      "applications": 19,
+      "students": 58,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-08",
+      "applications": 30,
+      "students": 58,
+      "streams": 3
+    },
+    {
+      "universityId": "u3",
+      "directionId": "d7",
+      "productId": "p7",
+      "month": "2026-09",
+      "applications": 29,
+      "students": 58,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2025-11",
+      "applications": 17,
+      "students": 39,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2025-12",
+      "applications": 14,
+      "students": 32,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-01",
+      "applications": 29,
+      "students": 44,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-02",
+      "applications": 15,
+      "students": 37,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-03",
+      "applications": 18,
+      "students": 43,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-04",
+      "applications": 21,
+      "students": 50,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-05",
+      "applications": 23,
+      "students": 56,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-06",
+      "applications": 16,
+      "students": 49,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-07",
+      "applications": 18,
+      "students": 55,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-08",
+      "applications": 35,
+      "students": 63,
+      "streams": 3
+    },
+    {
+      "universityId": "u12",
+      "directionId": "d3",
+      "productId": "p3",
+      "month": "2026-09",
+      "applications": 38,
+      "students": 69,
+      "streams": 3
+    }
+  ],
+  "inbox": [
+    {
+      "id": "in-1",
+      "source": "site",
+      "receivedAt": "2026-09-22T03:36:00.000Z",
+      "status": "new",
+      "title": "Заявка с сайта: обучение DevOps",
+      "payload": {
+        "universityName": "Санкт-Петербургский политехнический университет Петра Великого",
+        "universityId": null,
+        "directionId": "d1",
+        "programId": "pr1",
+        "productId": "p1",
+        "contact": {
+          "name": "Сергей Павлов",
+          "position": "Заведующий кафедрой",
+          "email": "s.pavlov@demo-spbstu.ru"
+        },
+        "message": "Хотим внедрить курс DevOps на Astra Linux для 3-го курса с сентября."
+      }
+    },
+    {
+      "id": "in-2",
+      "source": "lms",
+      "receivedAt": "2026-09-21T20:24:00.000Z",
+      "status": "new",
+      "title": "LMS: новые потоки по аналитике данных",
+      "payload": {
+        "universityId": "u1",
+        "directionId": "d3",
+        "programId": "pr3",
+        "productId": "p3",
+        "suggestedInteractionId": "i1",
+        "message": "Открыто 3 параллельных потока, зачислено 86 обучающихся."
+      }
+    },
+    {
+      "id": "in-3",
+      "source": "site",
+      "receivedAt": "2026-09-21T01:12:00.000Z",
+      "status": "new",
+      "title": "Заявка с сайта: повышение квалификации",
+      "payload": {
+        "universityId": "u2",
+        "universityName": "Университет ИТМО",
+        "directionId": "d5",
+        "programId": "pr5",
+        "productId": "p5",
+        "suggestedInteractionId": "i2",
+        "contact": {
+          "name": "Анна Григорьева",
+          "position": "Методист",
+          "email": "a.grigoreva@demo-itmo.ru"
+        },
+        "message": "Просим добавить курс повышения квалификации для 8 преподавателей Backend-направления."
+      }
+    },
+    {
+      "id": "in-4",
+      "source": "lms",
+      "receivedAt": "2026-09-20T06:00:00.000Z",
+      "status": "linked",
+      "title": "LMS: завершён курс тестирования",
+      "payload": {
+        "universityId": "u9",
+        "directionId": "d2",
+        "programId": "pr2",
+        "productId": "p5",
+        "suggestedInteractionId": "i9",
+        "linkedInteractionId": "i9",
+        "message": "Курс завершили 64 обучающихся, средний балл 4,6."
+      }
+    }
+  ],
+  "integrations": {
+    "sources": [
+      {
+        "id": "lms",
+        "name": "LMS ИТ Школы",
+        "description": "Обучающиеся, потоки и прогресс по курсам",
+        "endpoint": "https://lms.it-school.demo/api/v1/metrics",
+        "schedule": "Каждые 4 часа",
+        "enabled": true,
+        "lastSyncAt": "2026-09-22T02:24:00.000Z",
+        "lastStatus": "success"
+      },
+      {
+        "id": "site",
+        "name": "Сайт ИТ Школы",
+        "description": "Заявки вузов с формы на сайте (Laravel)",
+        "endpoint": "https://it-school.demo/api/v1/leads",
+        "schedule": "Каждые 15 минут",
+        "enabled": true,
+        "lastSyncAt": "2026-09-22T05:31:12.000Z",
+        "lastStatus": "failed",
+        "lastErrorCode": "SYNC-502"
+      }
+    ],
+    "log": [
+      {
+        "id": "sl-1",
+        "sourceId": "site",
+        "at": "2026-09-22T05:31:12.000Z",
+        "status": "failed",
+        "records": 0,
+        "errorCode": "SYNC-502"
+      },
+      {
+        "id": "sl-2",
+        "sourceId": "lms",
+        "at": "2026-09-22T02:24:00.000Z",
+        "status": "success",
+        "records": 24
+      },
+      {
+        "id": "sl-3",
+        "sourceId": "site",
+        "at": "2026-09-22T03:36:00.000Z",
+        "status": "success",
+        "records": 1
+      },
+      {
+        "id": "sl-4",
+        "sourceId": "lms",
+        "at": "2026-09-21T20:24:00.000Z",
+        "status": "success",
+        "records": 31
+      }
+    ]
+  },
+  "reports": [
+    {
+      "id": "r-1",
+      "name": "Все взаимодействия за квартал",
+      "createdAt": "2026-09-21T06:00:00.000Z",
+      "userId": "usr-6",
+      "format": "xlsx",
+      "rowCount": 24,
+      "summary": "Последние 3 месяца · все вузы"
+    },
+    {
+      "id": "r-2",
+      "name": "Кибербезопасность — статусы",
+      "createdAt": "2026-09-16T06:00:00.000Z",
+      "userId": "usr-7",
+      "format": "pdf",
+      "rowCount": 3,
+      "summary": "За всё время · Кибербезопасность"
+    },
+    {
+      "id": "r-3",
+      "name": "Мои вузы",
+      "createdAt": "2026-09-10T06:00:00.000Z",
+      "userId": "usr-1",
+      "format": "xls",
+      "rowCount": 5,
+      "summary": "За всё время · Алина Воронова"
+    }
+  ],
+  "audit": []
+}

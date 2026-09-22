@@ -1,10 +1,10 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { apiClient } from '../api/client.js';
 import { DEMO_USER_BY_ROLE } from '../data/catalogs.js';
 import { can } from '../domain/roles.js';
-import { sessionStore } from '../lib/storage.js';
-import { useStoreState } from '../store/StoreProvider.jsx';
+import { useStoreApi, useStoreState } from '../store/StoreProvider.jsx';
+import { clearStoredSession, readStoredSession, writeStoredSession } from './sessionStorage.js';
 
-const SESSION_KEY = 'crm.session';
 const SessionContext = createContext(null);
 
 /**
@@ -14,24 +14,43 @@ const SessionContext = createContext(null);
  */
 export function SessionProvider({ children }) {
   const { users } = useStoreState();
-  const [session, setSession] = useState(() => sessionStore.read(SESSION_KEY));
+  const { rehydrate } = useStoreApi();
+  const [session, setSession] = useState(readStoredSession);
 
-  const login = useCallback((role) => {
-    const next = { role };
-    sessionStore.write(SESSION_KEY, next);
+  const login = useCallback(async (role) => {
+    const authenticated = await apiClient.demoLogin(role);
+    const next = {
+      role: authenticated.user?.role ?? role,
+      user: authenticated.user ?? null,
+      accessToken: authenticated.accessToken,
+      tokenType: authenticated.tokenType ?? 'Bearer',
+      expiresAt: authenticated.expiresIn ? Date.now() + authenticated.expiresIn * 1_000 : null,
+    };
+    writeStoredSession(next);
+    // Первый запрос state мог пройти до входа и получить 401 в production — повторяем уже с токеном.
+    await rehydrate();
     setSession(next);
-  }, []);
+    return next.user;
+  }, [rehydrate]);
 
-  const logout = useCallback(() => {ч
-    sessionStore.remove(SESSION_KEY);
+  const logout = useCallback(() => {
+    clearStoredSession();
     setSession(null);
     window.location.hash = '/';
   }, []);
 
   const value = useMemo(() => {
-    const role = session?.role ?? null;
-    const user = role ? users.find((item) => item.id === DEMO_USER_BY_ROLE[role]) ?? null : null;
-    return { user, role, login, logout, can: (permission) => can(role, permission) };
+    const role = session?.role ?? session?.user?.role ?? null;
+    const userId = session?.user?.id ?? DEMO_USER_BY_ROLE[role];
+    const user = role ? users.find((item) => item.id === userId) ?? session?.user ?? null : null;
+    return {
+      user,
+      role,
+      accessToken: session?.accessToken ?? null,
+      login,
+      logout,
+      can: (permission) => can(role, permission),
+    };
   }, [session, users, login, logout]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

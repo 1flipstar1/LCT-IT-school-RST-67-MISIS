@@ -243,7 +243,10 @@ CREATE TABLE program_products (
 
     product_id UUID NOT NULL
         REFERENCES it_products(id)
-        O
+        ON DELETE CASCADE,
+
+    PRIMARY KEY (program_id, product_id)
+);
 
 
 -- 14. WORKFLOWS
