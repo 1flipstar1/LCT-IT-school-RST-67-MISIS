@@ -17,7 +17,7 @@ import { SelectMenu } from '../../../ui/SelectMenu.jsx';
 import { WIDGET_SIZE } from '../dashboard/layout.js';
 import { CHART_SIZES, formatAverageDays, monthTable, PHASE_SERIES, phaseColor, toLinePoints, WIDGET_CATEGORY } from './common.js';
 
-const chart = (definition) => ({ sizes: CHART_SIZES, defaultSize: WIDGET_SIZE.m, ...definition });
+const chart = (definition) => ({ rowSpan: 2, sizes: CHART_SIZES, defaultSize: WIDGET_SIZE.m, ...definition });
 
 /* ---------- Динамика по месяцам ---------- */
 

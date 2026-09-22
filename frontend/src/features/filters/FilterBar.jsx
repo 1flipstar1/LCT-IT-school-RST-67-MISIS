@@ -30,6 +30,7 @@ export function FilterBar({
   stages = [],
   variant = 'inline',
   resultLabel,
+  actions,
   searchPlaceholder = 'Вуз, направление, продукт или менеджер',
 }) {
   const set = (patch) => onChange({ ...filters, ...patch });
@@ -56,6 +57,7 @@ export function FilterBar({
             Сбросить фильтры ({activeCount})
           </button>
         )}
+        {actions && <div className={styles.actions}>{actions}</div>}
       </div>
     </div>
   );

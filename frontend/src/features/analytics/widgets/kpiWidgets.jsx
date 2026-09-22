@@ -139,6 +139,7 @@ export const KPI_WIDGETS = KPI.map(({ id, title, description, icon, tone, value,
   icon,
   category: WIDGET_CATEGORY.kpi,
   chartType: 'Плитка',
+  rowSpan: 1,
   sizes: KPI_SIZES,
   defaultSize: WIDGET_SIZE.s,
   Component: ({ data }) => (

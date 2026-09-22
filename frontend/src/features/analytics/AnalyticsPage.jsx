@@ -69,22 +69,34 @@ export function AnalyticsPage() {
         meta={<span className={styles.headerHint}>{editing ? 'Режим редактирования: меняйте порядок, размер и состав панели' : `${layout.length} виджетов на панели`}</span>}
         actions={
           <>
-            {editing && <Button icon={AddIcon} onClick={() => setCatalogOpen(true)}>Добавить виджет</Button>}
             <Button icon={DownloadIcon} onClick={exportPdf} disabled={exporting}>
               {exporting ? 'Формируем PDF…' : 'Скачать PDF'}
             </Button>
-            <IconButton
-              icon={SettingsIcon}
-              label={editing ? 'Завершить настройку панели' : 'Настроить панель'}
-              className={editing ? styles.settingsActive : undefined}
-              aria-pressed={editing}
-              onClick={() => setEditing((value) => !value)}
-            />
+            {!editing && (
+              <IconButton
+                icon={SettingsIcon}
+                label="Настроить панель"
+                aria-pressed={false}
+                onClick={() => setEditing(true)}
+              />
+            )}
           </>
         }
       />
 
-      <FilterBar filters={filters} onChange={setFilters} show={{ search: false }} />
+      <FilterBar
+        filters={filters}
+        onChange={setFilters}
+        show={{ search: false }}
+        actions={
+          editing && (
+            <>
+              <Button icon={AddIcon} onClick={() => setCatalogOpen(true)}>Добавить виджет</Button>
+              <Button variant="primary" className={styles.doneButton} onClick={() => setEditing(false)}>Готово</Button>
+            </>
+          )
+        }
+      />
 
       <DashboardGrid
         layout={layout}

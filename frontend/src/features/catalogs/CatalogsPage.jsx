@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { IMPORT_FIELDS } from '../../domain/import.js';
 import { PERMISSION } from '../../domain/roles.js';
@@ -23,6 +24,29 @@ export function CatalogsPage() {
   const { can } = useSession();
   const [tab, setTab] = usePersistentState('catalogs:tab', 'universities');
   const [query, setQuery] = useState('');
+  const tableBodyRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const rows = Array.from(tableBodyRef.current?.rows ?? []);
+    if (!rows.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const context = gsap.context(() => {
+      gsap.killTweensOf(rows);
+      gsap.fromTo(
+        rows,
+        { autoAlpha: 0 },
+        {
+          autoAlpha: 1,
+          duration: 0.32,
+          stagger: 0.035,
+          ease: 'power2.out',
+          clearProps: 'opacity,visibility',
+        },
+      );
+    });
+
+    return () => context.revert();
+  }, [tab]);
 
   const usage = useMemo(() => {
     const count = (key) => interactions.reduce((map, item) => map.set(item[key], (map.get(item[key]) ?? 0) + 1), new Map());
@@ -101,6 +125,7 @@ export function CatalogsPage() {
           <Tabs
             label="Справочники"
             value={tab}
+            animateIndicator
             onChange={(value) => {
               setTab(value);
               setQuery('');
@@ -109,7 +134,7 @@ export function CatalogsPage() {
           />
           <SearchField className={styles.search} value={query} onChange={setQuery} placeholder={`Поиск: ${current.label.toLowerCase()}`} />
         </div>
-        <DataTable caption={current.label} columns={current.columns} rows={rows} />
+        <DataTable caption={current.label} columns={current.columns} rows={rows} bodyRef={tableBodyRef} />
       </Card>
     </>
   );

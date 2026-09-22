@@ -22,7 +22,7 @@ export function SessionProvider({ children }) {
     setSession(next);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(() => {ч
     sessionStore.remove(SESSION_KEY);
     setSession(null);
     window.location.hash = '/';

@@ -355,12 +355,13 @@ export function DashboardGrid({ layout, catalog, data, editing, onMove, onResize
         const widget = catalog.get(entry.id);
         if (!widget) return null;
         const Widget = widget.Component;
+        const heightClass = widget.rowSpan === 2 ? styles.widgetDoubleRow : '';
         return (
           <div
             key={entry.id}
             data-widget-id={entry.id}
             data-widget-index={index}
-            className={`${styles.widget} ${styles[`size-${entry.size}`]} ${editing ? styles.widgetEditing : ''}`}
+            className={`${styles.widget} ${styles[`size-${entry.size}`]} ${heightClass} ${editing ? styles.widgetEditing : ''}`}
           >
             {editing && (
               <>

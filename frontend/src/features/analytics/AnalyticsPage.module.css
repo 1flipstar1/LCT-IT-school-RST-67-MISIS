@@ -3,16 +3,22 @@
   color: var(--color-text-secondary);
 }
 
-.settingsActive {
-  background: var(--color-neutral-soft);
-  color: var(--color-text);
+.doneButton {
+  --button-primary-accent-bg-color-default: var(--color-accent);
+  --button-primary-accent-bg-color-hover: var(--color-warning-text);
+  --button-primary-accent-bg-color-active: var(--color-warning-text);
+  --button-primary-accent-label-color-default: var(--color-text-on-brand);
+  --button-primary-accent-label-color-hover: var(--color-text-on-brand);
+  --button-primary-accent-label-color-active: var(--color-text-on-brand);
 }
 
 .dashboardGrid {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-items: start;
+  grid-auto-flow: row dense;
+  grid-auto-rows: minmax(176px, auto);
+  align-items: stretch;
   gap: var(--space-4x);
   margin-top: var(--space-4x);
 }
@@ -28,6 +34,15 @@
   width: 100%;
   height: 100%;
   transform-origin: center;
+}
+
+.widgetContent > * {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.widgetDoubleRow {
+  grid-row: span 2;
 }
 
 .size-s {
@@ -263,12 +278,17 @@
 @media (max-width: 760px) {
   .dashboardGrid {
     grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
   }
 
   .size-s,
   .size-m,
   .size-l {
     grid-column: 1;
+  }
+
+  .widgetDoubleRow {
+    grid-row: auto;
   }
 
   .catalogItem {

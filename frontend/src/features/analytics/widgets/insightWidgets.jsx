@@ -17,7 +17,7 @@ import { AnalyticsIcon, CalendarIcon, EducationIcon, ShieldIcon, UniversityIcon,
 import { WIDGET_SIZE } from '../dashboard/layout.js';
 import { CHART_SIZES, PHASE_SERIES, WIDGET_CATEGORY, formatAverageDays } from './common.js';
 
-const chart = (definition) => ({ sizes: CHART_SIZES, defaultSize: WIDGET_SIZE.m, ...definition });
+const chart = (definition) => ({ rowSpan: 2, sizes: CHART_SIZES, defaultSize: WIDGET_SIZE.m, ...definition });
 const fullChart = (definition) => chart({ defaultSize: WIDGET_SIZE.l, ...definition });
 const toBarItems = (items, getLabel, getValue) => items.map((item) => ({ id: item.item?.id ?? item.university?.id ?? item.manager?.id, label: getLabel(item), value: getValue(item), source: item }));
 
