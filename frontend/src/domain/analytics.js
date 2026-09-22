@@ -234,7 +234,7 @@ export function rankDirections(metrics, directions) {
     .sort((a, b) => b.index - a.index);
 }
 
-/** Сколько вузов работает с каждым элементом каталога (направлением или продуктом). */
+/** Сколько вузов работает с каждым элементом каталога. */
 export function countUniversitiesBy(rows, key, catalog) {
   const groups = groupBy(rows, (row) => row[key]);
   return catalog
@@ -246,16 +246,17 @@ export function countUniversitiesBy(rows, key, catalog) {
     .sort((a, b) => b.universities - a.universities || b.interactions - a.interactions);
 }
 
-/** Портфель вуза: сколько ИТ-программ и продуктов он использует. */
+/** Портфель вуза: сколько направлений, программ и продуктов он использует. */
 export function universityPortfolio(rows) {
   return [...groupBy(rows, (row) => row.universityId).values()]
     .map((own) => ({
       university: own[0].university,
       directions: distinctCount(own, (row) => row.directionId),
+      programs: distinctCount(own, (row) => row.programId),
       products: distinctCount(own, (row) => row.productId),
       interactions: own.length,
     }))
-    .sort((a, b) => b.directions + b.products - (a.directions + a.products) || a.university.name.localeCompare(b.university.name));
+    .sort((a, b) => b.programs + b.products - (a.programs + a.products) || a.university.name.localeCompare(b.university.name));
 }
 
 /** Сколько взаимодействий на пересечении двух измерений (вуз × направление и т. п.) — для тепловой карты. */

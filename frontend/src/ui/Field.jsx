@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { cn } from '../lib/cn.js';
-import { CheckIcon, ChevronDownIcon, SearchIcon } from './icons.js';
+import { CheckIcon, SearchIcon } from './icons.js';
 import styles from './Field.module.css';
 import { SelectMenu } from './SelectMenu.jsx';
 
@@ -70,37 +70,52 @@ export function TextAreaField({ label, hint, error, required, className, rows = 
 
 /** options: [{ value, label }]; placeholder — пустой первый пункт. */
 /** Выбор значения в форме: подпись как у остальных полей, список — как в «Пользователях и доступе». */
-export function SelectMenuField({ label, hint, error, required, className, value, options, onChange }) {
+export function SelectMenuField({ label, hint, error, required, className, value, options, onChange, placeholder, disabled, name, form }) {
   const id = useId();
   return (
     <FieldShell id={id} label={label} hint={hint} error={error} required={required} className={className}>
-      <SelectMenu id={id} label={label} value={value} options={options} onChange={onChange} fullWidth />
+      <SelectMenu
+        id={id}
+        label={label}
+        value={value}
+        options={options}
+        onChange={onChange}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+        name={name}
+        form={form}
+        invalid={Boolean(error)}
+        describedBy={describedBy(id, hint, error)}
+        fullWidth
+      />
     </FieldShell>
   );
 }
 
-export function SelectField({ label, hint, error, required, className, options, placeholder, ...selectProps }) {
+/**
+ * Совместимый API прежнего поля: визуально и по поведению это единый SelectMenu из фильтров,
+ * а onChange сохраняет привычную форму event.target.value для экранов приложения.
+ */
+export function SelectField({ label, hint, error, required, className, options, placeholder, value, onChange, disabled, name, form, 'aria-label': ariaLabel }) {
   const id = useId();
   return (
     <FieldShell id={id} label={label} hint={hint} error={error} required={required} className={className}>
-      <span className={styles.selectWrap}>
-        <select
-          id={id}
-          className={cn(styles.control, styles.select, error && styles.invalid)}
-          aria-invalid={Boolean(error)}
-          aria-describedby={describedBy(id, hint, error)}
-          required={required}
-          {...selectProps}
-        >
-          {placeholder !== undefined && <option value="">{placeholder}</option>}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDownIcon size={16} fill="currentColor" className={styles.selectIcon} aria-hidden="true" />
-      </span>
+      <SelectMenu
+        id={id}
+        label={ariaLabel ?? label}
+        value={value}
+        options={options}
+        onChange={(nextValue) => onChange?.({ target: { value: nextValue }, currentTarget: { value: nextValue } })}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+        name={name}
+        form={form}
+        invalid={Boolean(error)}
+        describedBy={describedBy(id, hint, error)}
+        fullWidth
+      />
     </FieldShell>
   );
 }

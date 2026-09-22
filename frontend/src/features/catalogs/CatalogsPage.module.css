@@ -8,6 +8,12 @@
   max-width: 420px;
 }
 
+.catalogDescription {
+  max-width: 76ch;
+  font: var(--font-body-s);
+  color: var(--color-text-secondary);
+}
+
 .strong {
   font-weight: 500;
 }

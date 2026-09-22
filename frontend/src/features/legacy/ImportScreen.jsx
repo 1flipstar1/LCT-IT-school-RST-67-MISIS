@@ -3,6 +3,7 @@ import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { useToast } from '../../ui/Toast.jsx';
 import { ArrowRightIcon, CheckIcon, CheckLargeIcon, HelpIcon, UploadIcon, XlsxIcon } from '../../ui/icons.js';
 import { Hint } from '../../ui/Hint.jsx';
+import { SelectMenu } from '../../ui/SelectMenu.jsx';
 import { LegacyButton, LegacyScreen, PageHeader } from './legacyUi.jsx';
 
 const STEPS = ['Загрузка файла', 'Сопоставление полей', 'Проверка', 'Результат'];
@@ -122,10 +123,7 @@ function FieldMapping({ onNext }) {
           <div key={column}>
             <b>{column}</b>
             <ArrowRightIcon size={16} fill="currentColor" />
-            <select defaultValue={field}>
-              <option>{field}</option>
-              <option>Не импортировать</option>
-            </select>
+            <LegacyMappingSelect field={field} />
             <CheckIcon size={17} fill="#059669" />
           </div>
         ))}
@@ -137,6 +135,22 @@ function FieldMapping({ onNext }) {
         </LegacyButton>
       </div>
     </>
+  );
+}
+
+function LegacyMappingSelect({ field }) {
+  const [value, setValue] = useState(field);
+  return (
+    <SelectMenu
+      label={`Поле для колонки «${field}»`}
+      value={value}
+      onChange={setValue}
+      options={[
+        { value: field, label: field },
+        { value: '__skip__', label: 'Не импортировать' },
+      ]}
+      fullWidth
+    />
   );
 }
 

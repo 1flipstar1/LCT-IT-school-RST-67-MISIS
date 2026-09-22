@@ -5,6 +5,7 @@ import { formatFileSize, initials, plural } from '../src/domain/format.js';
 import { can, createVisibilityFilter, DATA_SCOPE, PERMISSION, ROLE } from '../src/domain/roles.js';
 import { getStage } from '../src/domain/workflow.js';
 import { createZip } from '../src/lib/export/zip.js';
+import { ACTION, reducer } from '../src/store/reducer.js';
 
 describe('format', () => {
   it('plural склоняет по правилам русского языка', () => {
@@ -55,13 +56,18 @@ describe('seed', () => {
   it('все ссылки взаимодействий указывают на существующие записи каталогов', () => {
     const universities = ids(state.universities);
     const directions = ids(state.directions);
+    const programs = ids(state.programs);
     const products = ids(state.products);
     const users = ids(state.users);
     state.interactions.forEach((interaction) => {
       assert.ok(universities.has(interaction.universityId), interaction.id);
       assert.ok(directions.has(interaction.directionId), interaction.id);
+      assert.ok(programs.has(interaction.programId), interaction.id);
       assert.ok(products.has(interaction.productId), interaction.id);
       assert.ok(users.has(interaction.managerId), interaction.id);
+      const program = state.programs.find((item) => item.id === interaction.programId);
+      assert.equal(program.directionId, interaction.directionId, interaction.id);
+      assert.ok(program.productIds.includes(interaction.productId), interaction.id);
     });
   });
 
@@ -73,6 +79,25 @@ describe('seed', () => {
         assert.ok(getStage(workflow, event.fromStageId), event.id);
         assert.ok(getStage(workflow, event.toStageId), event.id);
       });
+  });
+});
+
+describe('interaction editing', () => {
+  it('обновляет параметры и сохраняет событие с записью аудита', () => {
+    const state = createSeedState(new Date('2026-09-17T12:00:00'));
+    const previous = state.interactions[0];
+    const event = { id: 'ev-edit', interactionId: previous.id, type: 'updated', userId: 'usr-6', at: '2026-09-17T13:00:00.000Z' };
+    const audit = { at: event.at, actorId: event.userId, text: 'Изменены параметры: ИТ-продукт', target: { type: 'interaction', id: previous.id } };
+    const next = reducer(state, {
+      type: ACTION.interactionUpdated,
+      payload: { interactionId: previous.id, patch: { productId: 'p1' }, event, audit },
+    });
+
+    assert.equal(next.interactions[0].productId, 'p1');
+    assert.equal(next.interactions[0].updatedAt, event.at);
+    assert.equal(next.events.at(-1), event);
+    assert.equal(next.audit[0].text, audit.text);
+    assert.notEqual(next.interactions, state.interactions);
   });
 });
 

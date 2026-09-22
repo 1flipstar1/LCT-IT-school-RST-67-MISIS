@@ -9,6 +9,7 @@ export const ACTION = Object.freeze({
   interactionTransitioned: 'interaction/transitioned',
   interactionCommented: 'interaction/commented',
   interactionAssigned: 'interaction/assigned',
+  interactionUpdated: 'interaction/updated',
   workflowSaved: 'workflow/saved',
   userUpdated: 'user/updated',
   inboxResolved: 'inbox/resolved',
@@ -63,6 +64,12 @@ export function reducer(state, action) {
       return withAudit({ ...state, interactions, events }, audit);
     }
 
+    case ACTION.interactionUpdated: {
+      const { interactionId, patch, event, audit } = payload;
+      const interactions = replaceById(state.interactions, interactionId, (item) => ({ ...item, ...patch, updatedAt: audit.at }));
+      return withAudit({ ...state, interactions, events: [...state.events, event] }, audit);
+    }
+
     case ACTION.workflowSaved: {
       const { workflow, audit } = payload;
       const exists = state.workflows.some((item) => item.id === workflow.id);
@@ -97,8 +104,8 @@ export function reducer(state, action) {
     }
 
     case ACTION.catalogImported: {
-      const { universities, products, interactions, audit } = payload;
-      return withAudit({ ...state, universities, products, interactions }, audit);
+      const { universities, programs, products, interactions, audit } = payload;
+      return withAudit({ ...state, universities, programs, products, interactions }, audit);
     }
 
     case ACTION.stateRestored:

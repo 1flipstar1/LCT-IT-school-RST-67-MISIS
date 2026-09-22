@@ -8,12 +8,13 @@ export const REPORT_FORMATS = [
 ];
 
 /**
- * Колонки отчёта. Первые пять — обязательный набор из ТЗ (п. 4 функциональных требований),
+ * Колонки отчёта. Базовый набор различает направление, программу и продукт,
  * остальные — поля договора из каталога импорта.
  */
 export const REPORT_COLUMNS = [
   { id: 'university', label: 'Наименование вуза', value: (row) => row.university.name, core: true },
   { id: 'direction', label: 'ИТ-направление', value: (row) => row.direction.name, core: true },
+  { id: 'program', label: 'ИТ-программа', value: (row) => row.program.name, core: true },
   { id: 'product', label: 'ИТ-продукт', value: (row) => row.product.name, core: true },
   { id: 'stage', label: 'Статус работы с вузом', value: (row) => row.stage.name, core: true },
   { id: 'manager', label: 'Ответственный', value: (row) => row.manager?.name ?? '—', core: true },

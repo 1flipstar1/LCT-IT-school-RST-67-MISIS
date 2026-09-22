@@ -23,10 +23,11 @@ const COLUMNS = [
   },
   {
     id: 'direction',
-    header: 'Направление и продукт',
+    header: 'Направление, программа и продукт',
     cell: (row) => (
       <span className={styles.stack}>
         <span>{row.direction.name}</span>
+        <span className={styles.secondary}>{row.program.name}</span>
         <span className={styles.secondary}>{row.product.name}</span>
       </span>
     ),

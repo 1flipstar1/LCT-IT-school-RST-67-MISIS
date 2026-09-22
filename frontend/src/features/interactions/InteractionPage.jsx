@@ -11,19 +11,18 @@ import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
 import { Hint } from '../../ui/Hint.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
-import { AttachmentIcon, DocumentIcon, MailIcon, PhoneIcon, WorkflowIcon } from '../../ui/icons.js';
+import { AttachmentIcon, CatalogIcon, DocumentIcon, EditIcon, EducationIcon, MailIcon, PhoneIcon, UniversityIcon, WorkflowIcon } from '../../ui/icons.js';
 import { PageHeader } from '../../ui/PageHeader.jsx';
 import { Tabs } from '../../ui/Tabs.jsx';
 import { ErrorPage } from '../errors/ErrorPage.jsx';
 import { AssignManagerDialog } from './AssignManagerDialog.jsx';
+import { EditInteractionDialog } from './EditInteractionDialog.jsx';
 import { CommentComposer } from './components/CommentComposer.jsx';
 import { EventFeed } from './components/EventFeed.jsx';
 import { SlaBadge } from './components/SlaBadge.jsx';
 import { StageStepper } from './components/StageStepper.jsx';
 import { TransitionDialog } from './TransitionDialog.jsx';
 import styles from './InteractionPage.module.css';
-
-const SOURCE_LABEL = { manual: 'Создано вручную', site: 'Заявка с сайта', lms: 'Данные из LMS' };
 
 export function InteractionPage({ params }) {
   const rows = useVisibleInteractionRows();
@@ -40,6 +39,7 @@ function InteractionView({ row }) {
   const [tab, setTab] = useState('history');
   const [transitionOpen, setTransitionOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const ownEvents = useMemo(
     () => events.filter((event) => event.interactionId === row.id).sort((a, b) => b.at.localeCompare(a.at)),
@@ -130,6 +130,50 @@ function InteractionView({ row }) {
         </div>
 
         <aside className={styles.aside}>
+          <Card className={styles.characteristics}>
+            <CardHeader
+              title="Характеристики заявки"
+              hint="Основные параметры заявки: вуз, ИТ-направление, учебная программа, ИТ-продукт и выбранный процесс работы."
+              actions={
+                <Button variant="ghost" size="s" icon={EditIcon} onClick={() => setEditOpen(true)}>
+                  Изменить
+                </Button>
+              }
+            />
+            <div className={styles.universitySummary}>
+              <span className={styles.characteristicIcon} aria-hidden="true">
+                <UniversityIcon size={20} fill="currentColor" />
+              </span>
+              <div>
+                <p className={styles.characteristicLabel}>Вуз</p>
+                <p className={styles.universityName}>{university.name}</p>
+                {university.city && <p className={styles.characteristicCaption}>{university.city}</p>}
+              </div>
+            </div>
+            <dl className={styles.characteristicList}>
+              <div className={styles.characteristicRow}>
+                <EducationIcon size={18} fill="currentColor" aria-hidden="true" />
+                <dt>ИТ-направление</dt>
+                <dd>{row.direction.name}</dd>
+              </div>
+              <div className={styles.characteristicRow}>
+                <DocumentIcon size={18} fill="currentColor" aria-hidden="true" />
+                <dt>ИТ-программа</dt>
+                <dd>{row.program.name}</dd>
+              </div>
+              <div className={styles.characteristicRow}>
+                <CatalogIcon size={18} fill="currentColor" aria-hidden="true" />
+                <dt>ИТ-продукт</dt>
+                <dd>{row.product.name}<span className={styles.characteristicCaption}> · {row.product.vendor}</span></dd>
+              </div>
+              <div className={styles.characteristicRow}>
+                <WorkflowIcon size={18} fill="currentColor" aria-hidden="true" />
+                <dt>Процесс</dt>
+                <dd>{row.workflow.name}</dd>
+              </div>
+            </dl>
+          </Card>
+
           <Card>
             <CardHeader
               title="Ответственные"
@@ -177,19 +221,12 @@ function InteractionView({ row }) {
             <StageStepper row={row} events={events} />
           </Card>
 
-          <Card padding="s" className={styles.meta}>
-            <p>
-              <span className={styles.muted}>Источник:</span> {SOURCE_LABEL[row.source]}
-            </p>
-            <p>
-              <span className={styles.muted}>Начато:</span> {formatDate(row.startedAt)}
-            </p>
-          </Card>
         </aside>
       </div>
 
       {transitionOpen && <TransitionDialog key={`${row.id}:${row.stageId}`} row={row} open onOpenChange={setTransitionOpen} />}
       {assignOpen && <AssignManagerDialog row={row} open onOpenChange={setAssignOpen} />}
+      {editOpen && <EditInteractionDialog row={row} open onOpenChange={setEditOpen} />}
     </>
   );
 }

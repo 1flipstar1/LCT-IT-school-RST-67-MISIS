@@ -80,6 +80,21 @@ export const PRODUCTS = [
   { id: 'p8', name: '1С:Предприятие', vendor: '1С' },
 ];
 
+/**
+ * ИТ-программа — набор методических материалов и практики по одному ИТ-направлению.
+ * productIds задаёт ПО, которое можно использовать при реализации программы.
+ */
+export const PROGRAMS = [
+  { id: 'pr1', directionId: 'd1', name: 'DevOps-инженер', description: 'Практика CI/CD, контейнеризации и эксплуатации инфраструктуры.', productIds: ['p1', 'p2'] },
+  { id: 'pr2', directionId: 'd2', name: 'Инженер по тестированию', description: 'Методические материалы по ручному и автоматизированному тестированию.', productIds: ['p5'] },
+  { id: 'pr3', directionId: 'd3', name: 'Аналитик данных', description: 'Практика сбора, обработки и визуализации данных.', productIds: ['p3', 'p7'] },
+  { id: 'pr4', directionId: 'd4', name: 'Специалист по информационной безопасности', description: 'Материалы и лабораторные работы по защите ИТ-инфраструктуры.', productIds: ['p6'] },
+  { id: 'pr5', directionId: 'd5', name: 'Backend-разработчик', description: 'Практика серверной разработки, баз данных и бизнес-логики.', productIds: ['p5', 'p8'] },
+  { id: 'pr6', directionId: 'd6', name: 'Frontend-разработчик', description: 'Методические материалы и практика разработки пользовательских интерфейсов.', productIds: ['p4'] },
+  { id: 'pr7', directionId: 'd7', name: 'Инженер машинного обучения', description: 'Практика подготовки данных, обучения и оценки моделей.', productIds: ['p7'] },
+  { id: 'pr8', directionId: 'd8', name: 'Системный администратор Linux', description: 'Практика установки, настройки и сопровождения операционных систем.', productIds: ['p1'] },
+];
+
 const user = (id, name, email, role, leadId, scope) => ({
   id, name, email, role, leadId, active: true, access: { scope, directionIds: [] },
 });

@@ -7,6 +7,8 @@ export const IMPORT_FIELDS = [
   { id: 'university', label: 'Название ВУЗа', required: true, aliases: ['вуз', 'университет', 'наименование вуза'] },
   { id: 'vendor', label: 'Вендор', aliases: ['производитель'] },
   { id: 'product', label: 'ПО', required: true, aliases: ['ит-продукт', 'продукт', 'программное обеспечение'] },
+  { id: 'direction', label: 'ИТ-направление', aliases: ['направление'] },
+  { id: 'program', label: 'ИТ-программа', aliases: ['программа', 'учебная программа'] },
   { id: 'contract', label: 'Номер договора', aliases: ['договор', '№ договора'] },
   { id: 'licenseSignedAt', label: 'Подписание лицензии', aliases: ['дата подписания', 'лицензия подписана'] },
   { id: 'licenseYears', label: 'Срок действия лицензии (год)', aliases: ['срок лицензии', 'срок действия лицензии'] },
@@ -54,15 +56,16 @@ export function parseExcelDate(value) {
  * План импорта — что изменится, ещё до записи в базу. Пользователь видит итог и ошибки по строкам
  * и только потом подтверждает. Функция чистая: на вход текущие данные, на выход новые массивы.
  */
-export function planImport(rows, mapping, { universities, products, interactions, users }) {
+export function planImport(rows, mapping, { universities, directions, programs, products, interactions, users }) {
   const [, ...dataRows] = rows;
   const cell = (row, fieldId) => (mapping[fieldId] === '' ? '' : row[Number(mapping[fieldId])] ?? '');
   const text = (row, fieldId) => String(cell(row, fieldId)).trim();
 
   const nextUniversities = universities.map((item) => ({ ...item, contacts: [...item.contacts] }));
   const nextProducts = [...products];
+  const nextPrograms = programs.map((item) => ({ ...item, productIds: [...item.productIds] }));
   const nextInteractions = interactions.map((item) => ({ ...item }));
-  const stats = { rows: 0, newUniversities: 0, newProducts: 0, newContacts: 0, updatedContracts: 0 };
+  const stats = { rows: 0, newUniversities: 0, newPrograms: 0, newProducts: 0, newContacts: 0, updatedContracts: 0 };
   const issues = [];
 
   const findByName = (items, name) => items.find((item) => normalize(item.name) === normalize(name) || normalize(item.shortName) === normalize(name));
@@ -93,6 +96,19 @@ export function planImport(rows, mapping, { universities, products, interactions
       stats.newProducts += 1;
     }
 
+    const directionName = text(row, 'direction');
+    const programName = text(row, 'program');
+    const direction = directionName ? findByName(directions, directionName) : null;
+    if (directionName && !direction) issues.push({ rowNumber, level: 'warning', message: `ИТ-направление «${directionName}» не найдено — программа не добавлена.` });
+    let program = programName && direction ? nextPrograms.find((item) => item.directionId === direction.id && normalize(item.name) === normalize(programName)) : null;
+    if (programName && direction && !program) {
+      program = { id: createId('pr'), directionId: direction.id, name: programName, description: '', productIds: [product.id] };
+      nextPrograms.push(program);
+      stats.newPrograms += 1;
+    } else if (program && !program.productIds.includes(product.id)) {
+      program.productIds.push(product.id);
+    }
+
     text(row, 'contacts')
       .split(/[;\n]/)
       .map((name) => name.trim())
@@ -108,7 +124,7 @@ export function planImport(rows, mapping, { universities, products, interactions
       issues.push({ rowNumber, level: 'warning', message: `Менеджер «${managerName}» не найден среди пользователей — ответственный не изменён.` });
     }
 
-    const interaction = nextInteractions.find((item) => item.universityId === university.id && item.productId === product.id);
+    const interaction = nextInteractions.find((item) => item.universityId === university.id && item.productId === product.id && (!program || item.programId === program.id));
     if (!interaction) {
       issues.push({ rowNumber, level: 'warning', message: `Нет взаимодействия «${universityName} — ${productName}». Обновлены только справочники.` });
       return;
@@ -131,13 +147,13 @@ export function planImport(rows, mapping, { universities, products, interactions
     stats.updatedContracts += 1;
   });
 
-  return { universities: nextUniversities, products: nextProducts, interactions: nextInteractions, stats, issues };
+  return { universities: nextUniversities, programs: nextPrograms, products: nextProducts, interactions: nextInteractions, stats, issues };
 }
 
 /** Пример файла: две строки обновят существующие договоры, одна добавит новый вуз. */
 export const SAMPLE_IMPORT_ROWS = [
   IMPORT_FIELDS.map((field) => field.label),
-  ['Казанский федеральный университет', 'МойОфис', 'МойОфис', 'РТК-ИТШ-2026/101', '15.08.2026', 2, 'Передано частично', 'Алина Воронова', 'Ирина Петрова', 'Лицензии на 120 рабочих мест'],
-  ['Университет ИТМО', 'Postgres Professional', 'Postgres Pro', 'РТК-ИТШ-2026/102', '02.09.2026', 3, 'Не передано', 'Михаил Орлов', 'Сергей Лавров; Анна Григорьева', ''],
-  ['Пермский политехнический университет', 'Группа Астра', 'Astra Linux', '', '', '', 'Не передано', 'Ольга Лебедева', 'Дмитрий Пермяков', 'Новый вуз из заявки с выставки'],
+  ['Казанский федеральный университет', 'МойОфис', 'МойОфис', 'Аналитика данных', 'Аналитик данных', 'РТК-ИТШ-2026/101', '15.08.2026', 2, 'Передано частично', 'Алина Воронова', 'Ирина Петрова', 'Лицензии на 120 рабочих мест'],
+  ['Университет ИТМО', 'Postgres Professional', 'Postgres Pro', 'Backend-разработка', 'Backend-разработчик', 'РТК-ИТШ-2026/102', '02.09.2026', 3, 'Не передано', 'Михаил Орлов', 'Сергей Лавров; Анна Григорьева', ''],
+  ['Пермский политехнический университет', 'Группа Астра', 'Astra Linux', 'Системное администрирование', 'Системный администратор Linux', '', '', '', 'Не передано', 'Ольга Лебедева', 'Дмитрий Пермяков', 'Новый вуз из заявки с выставки'],
 ];

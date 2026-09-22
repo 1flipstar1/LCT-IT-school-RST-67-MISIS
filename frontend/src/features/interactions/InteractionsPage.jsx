@@ -66,7 +66,7 @@ export function InteractionsPage() {
     <>
       <PageHeader
         title="Взаимодействия"
-        hint="Работа с вузами по ИТ-направлениям. Откройте карточку, чтобы сменить этап, оставить комментарий или приложить файлы."
+        hint="Работа с вузами по ИТ-направлениям, учебным программам и продуктам. Откройте карточку, чтобы сменить этап, оставить комментарий или приложить файлы."
         meta={<span className={styles.resultCount}>{countLabel}</span>}
         actions={
           <Button variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>

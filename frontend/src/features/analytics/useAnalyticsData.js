@@ -50,7 +50,7 @@ function chartMonths(range, now) {
  * Видимость по роли уже учтена в useVisibleInteractionRows: менеджер видит только свои взаимодействия.
  */
 export function useAnalyticsData(filters) {
-  const { universities, directions, products, workflows, events } = useStoreState();
+  const { universities, directions, programs, products, workflows, events } = useStoreState();
   const managers = useManagers();
   const allRows = useVisibleInteractionRows();
   const rows = useMemo(() => filterInteractionRows(allRows, filters), [allRows, filters]);
@@ -80,7 +80,7 @@ export function useAnalyticsData(filters) {
       workflow,
       stays,
       managers,
-      catalogs: { universities, directions, products },
+      catalogs: { universities, directions, programs, products },
       summary: summarizeInteractions(rows),
       newInteractions: countNewInteractions(rows, range, now),
       lms: {
@@ -92,9 +92,11 @@ export function useAnalyticsData(filters) {
       monthly,
       ranking: rankDirections(metrics, directions),
       directionsByUniversity: countUniversitiesBy(rows, 'directionId', directions),
+      programsByUniversity: countUniversitiesBy(rows, 'programId', programs),
       productsByUniversity: countUniversitiesBy(rows, 'productId', products),
       universityPortfolio: universityPortfolio(rows),
       universityDirectionCount: crossCount(rows, (row) => row.universityId, (row) => row.directionId),
+      universityProgramCount: crossCount(rows, (row) => row.universityId, (row) => row.programId),
       universityProductCount: crossCount(rows, (row) => row.universityId, (row) => row.productId),
       funnel: buildFunnel(rows, stays, workflow),
       stageTimes: averageStageDays(stays, workflow),
@@ -108,5 +110,5 @@ export function useAnalyticsData(filters) {
       dataGaps: findDataGaps(rows),
       documents: documentCompleteness(rows, events),
     };
-  }, [rows, pairMetrics, events, workflows, universities, directions, products, managers, filters.period]);
+  }, [rows, pairMetrics, events, workflows, universities, directions, programs, products, managers, filters.period]);
 }

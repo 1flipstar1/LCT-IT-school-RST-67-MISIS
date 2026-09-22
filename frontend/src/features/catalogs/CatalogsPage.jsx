@@ -17,9 +17,9 @@ import { Tabs } from '../../ui/Tabs.jsx';
 import styles from './CatalogsPage.module.css';
 import { downloadImportTemplate } from './importTemplate.js';
 
-/** Справочники из ТЗ: вузы, ИТ-направления, ИТ-продукты и ответственные. Обновляются импортом из Excel. */
+/** Справочники: вузы, ИТ-направления, ИТ-программы, ИТ-продукты и ответственные. */
 export function CatalogsPage() {
-  const { universities, directions, products, interactions } = useStoreState();
+  const { universities, directions, programs, products, interactions } = useStoreState();
   const managers = useManagers();
   const { can } = useSession();
   const [tab, setTab] = usePersistentState('catalogs:tab', 'universities');
@@ -50,12 +50,13 @@ export function CatalogsPage() {
 
   const usage = useMemo(() => {
     const count = (key) => interactions.reduce((map, item) => map.set(item[key], (map.get(item[key]) ?? 0) + 1), new Map());
-    return { universityId: count('universityId'), directionId: count('directionId'), productId: count('productId'), managerId: count('managerId') };
+    return { universityId: count('universityId'), directionId: count('directionId'), programId: count('programId'), productId: count('productId'), managerId: count('managerId') };
   }, [interactions]);
 
   const catalogs = {
     universities: {
       label: 'Вузы',
+      description: 'Образовательные организации, с которыми ведётся работа.',
       rows: universities,
       search: (item) => `${item.name} ${item.shortName} ${item.city}`,
       columns: [
@@ -68,6 +69,7 @@ export function CatalogsPage() {
     },
     directions: {
       label: 'ИТ-направления',
+      description: 'Области обучения в ИТ — например, DevOps, QA, аналитика данных или кибербезопасность.',
       rows: directions,
       search: (item) => item.name,
       columns: [
@@ -75,18 +77,34 @@ export function CatalogsPage() {
         { id: 'usage', header: 'Взаимодействий', align: 'right', cell: (item) => usage.directionId.get(item.id) ?? 0 },
       ],
     },
+    programs: {
+      label: 'ИТ-программы',
+      description: 'Учебные программы с методическими материалами и практикой по одному ИТ-направлению.',
+      rows: programs,
+      search: (item) => `${item.name} ${item.description} ${directions.find((direction) => direction.id === item.directionId)?.name ?? ''}`,
+      columns: [
+        { id: 'name', header: 'Программа', primary: true, cell: (item) => <b className={styles.strong}>{item.name}</b> },
+        { id: 'direction', header: 'ИТ-направление', cell: (item) => directions.find((direction) => direction.id === item.directionId)?.name ?? '—' },
+        { id: 'description', header: 'Содержание', cell: (item) => item.description || '—' },
+        { id: 'products', header: 'Продуктов', align: 'right', cell: (item) => item.productIds.length },
+        { id: 'usage', header: 'Взаимодействий', align: 'right', cell: (item) => usage.programId.get(item.id) ?? 0 },
+      ],
+    },
     products: {
       label: 'ИТ-продукты',
+      description: 'Программное обеспечение, которое помогает обучению по одной или нескольким ИТ-программам и направлениям.',
       rows: products,
       search: (item) => `${item.name} ${item.vendor}`,
       columns: [
         { id: 'name', header: 'Продукт (ПО)', primary: true, cell: (item) => <b className={styles.strong}>{item.name}</b> },
         { id: 'vendor', header: 'Вендор', cell: (item) => item.vendor },
+        { id: 'programs', header: 'ИТ-программ', align: 'right', cell: (item) => programs.filter((program) => program.productIds.includes(item.id)).length },
         { id: 'usage', header: 'Взаимодействий', align: 'right', cell: (item) => usage.productId.get(item.id) ?? 0 },
       ],
     },
     managers: {
       label: 'Ответственные',
+      description: 'Сотрудники ИТ Школы, которые сопровождают работу с вузами.',
       rows: managers,
       search: (item) => `${item.name} ${item.email}`,
       columns: [
@@ -132,6 +150,7 @@ export function CatalogsPage() {
             }}
             tabs={Object.entries(catalogs).map(([value, catalog]) => ({ value, label: catalog.label, count: catalog.rows.length }))}
           />
+          <p className={styles.catalogDescription}>{current.description}</p>
           <SearchField className={styles.search} value={query} onChange={setQuery} placeholder={`Поиск: ${current.label.toLowerCase()}`} />
         </div>
         <DataTable caption={current.label} columns={current.columns} rows={rows} bodyRef={tableBodyRef} />

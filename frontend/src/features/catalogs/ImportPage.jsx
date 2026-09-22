@@ -13,6 +13,7 @@ import { FileDropzone } from '../../ui/FileDropzone.jsx';
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, DownloadIcon, SuccessIcon, WarningIcon } from '../../ui/icons.js';
 import { ErrorAlert, InlineAlert } from '../../ui/InlineAlert.jsx';
 import { PageHeader } from '../../ui/PageHeader.jsx';
+import { SelectMenu } from '../../ui/SelectMenu.jsx';
 import { useToast } from '../../ui/Toast.jsx';
 import styles from './ImportPage.module.css';
 import { downloadImportTemplate } from './importTemplate.js';
@@ -66,6 +67,7 @@ export function ImportPage() {
     const { stats } = plan;
     actions.applyImport({
       universities: plan.universities,
+      programs: plan.programs,
       products: plan.products,
       interactions: plan.interactions,
       summary: `Импорт «${source.name}»: строк ${stats.rows}, новых вузов ${stats.newUniversities}, обновлено договоров ${stats.updatedContracts}`,
@@ -131,19 +133,16 @@ export function ImportPage() {
                       {field.required && <span className={styles.required}> *</span>}
                     </span>
                     <span role="cell">
-                      <select
-                        className={styles.select}
-                        aria-label={`Колонка для поля «${field.label}»`}
-                        value={columnIndex}
-                        onChange={(event) => setMapping((current) => ({ ...current, [field.id]: event.target.value }))}
-                      >
-                        <option value="">Не загружать</option>
-                        {headers.map((header, index) => (
-                          <option key={`${header}-${index}`} value={String(index)}>
-                            {header || `Колонка ${index + 1}`}
-                          </option>
-                        ))}
-                      </select>
+                      <SelectMenu
+                        label={`Колонка для поля «${field.label}»`}
+                        value={columnIndex === '' ? '__skip__' : columnIndex}
+                        onChange={(value) => setMapping((current) => ({ ...current, [field.id]: value === '__skip__' ? '' : value }))}
+                        options={[
+                          { value: '__skip__', label: 'Не загружать' },
+                          ...headers.map((header, index) => ({ value: String(index), label: header || `Колонка ${index + 1}` })),
+                        ]}
+                        fullWidth
+                      />
                     </span>
                     <span role="cell" className={styles.sample}>
                       {sample === '' || sample === undefined ? '—' : String(sample)}
@@ -170,6 +169,7 @@ export function ImportPage() {
               <Summary value={plan.stats.rows} label="строк в файле" />
               <Summary value={plan.stats.updatedContracts} label="договоров обновится" />
               <Summary value={plan.stats.newUniversities} label="новых вузов" />
+              <Summary value={plan.stats.newPrograms} label="новых программ" />
               <Summary value={plan.stats.newProducts} label="новых продуктов" />
               <Summary value={plan.stats.newContacts} label="новых контактов" />
             </div>
@@ -210,7 +210,7 @@ export function ImportPage() {
             </span>
             <h2 className={styles.doneTitle}>Данные загружены</h2>
             <p className={styles.doneText}>
-              Обновлено договоров: {result.updatedContracts}. Добавлено вузов: {result.newUniversities}, продуктов: {result.newProducts}, контактов: {result.newContacts}.
+              Обновлено договоров: {result.updatedContracts}. Добавлено вузов: {result.newUniversities}, программ: {result.newPrograms}, продуктов: {result.newProducts}, контактов: {result.newContacts}.
             </p>
             <div className={styles.actions}>
               <Button
