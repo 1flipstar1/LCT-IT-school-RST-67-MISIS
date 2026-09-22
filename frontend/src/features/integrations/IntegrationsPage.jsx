@@ -76,7 +76,8 @@ function SourceCard({ source }) {
     setSyncing(true);
     try {
       const entry = await actions.syncIntegration(source.id);
-      toast.success(`${source.name}: получено записей — ${entry.records}`);
+      if (entry.status === 'success') toast.success(`${source.name}: получено записей — ${entry.records}`);
+      else toast.error('Синхронизация не удалась', { code: entry.errorCode });
     } catch (error) {
       toast.error('Синхронизация не удалась', { code: error.code });
     } finally {

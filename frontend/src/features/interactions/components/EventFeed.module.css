@@ -97,6 +97,11 @@
   color: var(--color-text);
 }
 
+button.fileName:hover {
+  color: var(--color-brand-hover);
+  text-decoration: underline;
+}
+
 .fileSize {
   color: var(--color-text-tertiary);
 }

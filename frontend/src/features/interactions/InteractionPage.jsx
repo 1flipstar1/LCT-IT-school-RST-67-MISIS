@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { formatDate, formatDays, formatFileSize, formatRelativeDateTime } from '../../domain/format.js';
 import { PERMISSION } from '../../domain/roles.js';
+import { useAttachmentDownload } from '../../lib/useAttachmentDownload.js';
 import { getStage, getStageIndex, SLA_STATE } from '../../domain/workflow.js';
 import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selectors.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
@@ -247,6 +248,7 @@ function groupFilesByStage(events, workflow) {
 }
 
 function FilesByStage({ groups, users }) {
+  const downloadAttachment = useAttachmentDownload();
   if (groups.length === 0) {
     return (
       <EmptyState
@@ -267,7 +269,13 @@ function FilesByStage({ groups, users }) {
             {files.map((file) => (
               <li key={`${file.name}-${file.at}`} className={styles.fileRow}>
                 <DocumentIcon size={24} fill="currentColor" className={styles.fileIcon} />
-                <span className={styles.fileName}>{file.name}</span>
+                {file.id ? (
+                  <button type="button" className={`${styles.fileName} ${styles.fileDownload}`} onClick={() => downloadAttachment(file)}>
+                    {file.name}
+                  </button>
+                ) : (
+                  <span className={styles.fileName}>{file.name}</span>
+                )}
                 <span className={styles.muted}>{formatFileSize(file.size)}</span>
                 <span className={styles.muted}>
                   {users.get(file.userId)?.name} · {formatRelativeDateTime(file.at)}

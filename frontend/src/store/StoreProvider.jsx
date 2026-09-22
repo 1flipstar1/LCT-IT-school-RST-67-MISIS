@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { PageLoader } from '../ui/PageLoader.jsx';
-import { hydrateState, loadState, persistState, saveState, stateCache } from './persistence.js';
+import { hydrateState, isUsableState, loadState, persistState, saveState, stateCache } from './persistence.js';
 import { ACTION, reducer } from './reducer.js';
 
 const StateContext = createContext(null);
@@ -102,6 +102,27 @@ export function StoreProvider({ children }) {
     return snapshot;
   }, []);
 
+  const applyServerSnapshot = useCallback((snapshot) => {
+    if (!isUsableState(snapshot?.state) || !Number.isInteger(snapshot?.revision)) {
+      throw new Error('Сервер вернул неполное состояние приложения.');
+    }
+    syncGenerationRef.current += 1;
+    pendingStateRef.current = null;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = null;
+    revisionRef.current = snapshot.revision;
+    updatedAtRef.current = snapshot.updatedAt ?? null;
+    skipPersistRef.current = true;
+    stateRef.current = snapshot.state;
+    saveState(snapshot.state, {
+      revision: snapshot.revision,
+      updatedAt: snapshot.updatedAt ?? null,
+      dirty: false,
+    });
+    dispatch({ type: ACTION.stateRestored, payload: snapshot.state });
+    setReady(true);
+  }, []);
+
   useEffect(() => {
     mountedRef.current = true;
     const controller = new AbortController();
@@ -144,7 +165,10 @@ export function StoreProvider({ children }) {
     return () => window.removeEventListener('online', handleOnline);
   }, [queueStateSave]);
 
-  const api = useMemo(() => ({ dispatch, getState: () => stateRef.current, rehydrate }), [rehydrate]);
+  const api = useMemo(
+    () => ({ dispatch, getState: () => stateRef.current, rehydrate, applyServerSnapshot, flush: flushPendingState }),
+    [rehydrate, applyServerSnapshot, flushPendingState],
+  );
 
   if (!ready) return <PageLoader label="Загружаем данные" />;
 

@@ -71,7 +71,7 @@ Read-only façade для Swagger и интеграций:
 
 ## Авторизация
 
-В `development`, `demo` и `test` чтение/запись snapshot разрешены без токена, чтобы локальный стенд открывался сразу. Демо-вход выдаёт JWT:
+В `development`, `demo` и `test` снимок можно прочитать до входа, чтобы локальный стенд сразу показывал форму авторизации. Любая запись, загрузка файла и ручная синхронизация требуют Bearer-токен. Демо-вход выдаёт JWT:
 
 ```http
 POST /api/v1/auth/demo
@@ -82,9 +82,20 @@ Content-Type: application/json
 
 Допустимые роли: `manager`, `lead`, `admin`. Ответ содержит `accessToken`, `tokenType`, `user`, `expiresIn`. Токен можно проверить через `GET /api/v1/auth/me` с заголовком `Authorization: Bearer ...`.
 
+Frontend поддерживает Keycloak Authorization Code + PKCE без хранения client secret в браузере. Для сборки задайте `VITE_KEYCLOAK_URL`, `VITE_KEYCLOAK_REALM`, `VITE_KEYCLOAK_CLIENT_ID`; в Docker Compose им соответствуют `KEYCLOAK_PUBLIC_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`. В Keycloak клиент должен быть public, Standard Flow — включён, а redirect URI — адрес приложения. Роли `KAM`, `MANAGER_LEAD`, `ADMIN` отображаются в `manager`, `lead`, `admin`.
+
 В `APP_ENV=production` snapshot и façade всегда требуют Bearer-токен, а демо-вход по умолчанию отключён. Для Keycloak задайте как минимум `KEYCLOAK_ISSUER_URL`; при необходимости также `KEYCLOAK_AUDIENCE`, `KEYCLOAK_CLIENT_ID` или явный `KEYCLOAK_JWKS_URL`. Роли `KAM`, `MANAGER_LEAD`, `ADMIN` автоматически отображаются в роли приложения.
 
 Полный список переменных находится в [.env.example](.env.example). Для production обязательно замените `JWT_SECRET` и задайте точные `CORS_ORIGINS`.
+
+## Файлы и интеграции
+
+- `POST /api/v1/attachments` принимает `multipart/form-data`, проверяет расширение и лимит 25 МБ, сохраняет содержимое под непрозрачным именем; `GET /api/v1/attachments/{id}` скачивает файл с авторизацией.
+- `POST /api/v1/integrations/{lms|site}/ingest` принимает согласованный JSON вручную или от шлюза.
+- `POST /api/v1/integrations/{lms|site}/sync` забирает JSON с адресов `LMS_API_URL` / `WEBSITE_API_URL`. Поддерживается массив либо объект с массивом в `items`, `records` или `data`. Bearer-токены задаются отдельными переменными.
+- `GET /api/v1/state/export` скачивает результирующий JSON.
+
+Контракты заказчика для LMS и Laravel-сайта в исходном ТЗ не приложены, поэтому маппинг сохраняет исходный объект в `payload`, а известные поля (`title`, `id`/`externalId`) нормализует. После получения финального контракта этот адаптер расширяется в `app/services/integration.py`, не затрагивая UI.
 
 ## PostgreSQL и Docker
 

@@ -4,16 +4,19 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body
+import json
 
-from app.api.dependencies import DbSession, StateAccess
+from fastapi import APIRouter, Body
+from fastapi.responses import Response
+
+from app.api.dependencies import CurrentPrincipal, DbSession, StateAccess
 from app.schemas.common import ERROR_RESPONSES
 from app.schemas.state import (
     StateResetRequest,
     StateSnapshotResponse,
     StateUpdateRequest,
 )
-from app.services.state import get_state, replace_state, reset_state
+from app.services.state import get_state_for_principal, replace_state, reset_state
 
 
 router = APIRouter(prefix="/state", tags=["state"])
@@ -25,8 +28,27 @@ router = APIRouter(prefix="/state", tags=["state"])
     responses={401: ERROR_RESPONSES[401]},
     summary="Получить актуальное состояние приложения",
 )
-def read_state(db: DbSession, _: StateAccess) -> StateSnapshotResponse:
-    return get_state(db)
+def read_state(db: DbSession, principal: StateAccess) -> StateSnapshotResponse:
+    return get_state_for_principal(db, principal)
+
+
+@router.get(
+    "/export",
+    responses={401: ERROR_RESPONSES[401]},
+    summary="Скачать результирующее состояние в JSON",
+)
+def export_state(db: DbSession, principal: StateAccess) -> Response:
+    snapshot = get_state_for_principal(db, principal)
+    content = json.dumps(
+        snapshot.model_dump(mode="json", by_alias=True),
+        ensure_ascii=False,
+        indent=2,
+    ).encode("utf-8")
+    return Response(
+        content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="crm-state.json"'},
+    )
 
 
 @router.put(
@@ -38,13 +60,14 @@ def read_state(db: DbSession, _: StateAccess) -> StateSnapshotResponse:
 def write_state(
     payload: StateUpdateRequest,
     db: DbSession,
-    _: StateAccess,
+    principal: CurrentPrincipal,
 ) -> StateSnapshotResponse:
     return replace_state(
         db,
         payload.state,
         expected_revision=payload.expected_revision,
         force=payload.force,
+        principal=principal,
     )
 
 
@@ -56,7 +79,7 @@ def write_state(
 )
 def restore_seed_state(
     db: DbSession,
-    _: StateAccess,
+    principal: CurrentPrincipal,
     payload: Annotated[StateResetRequest | None, Body()] = None,
 ) -> StateSnapshotResponse:
     request = payload or StateResetRequest()
@@ -64,4 +87,5 @@ def restore_seed_state(
         db,
         expected_revision=request.expected_revision,
         force=request.force,
+        principal=principal,
     )

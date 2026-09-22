@@ -3,6 +3,7 @@ import { formatFileSize, formatRelativeDateTime } from '../../../domain/format.j
 import { getStage, getStageIndex } from '../../../domain/workflow.js';
 import { Avatar } from '../../../ui/Avatar.jsx';
 import { AttachmentIcon } from '../../../ui/icons.js';
+import { useAttachmentDownload } from '../../../lib/useAttachmentDownload.js';
 import styles from './EventFeed.module.css';
 
 /** Короткое описание события без гендерных окончаний: имя автора показывается отдельно. */
@@ -33,6 +34,7 @@ export function describeEvent(event, workflow, users) {
  * в карточке взаимодействия это лишнее.
  */
 export function EventFeed({ items, users, showSubject = false }) {
+  const downloadAttachment = useAttachmentDownload();
   return (
     <ol className={styles.feed}>
       {items.map(({ event, row }) => {
@@ -57,7 +59,13 @@ export function EventFeed({ items, users, showSubject = false }) {
                   {event.files.map((file) => (
                     <li key={file.name} className={styles.file}>
                       <AttachmentIcon size={16} fill="currentColor" />
-                      <span className={styles.fileName}>{file.name}</span>
+                      {file.id ? (
+                        <button type="button" className={styles.fileName} onClick={() => downloadAttachment(file)}>
+                          {file.name}
+                        </button>
+                      ) : (
+                        <span className={styles.fileName}>{file.name}</span>
+                      )}
                       <span className={styles.fileSize}>{formatFileSize(file.size)}</span>
                     </li>
                   ))}

@@ -3,17 +3,31 @@ services:
     build:
       context: ..
       dockerfile: backend/Dockerfile
+      args:
+        VITE_KEYCLOAK_URL: ${KEYCLOAK_PUBLIC_URL:-}
+        VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-}
+        VITE_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
     restart: unless-stopped
     environment:
       APP_ENV: demo
       DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/lct_db
-      JWT_SECRET: ${JWT_SECRET:-local-compose-secret-change-me}
+      JWT_SECRET: ${JWT_SECRET:-local-compose-secret-change-me-at-least-32-bytes}
       CORS_ORIGINS: http://localhost:8000,http://localhost:5173
+      ATTACHMENT_STORAGE_PATH: /app/data/attachments
+      KEYCLOAK_ISSUER_URL: ${KEYCLOAK_ISSUER_URL:-}
+      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
+      LMS_API_URL: ${LMS_API_URL:-}
+      LMS_API_TOKEN: ${LMS_API_TOKEN:-}
+      WEBSITE_API_URL: ${WEBSITE_API_URL:-}
+      WEBSITE_API_TOKEN: ${WEBSITE_API_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy
     ports:
       - "8000:8000"
+    volumes:
+      - attachment_data:/app/data/attachments
     healthcheck:
       test:
         - CMD
@@ -41,3 +55,4 @@ services:
 
 volumes:
   postgres_data:
+  attachment_data:

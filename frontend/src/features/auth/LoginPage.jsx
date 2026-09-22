@@ -19,16 +19,23 @@ const BENEFITS = [
 
 export function LoginPage() {
   useDocumentTitle('Вход');
-  const { login } = useSession();
+  const { login, loginWithKeycloak, keycloakError } = useSession();
   const [ssoUnavailable, setSsoUnavailable] = useState(false);
   const [loginError, setLoginError] = useState(null);
   const [loggingInAs, setLoggingInAs] = useState(null);
   const rolesRef = useRef(null);
 
-  const handleSso = () => {
-    // В продуктиве: редирект на Keycloak (OIDC Authorization Code + PKCE).
-    setSsoUnavailable(true);
-    rolesRef.current?.querySelector('button')?.focus();
+  const handleSso = async () => {
+    setLoginError(null);
+    try {
+      const redirected = await loginWithKeycloak();
+      if (!redirected) {
+        setSsoUnavailable(true);
+        rolesRef.current?.querySelector('button')?.focus();
+      }
+    } catch (error) {
+      setLoginError(error);
+    }
   };
 
   const handleDemoLogin = async (role) => {
@@ -81,7 +88,7 @@ export function LoginPage() {
             <span>Демо-доступ</span>
           </div>
 
-          {loginError && <ErrorAlert error={loginError} />}
+          {(loginError || keycloakError) && <ErrorAlert error={loginError || keycloakError} />}
 
           <ul className={styles.roles} ref={rolesRef}>
             {Object.values(ROLE).map((role) => {

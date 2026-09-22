@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { apiClient } from '../api/client.js';
 import { useSession } from '../auth/SessionProvider.jsx';
 import { toAttachmentMeta } from '../domain/attachments.js';
 import { AppError } from '../domain/errors.js';
@@ -15,7 +16,7 @@ import { useStoreApi } from './StoreProvider.jsx';
  * Действия, которые можно отменить, возвращают { undo } — его вызывает кнопка «Отменить» в уведомлении.
  */
 export function useActions() {
-  const { dispatch, getState } = useStoreApi();
+  const { dispatch, getState, applyServerSnapshot, flush } = useStoreApi();
   const session = useSession();
 
   return useMemo(() => {
@@ -47,6 +48,12 @@ export function useActions() {
       return { undo: () => dispatch({ type: ACTION.stateRestored, payload: snapshot }) };
     };
 
+    const withUploadedFiles = (files, perform) => {
+      if (files.length === 0) return perform([]);
+      return Promise.all(files.map((file) => apiClient.uploadAttachment(file)))
+        .then((uploaded) => perform(uploaded.map(toAttachmentMeta)));
+    };
+
     return {
       transitionInteraction({ interactionId, expectedStageId, toStageId, kind, comment = '', files = [] }) {
         const state = getState();
@@ -59,7 +66,7 @@ export function useActions() {
         const toStage = getStage(workflow, toStageId);
         const at = now();
 
-        return undoable({
+        return withUploadedFiles(files, (uploadedFiles) => undoable({
           type: ACTION.interactionTransitioned,
           payload: {
             event: {
@@ -72,11 +79,11 @@ export function useActions() {
               toStageId,
               stageId: interaction.stageId,
               comment: comment.trim(),
-              files: files.map(toAttachmentMeta),
+              files: uploadedFiles,
             },
             audit: { at, actorId, text: `Перевод на этап «${toStage.name}»`, target: interactionTarget(state, interaction) },
           },
-        });
+        }));
       },
 
       completeInteraction({ interactionId, comment = '', files = [] }) {
@@ -86,7 +93,7 @@ export function useActions() {
         if (!isFinalStage(workflow, interaction.stageId)) throw new AppError('WORKFLOW-409');
         const at = now();
 
-        return undoable({
+        return withUploadedFiles(files, (uploadedFiles) => undoable({
           type: ACTION.interactionTransitioned,
           payload: {
             completed: true,
@@ -100,11 +107,11 @@ export function useActions() {
               toStageId: interaction.stageId,
               stageId: interaction.stageId,
               comment: comment.trim(),
-              files: files.map(toAttachmentMeta),
+              files: uploadedFiles,
             },
             audit: { at, actorId, text: 'Взаимодействие завершено', target: interactionTarget(state, interaction) },
           },
-        });
+        }));
       },
 
       addComment({ interactionId, comment = '', files = [] }) {
@@ -112,7 +119,7 @@ export function useActions() {
         const interaction = findInteraction(state, interactionId);
         const at = now();
 
-        return undoable({
+        return withUploadedFiles(files, (uploadedFiles) => undoable({
           type: ACTION.interactionCommented,
           payload: {
             event: {
@@ -123,7 +130,7 @@ export function useActions() {
               at,
               stageId: interaction.stageId,
               comment: comment.trim(),
-              files: files.map(toAttachmentMeta),
+              files: uploadedFiles,
             },
             audit: {
               at,
@@ -132,7 +139,7 @@ export function useActions() {
               target: interactionTarget(state, interaction),
             },
           },
-        });
+        }));
       },
 
       assignManager({ interactionId, managerId }) {
@@ -300,19 +307,12 @@ export function useActions() {
         });
       },
 
-      /** Имитация запроса к внешней системе: сетевой вызов занимает время и может завершиться ошибкой. */
       async syncIntegration(sourceId) {
         requirePermission(PERMISSION.manageIntegrations);
-        await new Promise((resolve) => setTimeout(resolve, 900));
-        const at = now();
-        const records = 5 + Math.floor(Math.random() * 20);
-        const logEntry = { id: createId('sl'), sourceId, at, status: 'success', records };
-        const source = getState().integrations.sources.find((item) => item.id === sourceId);
-        dispatch({
-          type: ACTION.integrationSynced,
-          payload: { logEntry, audit: { at, actorId, text: `Синхронизация: получено записей — ${records}`, target: { type: 'integration', id: sourceId, label: source.name } } },
-        });
-        return logEntry;
+        await flush();
+        const result = await apiClient.syncIntegration(sourceId);
+        applyServerSnapshot(result.snapshot);
+        return result.logEntry;
       },
 
       recordReport(report) {
@@ -335,5 +335,5 @@ export function useActions() {
         });
       },
     };
-  }, [dispatch, getState, session]);
+  }, [dispatch, getState, applyServerSnapshot, flush, session]);
 }

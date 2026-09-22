@@ -49,6 +49,7 @@ def get_db() -> Generator[Session, None, None]:
 def create_database_schema() -> None:
     # Importing the model registers it on Base.metadata.
     from app.models.base import Base
+    from app.models.attachment import AttachmentModel  # noqa: F401
     from app.models.state import StateSnapshotModel  # noqa: F401
 
     Base.metadata.create_all(bind=engine)

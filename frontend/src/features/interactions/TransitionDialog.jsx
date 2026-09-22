@@ -44,6 +44,7 @@ export function TransitionDialog({ row, open, onOpenChange, preferredStageId }) 
   const [selectedKey, setSelectedKey] = useState(`${initialOption.kind}:${initialOption.stage.id}`);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const selected = options.find((option) => `${option.kind}:${option.stage.id}` === selectedKey) ?? initialOption;
   const commentRequired = selected.kind !== COMPLETE && requiresComment(selected.kind);
@@ -54,14 +55,15 @@ export function TransitionDialog({ row, open, onOpenChange, preferredStageId }) 
     onOpenChange(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setSubmitting(true);
     try {
       const payload = { interactionId: row.id, comment, files };
       const { undo } =
         selected.kind === COMPLETE
-          ? actions.completeInteraction(payload)
-          : actions.transitionInteraction({ ...payload, expectedStageId: row.stageId, toStageId: selected.stage.id, kind: selected.kind });
+          ? await actions.completeInteraction(payload)
+          : await actions.transitionInteraction({ ...payload, expectedStageId: row.stageId, toStageId: selected.stage.id, kind: selected.kind });
 
       sessionStore.remove(draftKey);
       setComment('');
@@ -69,6 +71,8 @@ export function TransitionDialog({ row, open, onOpenChange, preferredStageId }) 
       toast.success(selected.kind === COMPLETE ? 'Взаимодействие завершено' : `Этап изменён: «${selected.stage.name}»`, { undo });
     } catch (caught) {
       setError(caught);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -82,7 +86,7 @@ export function TransitionDialog({ row, open, onOpenChange, preferredStageId }) 
       footer={
         <>
           <Button onClick={close}>Отмена</Button>
-          <Button variant="primary" type="submit" form="transition-form">
+          <Button variant="primary" type="submit" form="transition-form" disabled={submitting} aria-busy={submitting}>
             {selected.kind === COMPLETE ? 'Завершить' : 'Сменить этап'}
           </Button>
         </>

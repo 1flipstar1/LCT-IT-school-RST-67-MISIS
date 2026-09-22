@@ -20,6 +20,8 @@ OPENAPI_TAGS = [
     {"name": "health", "description": "Проверка готовности приложения и базы данных."},
     {"name": "auth", "description": "Демо-JWT и проверка текущего пользователя."},
     {"name": "state", "description": "Версионная синхронизация всего состояния CRM."},
+    {"name": "attachments", "description": "Загрузка и скачивание файлов этапов."},
+    {"name": "integrations", "description": "Получение JSON из LMS и сайта."},
     {"name": "resources", "description": "Read-only представления данных из snapshot."},
 ]
 

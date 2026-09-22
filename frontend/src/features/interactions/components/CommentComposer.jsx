@@ -20,14 +20,16 @@ export function CommentComposer({ row }) {
   const [files, setFiles] = useState([]);
   const [showFiles, setShowFiles] = useState(false);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = comment.trim().length > 0 || files.length > 0;
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!canSubmit) return;
+    setSubmitting(true);
     try {
-      const { undo } = actions.addComment({ interactionId: row.id, comment, files });
+      const { undo } = await actions.addComment({ interactionId: row.id, comment, files });
       sessionStore.remove(draftKey);
       setComment('');
       setFiles([]);
@@ -36,6 +38,8 @@ export function CommentComposer({ row }) {
       toast.success(files.length ? 'Файлы добавлены' : 'Комментарий добавлен', { undo });
     } catch (caught) {
       setError(caught);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -65,7 +69,7 @@ export function CommentComposer({ row }) {
             Прикрепить файлы
           </Button>
         )}
-        <Button variant="primary" type="submit" disabled={!canSubmit}>
+        <Button variant="primary" type="submit" disabled={!canSubmit || submitting} aria-busy={submitting}>
           Отправить
         </Button>
       </div>

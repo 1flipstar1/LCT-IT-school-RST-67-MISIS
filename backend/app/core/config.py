@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000,http://127.0.0.1:4173,http://127.0.0.1:5173"
     )
 
-    jwt_secret: str = "local-demo-secret-change-me"
+    jwt_secret: str = "local-demo-secret-change-me-at-least-32-bytes"
     jwt_algorithm: str = "HS256"
     jwt_issuer: str = "rtk-it-school-api"
     jwt_audience: str = "rtk-it-school-web"
@@ -61,6 +61,17 @@ class Settings(BaseSettings):
     seed_state_path: Path = BACKEND_DIR / "app" / "seed_state.json"
     frontend_dist_path: Path = PROJECT_DIR / "frontend" / "dist"
     max_state_bytes: int = 20 * 1024 * 1024
+    attachment_storage_path: Path = BACKEND_DIR / "data" / "attachments"
+    max_attachment_bytes: int = 25 * 1024 * 1024
+
+    # The external contracts were not supplied with the task. These optional
+    # URLs let an installation connect the two agreed sources without changing
+    # application code. Empty values intentionally mean "not configured".
+    lms_api_url: str | None = None
+    lms_api_token: str | None = None
+    website_api_url: str | None = None
+    website_api_token: str | None = None
+    integration_timeout_seconds: int = 20
 
     @field_validator("database_url", mode="before")
     @classmethod
@@ -79,7 +90,15 @@ class Settings(BaseSettings):
         value = "/" + value.strip("/")
         return value if value != "/" else "/api/v1"
 
-    @field_validator("keycloak_issuer_url", "keycloak_jwks_url", mode="before")
+    @field_validator(
+        "keycloak_issuer_url",
+        "keycloak_jwks_url",
+        "lms_api_url",
+        "lms_api_token",
+        "website_api_url",
+        "website_api_token",
+        mode="before",
+    )
     @classmethod
     def empty_url_is_none(cls, value: object) -> object:
         if isinstance(value, str) and not value.strip():
@@ -114,6 +133,12 @@ class Settings(BaseSettings):
         if self.keycloak_issuer_url:
             return f"{self.keycloak_issuer_url.rstrip('/')}/protocol/openid-connect/certs"
         return None
+
+    def integration_url(self, source_id: str) -> str | None:
+        return {"lms": self.lms_api_url, "site": self.website_api_url}.get(source_id)
+
+    def integration_token(self, source_id: str) -> str | None:
+        return {"lms": self.lms_api_token, "site": self.website_api_token}.get(source_id)
 
 
 @lru_cache

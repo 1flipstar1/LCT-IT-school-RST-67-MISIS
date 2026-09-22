@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, Query
 from app.api.dependencies import DbSession, StateAccess
 from app.schemas.common import ERROR_RESPONSES
 from app.schemas.state import CollectionResponse, DataResponse, StateSnapshotResponse
-from app.services.state import get_state
+from app.services.state import get_state_for_principal
 
 
 router = APIRouter(tags=["resources"])
@@ -46,7 +46,7 @@ def _page_params(
     summary="Получить справочники",
 )
 def catalogs(db: DbSession, _: StateAccess) -> DataResponse:
-    snapshot = get_state(db)
+    snapshot = get_state_for_principal(db, _)
     keys = ("universities", "directions", "programs", "products")
     return DataResponse(
         data={key: snapshot.state.get(key, []) for key in keys},
@@ -71,7 +71,7 @@ def interactions(
     product_id: Annotated[str | None, Query(alias="productId")] = None,
     stage_id: Annotated[str | None, Query(alias="stageId")] = None,
 ) -> CollectionResponse:
-    snapshot = get_state(db)
+    snapshot = get_state_for_principal(db, _)
     value = snapshot.state.get("interactions", [])
     items: list[Any] = value if isinstance(value, list) else []
     filters = {
@@ -95,22 +95,22 @@ def interactions(
 
 @router.get("/workflows", response_model=CollectionResponse, summary="Получить процессы")
 def workflows(db: DbSession, _: StateAccess, page: Annotated[tuple[int, int], Depends(_page_params)]) -> CollectionResponse:
-    return _collection(get_state(db), "workflows", offset=page[0], limit=page[1])
+    return _collection(get_state_for_principal(db, _), "workflows", offset=page[0], limit=page[1])
 
 
 @router.get("/users", response_model=CollectionResponse, summary="Получить пользователей")
 def users(db: DbSession, _: StateAccess, page: Annotated[tuple[int, int], Depends(_page_params)]) -> CollectionResponse:
-    return _collection(get_state(db), "users", offset=page[0], limit=page[1])
+    return _collection(get_state_for_principal(db, _), "users", offset=page[0], limit=page[1])
 
 
 @router.get("/audit", response_model=CollectionResponse, summary="Получить журнал аудита")
 def audit(db: DbSession, _: StateAccess, page: Annotated[tuple[int, int], Depends(_page_params)]) -> CollectionResponse:
-    return _collection(get_state(db), "audit", offset=page[0], limit=page[1])
+    return _collection(get_state_for_principal(db, _), "audit", offset=page[0], limit=page[1])
 
 
 @router.get("/reports", response_model=CollectionResponse, summary="Получить сохранённые отчёты")
 def reports(db: DbSession, _: StateAccess, page: Annotated[tuple[int, int], Depends(_page_params)]) -> CollectionResponse:
-    return _collection(get_state(db), "reports", offset=page[0], limit=page[1])
+    return _collection(get_state_for_principal(db, _), "reports", offset=page[0], limit=page[1])
 
 
 @router.get(
@@ -120,7 +120,7 @@ def reports(db: DbSession, _: StateAccess, page: Annotated[tuple[int, int], Depe
     summary="Получить состояние интеграций",
 )
 def integrations(db: DbSession, _: StateAccess) -> DataResponse:
-    snapshot = get_state(db)
+    snapshot = get_state_for_principal(db, _)
     value = snapshot.state.get("integrations", {})
     return DataResponse(
         data=value if isinstance(value, dict) else {},

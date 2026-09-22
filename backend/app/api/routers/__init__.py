@@ -1,3 +1,3 @@
 """HTTP route modules."""
 
-__all__ = ["auth", "facades", "health", "state"]
+__all__ = ["attachments", "auth", "facades", "health", "integrations", "state"]

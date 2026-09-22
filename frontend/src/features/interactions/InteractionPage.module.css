@@ -130,6 +130,15 @@
   font-weight: 500;
 }
 
+.fileDownload {
+  text-align: left;
+}
+
+.fileDownload:hover {
+  color: var(--color-brand-hover);
+  text-decoration: underline;
+}
+
 /* ---------- Боковая колонка ---------- */
 .characteristics {
   display: grid;

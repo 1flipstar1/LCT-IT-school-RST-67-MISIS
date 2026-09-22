@@ -5,6 +5,7 @@ alembic>=1.14,<2
 psycopg[binary]>=3.2,<4
 pydantic-settings>=2.7,<3
 PyJWT[crypto]>=2.10,<3
+python-multipart>=0.0.20,<1
 
 # Kept in the main file so a fresh clone can run the supplied smoke tests.
 httpx>=0.28,<1

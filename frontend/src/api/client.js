@@ -54,7 +54,7 @@ export function createApiClient({
 } = {}) {
   const root = baseUrl.replace(/\/$/, '');
 
-  async function request(path, { method = 'GET', body, signal } = {}) {
+  async function request(path, { method = 'GET', body, formData, responseType = 'json', signal } = {}) {
     if (!fetchImpl) throw new ApiError('Fetch API недоступен', { status: 0, code: 'network_error' });
 
     const accessToken = getAccessToken?.();
@@ -68,7 +68,7 @@ export function createApiClient({
       response = await fetchImpl(`${root}${path}`, {
         method,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: formData ?? (body === undefined ? undefined : JSON.stringify(body)),
         cache: 'no-store',
         credentials: 'same-origin',
         signal: requestSignal.signal,
@@ -79,6 +79,7 @@ export function createApiClient({
       requestSignal.dispose();
     }
 
+    if (response.ok && responseType === 'blob') return response.blob();
     const payload = await readPayload(response);
     if (!response.ok) {
       const apiError = payload && typeof payload === 'object' ? payload.error : null;
@@ -100,6 +101,15 @@ export function createApiClient({
         body: { state, expectedRevision, ...(force ? { force: true } : {}) },
       }),
     demoLogin: (role, options = {}) => request('/auth/demo', { ...options, method: 'POST', body: { role } }),
+    uploadAttachment: (file, options = {}) => {
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+      return request('/attachments', { ...options, method: 'POST', formData });
+    },
+    downloadAttachment: (attachmentId, options = {}) =>
+      request(`/attachments/${encodeURIComponent(attachmentId)}`, { ...options, responseType: 'blob' }),
+    syncIntegration: (sourceId, options = {}) =>
+      request(`/integrations/${encodeURIComponent(sourceId)}/sync`, { ...options, method: 'POST' }),
   });
 }
 

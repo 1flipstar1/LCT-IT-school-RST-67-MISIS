@@ -6,4 +6,6 @@ __pycache__/
 *.db
 *.db-shm
 *.db-wal
+data/
+tests/test_attachments/
 .coverage

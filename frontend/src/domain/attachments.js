@@ -13,5 +13,11 @@ export function validateAttachment(file) {
   if (file.size > MAX_ATTACHMENT_BYTES) throw new AppError('FILE-413', file.name);
 }
 
-/** В прототипе храним только метаданные: сами файлы уходят в хранилище на бэкенде. */
-export const toAttachmentMeta = (file) => ({ name: file.name, size: file.size });
+/** В состоянии храним метаданные и непрозрачный id; содержимое остаётся в серверном хранилище. */
+export const toAttachmentMeta = (file) => ({
+  ...(file.id ? { id: file.id } : {}),
+  name: file.name,
+  size: file.size,
+  ...(file.contentType ? { contentType: file.contentType } : {}),
+  ...(file.downloadUrl ? { downloadUrl: file.downloadUrl } : {}),
+});
