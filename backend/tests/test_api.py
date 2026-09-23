@@ -2,13 +2,18 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from app.core.config import settings
+from app.core.config import Settings, settings
 
 
 def test_health_and_seeded_state(client: TestClient) -> None:
     health = client.get("/api/v1/health")
     assert health.status_code == 200
     assert health.json()["status"] == "ok"
+    assert health.json()["integrations"] == {"lms": "mock", "site": "mock"}
+    assert client.get("/api/v1/health/live").status_code == 200
+    assert health.headers["x-content-type-options"] == "nosniff"
+    assert health.headers["cache-control"] == "no-store"
+    assert health.headers["x-request-id"]
 
     response = client.get("/api/v1/state")
     assert response.status_code == 200
@@ -185,6 +190,90 @@ def test_integration_ingest_updates_snapshot(
     assert body["logEntry"]["status"] == "success"
     assert body["logEntry"]["records"] == 1
     assert body["snapshot"]["state"]["inbox"][0]["payload"]["externalId"] == "lms-test-1"
+
+
+def test_integration_mocks_sync_and_deduplicate(
+    client: TestClient,
+    admin_headers: dict[str, str],
+) -> None:
+    client.post("/api/v1/state/reset", json={"force": True}, headers=admin_headers)
+    previous_mock = settings.integration_mock_enabled
+    previous_lms_url = settings.lms_api_url
+    previous_site_url = settings.website_api_url
+    settings.integration_mock_enabled = True
+    settings.lms_api_url = None
+    settings.website_api_url = None
+    try:
+        status = client.get("/api/v1/integrations/status", headers=admin_headers)
+        assert status.status_code == 200
+        assert {item["sourceId"]: item["mode"] for item in status.json()["sources"]} == {
+            "lms": "mock",
+            "site": "mock",
+        }
+
+        first = client.post("/api/v1/integrations/lms/sync", headers=admin_headers)
+        assert first.status_code == 200
+        assert first.json()["logEntry"]["status"] == "success"
+        assert first.json()["logEntry"]["records"] == 1
+        assert first.json()["logEntry"]["mode"] == "mock"
+        assert first.json()["snapshot"]["state"]["inbox"][0]["payload"]["externalId"] == "mock-lms-flow-2026-09-analytics"
+
+        duplicate = client.post("/api/v1/integrations/lms/sync", headers=admin_headers)
+        assert duplicate.status_code == 200
+        assert duplicate.json()["logEntry"]["records"] == 0
+
+        site = client.post("/api/v1/integrations/site/sync", headers=admin_headers)
+        assert site.status_code == 200
+        assert site.json()["logEntry"]["records"] == 1
+    finally:
+        settings.integration_mock_enabled = previous_mock
+        settings.lms_api_url = previous_lms_url
+        settings.website_api_url = previous_site_url
+
+
+def test_unconfigured_integration_uses_public_sync_error_code(
+    client: TestClient,
+    admin_headers: dict[str, str],
+) -> None:
+    previous_mock = settings.integration_mock_enabled
+    previous_url = settings.lms_api_url
+    settings.integration_mock_enabled = False
+    settings.lms_api_url = None
+    try:
+        response = client.post("/api/v1/integrations/lms/sync", headers=admin_headers)
+        assert response.status_code == 200
+        assert response.json()["logEntry"]["status"] == "failed"
+        assert response.json()["logEntry"]["errorCode"] == "SYNC-502"
+        assert response.json()["logEntry"]["technicalCode"] == "integration_not_configured"
+    finally:
+        settings.integration_mock_enabled = previous_mock
+        settings.lms_api_url = previous_url
+
+
+def test_production_configuration_fails_closed() -> None:
+    invalid = Settings(
+        _env_file=None,
+        app_env="production",
+        jwt_secret="change-me",
+        keycloak_issuer_url=None,
+        allowed_hosts="*",
+    )
+    errors = invalid.production_validation_errors()
+    assert any("JWT_SECRET" in error for error in errors)
+    assert any("KEYCLOAK_ISSUER_URL" in error for error in errors)
+    assert any("ALLOWED_HOSTS" in error for error in errors)
+
+    valid = Settings(
+        _env_file=None,
+        app_env="production",
+        jwt_secret="production-secret-with-more-than-32-characters",
+        demo_auth_enabled=False,
+        database_url="postgresql+psycopg://lct:secret@postgres/lct_db",
+        keycloak_issuer_url="https://sso.example.ru/realms/it-school",
+        cors_origins="https://crm.example.ru",
+        allowed_hosts="crm.example.ru",
+    )
+    valid.validate_runtime()
 
 
 def test_json_export(client: TestClient) -> None:

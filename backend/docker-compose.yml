@@ -1,33 +1,47 @@
+x-app: &app
+  image: lct-it-school:${IMAGE_TAG:-local}
+  build:
+    context: ..
+    dockerfile: backend/Dockerfile
+    args:
+      VITE_KEYCLOAK_URL: ${KEYCLOAK_PUBLIC_URL:-}
+      VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-}
+      VITE_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
+  restart: unless-stopped
+  stop_grace_period: 30s
+
+x-runtime-environment: &runtime-environment
+  APP_ENV: ${APP_ENV:-demo}
+  DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://postgres:postgres@postgres:5432/lct_db}
+  JWT_SECRET: ${JWT_SECRET:-local-compose-secret-change-me-at-least-32-bytes}
+  DEMO_AUTH_ENABLED: ${DEMO_AUTH_ENABLED:-true}
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8000,http://localhost:5173}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+  KEYCLOAK_ISSUER_URL: ${KEYCLOAK_ISSUER_URL:-}
+  KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-}
+  KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
+  LMS_API_URL: ${LMS_API_URL:-}
+  LMS_API_TOKEN: ${LMS_API_TOKEN:-}
+  WEBSITE_API_URL: ${WEBSITE_API_URL:-}
+  WEBSITE_API_TOKEN: ${WEBSITE_API_TOKEN:-}
+  INTEGRATION_MOCK_ENABLED: ${INTEGRATION_MOCK_ENABLED:-true}
+  INTEGRATION_SCHEDULER_ENABLED: ${INTEGRATION_SCHEDULER_ENABLED:-true}
+  ATTACHMENT_STORAGE_PATH: /app/data/attachments
+  JOB_STORAGE_BACKEND: s3
+  JOB_QUEUE_BACKEND: rabbitmq
+  S3_ENDPOINT_URL: http://minio:9000
+  S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+  S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+  S3_BUCKET: ${S3_BUCKET:-lct-artifacts}
+  RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
+
 services:
   api:
-    build:
-      context: ..
-      dockerfile: backend/Dockerfile
-      args:
-        VITE_KEYCLOAK_URL: ${KEYCLOAK_PUBLIC_URL:-}
-        VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-}
-        VITE_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
-    restart: unless-stopped
+    <<: *app
     environment:
-      APP_ENV: demo
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/lct_db
-      JWT_SECRET: ${JWT_SECRET:-local-compose-secret-change-me-at-least-32-bytes}
-      CORS_ORIGINS: http://localhost:8000,http://localhost:5173
-      ATTACHMENT_STORAGE_PATH: /app/data/attachments
-      KEYCLOAK_ISSUER_URL: ${KEYCLOAK_ISSUER_URL:-}
-      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
-      LMS_API_URL: ${LMS_API_URL:-}
-      LMS_API_TOKEN: ${LMS_API_TOKEN:-}
-      WEBSITE_API_URL: ${WEBSITE_API_URL:-}
-      WEBSITE_API_TOKEN: ${WEBSITE_API_TOKEN:-}
-      JOB_STORAGE_BACKEND: s3
-      JOB_QUEUE_BACKEND: rabbitmq
-      S3_ENDPOINT_URL: http://minio:9000
-      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
-      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      S3_BUCKET: lct-artifacts
-      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
+      <<: *runtime-environment
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1}
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,7 +50,7 @@ services:
       minio-init:
         condition: service_completed_successfully
     ports:
-      - "8000:8000"
+      - "${APP_BIND_ADDRESS:-0.0.0.0}:${APP_PORT:-8000}:8000"
     volumes:
       - attachment_data:/app/data/attachments
     healthcheck:
@@ -47,24 +61,14 @@ services:
         - "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 8
+      start_period: 20s
 
   import-worker:
-    build:
-      context: ..
-      dockerfile: backend/Dockerfile
-    restart: unless-stopped
+    <<: *app
     command: ["python", "-m", "app.worker"]
     environment:
-      APP_ENV: demo
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/lct_db
-      JOB_STORAGE_BACKEND: s3
-      JOB_QUEUE_BACKEND: rabbitmq
-      S3_ENDPOINT_URL: http://minio:9000
-      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
-      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      S3_BUCKET: lct-artifacts
-      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
+      <<: *runtime-environment
       WORKER_QUEUES: lct.imports
     depends_on:
       api:
@@ -75,21 +79,10 @@ services:
         condition: service_completed_successfully
 
   report-worker:
-    build:
-      context: ..
-      dockerfile: backend/Dockerfile
-    restart: unless-stopped
+    <<: *app
     command: ["python", "-m", "app.worker"]
     environment:
-      APP_ENV: demo
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/lct_db
-      JOB_STORAGE_BACKEND: s3
-      JOB_QUEUE_BACKEND: rabbitmq
-      S3_ENDPOINT_URL: http://minio:9000
-      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
-      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      S3_BUCKET: lct-artifacts
-      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
+      <<: *runtime-environment
       WORKER_QUEUES: lct.reports
     depends_on:
       api:
@@ -99,30 +92,43 @@ services:
       minio-init:
         condition: service_completed_successfully
 
+  integration-worker:
+    <<: *app
+    command: ["python", "-m", "app.integration_worker"]
+    environment:
+      <<: *runtime-environment
+      LMS_SYNC_INTERVAL_SECONDS: ${LMS_SYNC_INTERVAL_SECONDS:-14400}
+      WEBSITE_SYNC_INTERVAL_SECONDS: ${WEBSITE_SYNC_INTERVAL_SECONDS:-900}
+      INTEGRATION_SYSTEM_USER_ID: ${INTEGRATION_SYSTEM_USER_ID:-usr-8}
+    depends_on:
+      api:
+        condition: service_healthy
+
   postgres:
     image: postgres:16
     restart: unless-stopped
+    stop_grace_period: 30s
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: lct_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-lct_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d lct_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 12
 
   rabbitmq:
     image: rabbitmq:4.1.8-management
     restart: unless-stopped
+    stop_grace_period: 30s
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-lct}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-lct}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "${LOCAL_ADMIN_BIND_ADDRESS:-127.0.0.1}:15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -134,13 +140,13 @@ services:
   minio:
     image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
     restart: unless-stopped
+    stop_grace_period: 30s
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${LOCAL_ADMIN_BIND_ADDRESS:-127.0.0.1}:9001:9001"
     volumes:
       - minio_data:/data
 
@@ -153,10 +159,11 @@ services:
     entrypoint: >-
       /bin/sh -c "until /usr/bin/mc alias set local http://minio:9000
       $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD}; do sleep 2; done;
-      /usr/bin/mc mb --ignore-existing local/lct-artifacts"
+      /usr/bin/mc mb --ignore-existing local/$${S3_BUCKET}"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET: ${S3_BUCKET:-lct-artifacts}
 
 volumes:
   postgres_data:

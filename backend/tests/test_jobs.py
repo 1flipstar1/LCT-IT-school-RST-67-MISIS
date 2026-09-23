@@ -73,6 +73,9 @@ def test_async_import_preview_and_apply(client: TestClient) -> None:
     assert applied.json()["result"]["stats"]["newProducts"] == 1
     state = client.get("/api/v1/state").json()["state"]
     assert any(item["name"] == "Тестовый технологический университет" for item in state["universities"])
+    audit = next(item for item in state["audit"] if item["target"]["type"] == "import")
+    assert audit["userId"] == "usr-8"
+    assert "actorId" not in audit
 
 
 def test_import_requires_lead_or_admin(client: TestClient) -> None:
@@ -107,3 +110,8 @@ def test_report_worker_and_download(client: TestClient) -> None:
     assert download.status_code == 200
     assert download.content.startswith(b"PK")
     assert "filename*=UTF-8''" in download.headers["content-disposition"]
+
+    state = client.get("/api/v1/state", headers=headers).json()["state"]
+    audit = next(item for item in state["audit"] if item.get("target", {}).get("type") == "report")
+    assert audit["userId"] == "usr-1"
+    assert "actorId" not in audit

@@ -17,6 +17,7 @@ from app.core.errors import APIError
 from app.core.security import Principal
 from app.domain.state import find_principal_user, project_state_for_principal
 from app.schemas.integration import IntegrationSyncResult
+from app.services.integration_mock import get_mock_records
 from app.services.state import get_state, mutate_state
 
 
@@ -44,8 +45,12 @@ def _records_from_payload(payload: Any) -> list[dict[str, Any]]:
 
 
 def fetch_records(source_id: str) -> list[dict[str, Any]]:
+    if source_id not in SUPPORTED_SOURCES:
+        raise APIError(404, "integration_source_not_found", "Источник интеграции не найден.")
     url = settings.integration_url(source_id)
     if not url:
+        if settings.effective_integration_mock_enabled:
+            return get_mock_records(source_id)
         raise APIError(
             503,
             "integration_not_configured",
@@ -90,6 +95,7 @@ def ingest_records(
     source_id: str,
     records: list[dict[str, Any]],
     principal: Principal,
+    mode: str = "push",
 ) -> IntegrationSyncResult:
     if source_id not in SUPPORTED_SOURCES:
         raise APIError(404, "integration_source_not_found", "Источник интеграции не найден.")
@@ -102,13 +108,17 @@ def ingest_records(
         "at": timestamp,
         "status": "success",
         "records": len(records),
+        "mode": mode,
     }
 
     def mutation(state: dict[str, Any]) -> dict[str, Any]:
         known_external_ids = {
-            str(item.get("payload", {}).get("externalId"))
+            str(payload.get("externalId"))
             for item in state["inbox"]
-            if item.get("source") == source_id and item.get("payload", {}).get("externalId") is not None
+            if isinstance(item, dict)
+            and item.get("source") == source_id
+            and isinstance((payload := item.get("payload")), dict)
+            and payload.get("externalId") is not None
         }
         added = 0
         for record in records:
@@ -133,6 +143,7 @@ def ingest_records(
             added += 1
         entry = {**log_entry, "records": added}
         state["integrations"]["log"].insert(0, entry)
+        state["integrations"]["log"] = state["integrations"]["log"][:500]
         for source in state["integrations"]["sources"]:
             if source.get("id") == source_id:
                 source.update({"lastSyncAt": timestamp, "lastStatus": "success"})
@@ -172,14 +183,16 @@ def record_failed_sync(
         "at": timestamp,
         "status": "failed",
         "records": 0,
-        "errorCode": error.code,
+        "errorCode": "SYNC-502",
+        "technicalCode": error.code,
     }
 
     def mutation(state: dict[str, Any]) -> dict[str, Any]:
         state["integrations"]["log"].insert(0, log_entry)
+        state["integrations"]["log"] = state["integrations"]["log"][:500]
         for source in state["integrations"]["sources"]:
             if source.get("id") == source_id:
-                source.update({"lastSyncAt": timestamp, "lastStatus": "failed", "lastErrorCode": error.code})
+                source.update({"lastSyncAt": timestamp, "lastStatus": "failed", "lastErrorCode": "SYNC-502"})
                 break
         state["audit"].insert(
             0,

@@ -18,7 +18,8 @@ uvicorn app.main:app --reload --port 8000
 
 - приложение: <http://localhost:8000/> (если собран `frontend/dist`);
 - Swagger: <http://localhost:8000/docs>;
-- health check: <http://localhost:8000/api/v1/health>;
+- readiness (процесс + БД): <http://localhost:8000/api/v1/health>;
+- liveness (только HTTP-процесс): <http://localhost:8000/api/v1/health/live>;
 - OpenAPI JSON: <http://localhost:8000/openapi.json>.
 
 Если `frontend/dist` ещё нет, соберите его один раз:
@@ -86,16 +87,34 @@ Frontend поддерживает Keycloak Authorization Code + PKCE без хр
 
 В `APP_ENV=production` snapshot и façade всегда требуют Bearer-токен, а демо-вход по умолчанию отключён. Для Keycloak задайте как минимум `KEYCLOAK_ISSUER_URL`; при необходимости также `KEYCLOAK_AUDIENCE`, `KEYCLOAK_CLIENT_ID` или явный `KEYCLOAK_JWKS_URL`. Роли `KAM`, `MANAGER_LEAD`, `ADMIN` автоматически отображаются в роли приложения.
 
-Полный список переменных находится в [.env.example](.env.example). Для production обязательно замените `JWT_SECRET` и задайте точные `CORS_ORIGINS`.
+Полный список переменных находится в [.env.example](.env.example). В production
+приложение запускается по fail-closed принципу: оно откажется стартовать с
+демо-секретом, включённым демо-входом, wildcard в `CORS_ORIGINS` / `ALLOWED_HOSTS`
+или без HTTPS issuer Keycloak.
+Для внутреннего Docker healthcheck оставьте `localhost` в `ALLOWED_HOSTS` рядом
+с публичным доменом.
 
 ## Файлы и интеграции
 
 - `POST /api/v1/attachments` принимает `multipart/form-data`, проверяет расширение и лимит 25 МБ, сохраняет содержимое под непрозрачным именем; `GET /api/v1/attachments/{id}` скачивает файл с авторизацией.
 - `POST /api/v1/integrations/{lms|site}/ingest` принимает согласованный JSON вручную или от шлюза.
 - `POST /api/v1/integrations/{lms|site}/sync` забирает JSON с адресов `LMS_API_URL` / `WEBSITE_API_URL`. Поддерживается массив либо объект с массивом в `items`, `records` или `data`. Bearer-токены задаются отдельными переменными.
+- `GET /api/v1/integrations/status` показывает безопасный runtime-статус коннекторов (`remote`, `mock`, `unconfigured`) без выдачи URL и токенов.
 - `GET /api/v1/state/export` скачивает результирующий JSON.
 
 Контракты заказчика для LMS и Laravel-сайта в исходном ТЗ не приложены, поэтому маппинг сохраняет исходный объект в `payload`, а известные поля (`title`, `id`/`externalId`) нормализует. После получения финального контракта этот адаптер расширяется в `app/services/integration.py`, не затрагивая UI.
+
+Пока внешние URL не настроены, в `development`, `demo` и `test` используются
+детерминированные заглушки из `app/services/integration_mock.py`. Они проходят
+через тот же ingestion, журнал, аудит и защиту от дублей, что и реальные ответы.
+`INTEGRATION_MOCK_ENABLED=false` отключает их; в production они отключены всегда.
+Контейнер `integration-worker` синхронизирует сайт каждые 15 минут и LMS каждые
+4 часа. Интервалы задаются через `WEBSITE_SYNC_INTERVAL_SECONDS` и
+`LMS_SYNC_INTERVAL_SECONDS`. Запуск одного проверочного цикла:
+
+```powershell
+python -m app.integration_worker --once
+```
 
 ## Импорт, объектное хранилище и фоновые задачи
 
@@ -115,11 +134,12 @@ API → MinIO/S3 (файл) → RabbitMQ (только jobId) → worker → Pos
 В обычном локальном запуске используются файловое хранилище `backend/.data/objects`
 и синхронный inline-обработчик, поэтому дополнительные сервисы не нужны. В Compose
 автоматически включаются MinIO и RabbitMQ, а обработка разделена между контейнерами
-`import-worker` и `report-worker`; их можно масштабировать независимо.
+`import-worker` и `report-worker`; их можно масштабировать независимо. Плановая
+синхронизация вынесена в единственный `integration-worker`.
 
 ## PostgreSQL и Docker
 
-Полный стенд (frontend build + API + два worker-процесса + PostgreSQL + MinIO + RabbitMQ):
+Полный demo-стенд (frontend build + API + три worker-процесса + PostgreSQL + MinIO + RabbitMQ):
 
 ```powershell
 cd backend
@@ -129,6 +149,20 @@ docker compose up --build
 Приложение откроется на <http://localhost:8000>. MinIO Console доступна на
 <http://localhost:9001>, RabbitMQ Management — на <http://localhost:15672>.
 Контейнер API перед стартом выполняет `alembic upgrade head`.
+
+Для production скопируйте [.env.production.example](.env.production.example) во
+внешний файл, замените все `CHANGE_ME`, затем запустите:
+
+```powershell
+docker compose --env-file .env.production up -d --build
+docker compose --env-file .env.production ps
+```
+
+Перед публикацией поставьте перед API TLS reverse proxy / ingress, настройте
+резервное копирование PostgreSQL и MinIO, не публикуйте management-порты наружу
+и сохраните production env в менеджере секретов. По умолчанию консоли RabbitMQ
+и MinIO привязаны только к `127.0.0.1`. Контейнер приложения работает от
+непривилегированного пользователя `app`.
 
 Без Docker достаточно переопределить строку подключения:
 

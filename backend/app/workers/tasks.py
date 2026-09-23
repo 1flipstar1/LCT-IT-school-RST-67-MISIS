@@ -91,7 +91,7 @@ def _process_import_apply(job_id: str) -> None:
                     audit.insert(0, {
                         "id": audit_id,
                         "at": datetime.now(UTC).isoformat(),
-                        "actorId": job.requester_id,
+                        "userId": job.requester_id,
                         "text": f"Импорт «{job.original_name}»: строк {plan['stats']['rows']}, новых вузов {plan['stats']['newUniversities']}, обновлено договоров {plan['stats']['updatedContracts']}",
                         "target": {"type": "import", "label": "Импорт каталога"},
                     })
@@ -162,7 +162,7 @@ def _process_report(job_id: str) -> None:
                     state.setdefault("audit", []).insert(0, {
                         "id": f"audit-{uuid.uuid4().hex[:12]}",
                         "at": created_at.isoformat(),
-                        "actorId": job.requester_id,
+                        "userId": job.requester_id,
                         "text": f"Сформирован отчёт ({format_name.upper()})",
                         "target": {"type": "report", "id": report_record["id"], "label": report_record["name"]},
                     })

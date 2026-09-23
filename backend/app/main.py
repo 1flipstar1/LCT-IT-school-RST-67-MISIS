@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from uuid import uuid4
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -30,6 +32,7 @@ OPENAPI_TAGS = [
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    settings.validate_runtime()
     create_database_schema()
     with SessionLocal() as db:
         initialize_state(db)
@@ -59,8 +62,25 @@ def create_app() -> FastAPI:
         allow_credentials=allow_credentials,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["ETag"],
+        expose_headers=["ETag", "X-Request-ID"],
     )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_host_list)
+
+    @app.middleware("http")
+    async def operational_headers(request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID", "")
+        if not request_id or len(request_id) > 128:
+            request_id = uuid4().hex
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "same-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        if request.url.path.startswith(settings.api_v1_prefix):
+            response.headers.setdefault("Cache-Control", "no-store")
+        return response
+
     install_error_handlers(app)
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 

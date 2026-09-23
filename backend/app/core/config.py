@@ -10,8 +10,9 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlparse
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -43,6 +44,7 @@ class Settings(BaseSettings):
         "http://localhost:3000,http://localhost:4173,http://localhost:5173,"
         "http://127.0.0.1:3000,http://127.0.0.1:4173,http://127.0.0.1:5173"
     )
+    allowed_hosts: str = "*"
 
     jwt_secret: str = "local-demo-secret-change-me-at-least-32-bytes"
     jwt_algorithm: str = "HS256"
@@ -71,7 +73,14 @@ class Settings(BaseSettings):
     lms_api_token: str | None = None
     website_api_url: str | None = None
     website_api_token: str | None = None
-    integration_timeout_seconds: int = 20
+    integration_timeout_seconds: int = Field(default=20, ge=1, le=120)
+    # Missing upstream URLs use deterministic records in non-production modes.
+    # Production always disables these built-in mocks.
+    integration_mock_enabled: bool | None = None
+    integration_scheduler_enabled: bool = False
+    lms_sync_interval_seconds: int = Field(default=4 * 60 * 60, ge=60)
+    website_sync_interval_seconds: int = Field(default=15 * 60, ge=60)
+    integration_system_user_id: str = "usr-8"
 
     # Binary artifacts never live in the database. Local backends make a fresh
     # checkout testable without infrastructure; Compose switches both values.
@@ -146,6 +155,19 @@ class Settings(BaseSettings):
         return [origin for origin in values if origin]
 
     @property
+    def allowed_host_list(self) -> list[str]:
+        values = [host.strip() for host in self.allowed_hosts.split(",")]
+        return [host for host in values if host] or ["*"]
+
+    @property
+    def effective_integration_mock_enabled(self) -> bool:
+        if self.is_production:
+            return False
+        if self.integration_mock_enabled is not None:
+            return self.integration_mock_enabled
+        return True
+
+    @property
     def resolved_keycloak_jwks_url(self) -> str | None:
         if self.keycloak_jwks_url:
             return self.keycloak_jwks_url
@@ -158,6 +180,99 @@ class Settings(BaseSettings):
 
     def integration_token(self, source_id: str) -> str | None:
         return {"lms": self.lms_api_token, "site": self.website_api_token}.get(source_id)
+
+    def integration_mode(self, source_id: str) -> Literal["remote", "mock", "unconfigured"]:
+        if self.integration_url(source_id):
+            return "remote"
+        if self.effective_integration_mock_enabled:
+            return "mock"
+        return "unconfigured"
+
+    def integration_interval_seconds(self, source_id: str) -> int:
+        return {
+            "lms": self.lms_sync_interval_seconds,
+            "site": self.website_sync_interval_seconds,
+        }[source_id]
+
+    def production_validation_errors(self) -> list[str]:
+        """Return actionable configuration errors for a production process."""
+
+        if not self.is_production:
+            return []
+
+        errors: list[str] = []
+        insecure_secrets = {
+            "local-demo-secret-change-me-at-least-32-bytes",
+            "local-compose-secret-change-me-at-least-32-bytes",
+            "replace-with-a-long-random-secret",
+            "change-me",
+        }
+        secret_lower = self.jwt_secret.casefold()
+        has_placeholder = any(
+            marker in secret_lower
+            for marker in ("change-me", "change_me", "replace", "local-demo", "local-compose")
+        )
+        if len(self.jwt_secret) < 32 or self.jwt_secret in insecure_secrets or has_placeholder:
+            errors.append("JWT_SECRET must be a unique secret of at least 32 characters")
+        if self.jwt_algorithm not in {"HS256", "HS384", "HS512"}:
+            errors.append("JWT_ALGORITHM must be HS256, HS384 or HS512")
+        if self.effective_demo_auth_enabled:
+            errors.append("DEMO_AUTH_ENABLED must be false")
+        if self.database_url.startswith("sqlite"):
+            errors.append("DATABASE_URL must use PostgreSQL in production")
+        if not self.keycloak_issuer_url:
+            errors.append("KEYCLOAK_ISSUER_URL is required")
+        else:
+            issuer = urlparse(self.keycloak_issuer_url)
+            if issuer.scheme != "https" or not issuer.netloc:
+                errors.append("KEYCLOAK_ISSUER_URL must be an absolute HTTPS URL")
+        if "*" in self.cors_origin_list:
+            errors.append("CORS_ORIGINS must not contain '*' in production")
+        insecure_origins = [
+            origin
+            for origin in self.cors_origin_list
+            if urlparse(origin).scheme != "https"
+        ]
+        if insecure_origins:
+            errors.append("CORS_ORIGINS must contain only HTTPS origins in production")
+        if "*" in self.allowed_host_list:
+            errors.append("ALLOWED_HOSTS must list the public application host")
+        if self.job_queue_backend == "rabbitmq" and self.job_storage_backend != "s3":
+            errors.append("JOB_STORAGE_BACKEND must be 's3' when RabbitMQ workers are enabled")
+        if self.job_storage_backend == "s3" and (
+            not self.s3_access_key
+            or not self.s3_secret_key
+            or (self.s3_access_key == "minioadmin" and self.s3_secret_key == "minioadmin")
+        ):
+            errors.append("S3 credentials must be configured and must not use MinIO defaults")
+        if self.integration_scheduler_enabled:
+            missing_sources = [
+                source_id
+                for source_id in ("lms", "site")
+                if self.integration_url(source_id) is None
+            ]
+            if missing_sources:
+                errors.append(
+                    "Integration scheduler requires external URLs for: "
+                    + ", ".join(missing_sources)
+                )
+            insecure_sources = [
+                source_id
+                for source_id in ("lms", "site")
+                if self.integration_url(source_id)
+                and urlparse(str(self.integration_url(source_id))).scheme != "https"
+            ]
+            if insecure_sources:
+                errors.append(
+                    "Integration URLs must use HTTPS for: "
+                    + ", ".join(insecure_sources)
+                )
+        return errors
+
+    def validate_runtime(self) -> None:
+        errors = self.production_validation_errors()
+        if errors:
+            raise RuntimeError("Invalid production configuration: " + "; ".join(errors))
 
 
 @lru_cache

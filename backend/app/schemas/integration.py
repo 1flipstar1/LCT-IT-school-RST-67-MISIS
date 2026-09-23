@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import Field
 
@@ -17,3 +17,15 @@ class IntegrationIngestRequest(APIModel):
 class IntegrationSyncResult(APIModel):
     log_entry: dict[str, Any]
     snapshot: StateSnapshotResponse
+
+
+class IntegrationSourceRuntime(APIModel):
+    source_id: Literal["lms", "site"]
+    mode: Literal["remote", "mock", "unconfigured"]
+    url_configured: bool
+    token_configured: bool
+
+
+class IntegrationRuntimeStatus(APIModel):
+    sources: list[IntegrationSourceRuntime]
+    scheduler_enabled: bool

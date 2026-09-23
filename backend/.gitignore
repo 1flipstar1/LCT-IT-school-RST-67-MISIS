@@ -1,4 +1,8 @@
 .venv/
+.venv-local/
+.env.*
+!.env.example
+!.env.production.example
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -7,5 +11,6 @@ __pycache__/
 *.db-shm
 *.db-wal
 data/
+.data/
 tests/test_attachments/
 .coverage

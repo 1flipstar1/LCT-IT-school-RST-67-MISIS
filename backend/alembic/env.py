@@ -25,6 +25,27 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
+
+def compare_type(context, inspected_column, metadata_column, inspected_type, metadata_type):
+    """Ignore SQLite's lossy reflection of legacy UUID primary keys.
+
+    PostgreSQL keeps the native UUID type. SQLite reflects the UUID columns
+    created by the first migration as NUMERIC, although the ORM serializer is
+    unchanged; treating that as a migration on every ``alembic check`` is a
+    false positive.
+    """
+
+    del inspected_type, metadata_type
+    legacy_tables = {"it_directions", "it_products", "universities"}
+    if (
+        context.dialect.name == "sqlite"
+        and inspected_column.table.name in legacy_tables
+        and inspected_column.name == "id"
+        and metadata_column.name == "id"
+    ):
+        return False
+    return None
+
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
@@ -49,6 +70,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=compare_type,
     )
 
     with context.begin_transaction():
@@ -76,7 +98,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=compare_type,
         )
 
         with context.begin_transaction():
