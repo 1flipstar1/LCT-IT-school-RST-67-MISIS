@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { ApiError, createApiClient } from '../src/api/client.js';
+import { ApiError, createApiClient, waitForJob } from '../src/api/client.js';
 
 function jsonResponse(body, status = 200) {
   return {
@@ -73,5 +73,22 @@ describe('API client', () => {
   it('превращает сетевой сбой в ApiError со статусом 0', async () => {
     const client = createApiClient({ fetchImpl: async () => { throw new TypeError('offline'); } });
     await assert.rejects(client.getState(), (error) => error instanceof ApiError && error.status === 0);
+  });
+
+  it('дожидается завершения фонового задания', async () => {
+    const statuses = ['processing', 'completed'];
+    const completed = await waitForJob(
+      async (id) => ({ id, status: statuses.shift() }),
+      { id: 'job-1', status: 'queued' },
+      { intervalMs: 0, timeoutMs: 100 },
+    );
+    assert.equal(completed.status, 'completed');
+  });
+
+  it('останавливает ожидание при ошибке worker', async () => {
+    await assert.rejects(
+      waitForJob(async () => ({ id: 'job-2', status: 'failed', error: 'parser failed' }), { id: 'job-2', status: 'queued' }, { intervalMs: 0 }),
+      (error) => error instanceof ApiError && error.code === 'job_failed',
+    );
   });
 });

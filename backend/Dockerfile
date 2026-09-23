@@ -25,6 +25,8 @@ COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ ./
+COPY frontend/design/font/RostelecomBasis-Regular.otf /app/app/assets/RostelecomBasis-Regular.otf
+COPY frontend/design/font/RostelecomBasis-Bold.otf /app/app/assets/RostelecomBasis-Bold.otf
 COPY --from=frontend-build /source/frontend/dist /frontend/dist
 
 EXPOSE 8000

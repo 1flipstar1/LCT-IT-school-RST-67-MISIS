@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
+import { apiErrorToAppError } from '../../api/client.js';
 import { EMPTY_FILTERS, filterInteractionRows } from '../../domain/filters.js';
 import { formatDate, formatRelativeDateTime, plural } from '../../domain/format.js';
 import { DEFAULT_REPORT_COLUMNS, REPORT_COLUMNS, REPORT_FORMATS } from '../../domain/reports.js';
 import { cn } from '../../lib/cn.js';
 import { usePersistentState } from '../../lib/usePersistentState.js';
 import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selectors.js';
-import { useStoreState } from '../../store/StoreProvider.jsx';
-import { useActions } from '../../store/useActions.js';
+import { useStoreApi, useStoreState } from '../../store/StoreProvider.jsx';
 import { Badge } from '../../ui/Badge.jsx';
 import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
@@ -30,7 +30,7 @@ export function ReportsPage() {
   const { reports } = useStoreState();
   const index = useCatalogIndex();
   const allRows = useVisibleInteractionRows();
-  const actions = useActions();
+  const storeApi = useStoreApi();
   const toast = useToast();
 
   const [filters, setFilters] = useFilters('reports');
@@ -52,11 +52,11 @@ export function ReportsPage() {
     setBusy(true);
     try {
       const rowCount = await exportReport(config);
-      actions.recordReport({ name: config.name, format: config.format, rowCount, summary: config.summary, filters: config.filters, columns: config.columns });
+      await storeApi.rehydrate();
       setError(null);
       toast.success(`Файл скачан: ${rowCount} ${plural(rowCount, ['строка', 'строки', 'строк'])}`);
     } catch (caught) {
-      setError(caught);
+      setError(apiErrorToAppError(caught));
     } finally {
       setBusy(false);
     }

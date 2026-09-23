@@ -23,6 +23,8 @@ OPENAPI_TAGS = [
     {"name": "attachments", "description": "Загрузка и скачивание файлов этапов."},
     {"name": "integrations", "description": "Получение JSON из LMS и сайта."},
     {"name": "resources", "description": "Read-only представления данных из snapshot."},
+    {"name": "imports", "description": "Асинхронный импорт XLS/XLSX через объектное хранилище и очередь."},
+    {"name": "reports", "description": "Асинхронное формирование и скачивание отчётов."},
 ]
 
 

@@ -21,9 +21,20 @@ services:
       LMS_API_TOKEN: ${LMS_API_TOKEN:-}
       WEBSITE_API_URL: ${WEBSITE_API_URL:-}
       WEBSITE_API_TOKEN: ${WEBSITE_API_TOKEN:-}
+      JOB_STORAGE_BACKEND: s3
+      JOB_QUEUE_BACKEND: rabbitmq
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET: lct-artifacts
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     ports:
       - "8000:8000"
     volumes:
@@ -37,6 +48,56 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  import-worker:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "app.worker"]
+    environment:
+      APP_ENV: demo
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/lct_db
+      JOB_STORAGE_BACKEND: s3
+      JOB_QUEUE_BACKEND: rabbitmq
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET: lct-artifacts
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
+      WORKER_QUEUES: lct.imports
+    depends_on:
+      api:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+
+  report-worker:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "app.worker"]
+    environment:
+      APP_ENV: demo
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/lct_db
+      JOB_STORAGE_BACKEND: s3
+      JOB_QUEUE_BACKEND: rabbitmq
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET: lct-artifacts
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-lct}:${RABBITMQ_DEFAULT_PASS:-lct}@rabbitmq:5672/%2F
+      WORKER_QUEUES: lct.reports
+    depends_on:
+      api:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
 
   postgres:
     image: postgres:16
@@ -53,6 +114,52 @@ services:
       timeout: 5s
       retries: 10
 
+  rabbitmq:
+    image: rabbitmq:4.1.8-management
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-lct}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-lct}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  minio-init:
+    image: quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: >-
+      /bin/sh -c "until /usr/bin/mc alias set local http://minio:9000
+      $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD}; do sleep 2; done;
+      /usr/bin/mc mb --ignore-existing local/lct-artifacts"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+
 volumes:
   postgres_data:
   attachment_data:
+  rabbitmq_data:
+  minio_data:

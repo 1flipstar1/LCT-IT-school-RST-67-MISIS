@@ -97,16 +97,38 @@ Frontend поддерживает Keycloak Authorization Code + PKCE без хр
 
 Контракты заказчика для LMS и Laravel-сайта в исходном ТЗ не приложены, поэтому маппинг сохраняет исходный объект в `payload`, а известные поля (`title`, `id`/`externalId`) нормализует. После получения финального контракта этот адаптер расширяется в `app/services/integration.py`, не затрагивая UI.
 
+## Импорт, объектное хранилище и фоновые задачи
+
+Импорт `.xls`/`.xlsx` и генерация отчётов выполняются вне HTTP-процесса:
+
+```text
+API → MinIO/S3 (файл) → RabbitMQ (только jobId) → worker → PostgreSQL + MinIO/S3
+```
+
+- `POST /api/v1/imports` принимает файл и ставит разбор в очередь;
+- `GET /api/v1/imports/{id}` возвращает `queued / processing / ready / completed / failed`;
+- `POST /api/v1/imports/{id}/preview` проверяет сопоставление без записи;
+- `POST /api/v1/imports/{id}/apply` применяет импорт через worker;
+- `POST /api/v1/report-jobs` создаёт отчёт;
+- `GET /api/v1/report-jobs/{id}/download` отдаёт готовый артефакт.
+
+В обычном локальном запуске используются файловое хранилище `backend/.data/objects`
+и синхронный inline-обработчик, поэтому дополнительные сервисы не нужны. В Compose
+автоматически включаются MinIO и RabbitMQ, а обработка разделена между контейнерами
+`import-worker` и `report-worker`; их можно масштабировать независимо.
+
 ## PostgreSQL и Docker
 
-Полный стенд (frontend build + API + PostgreSQL):
+Полный стенд (frontend build + API + два worker-процесса + PostgreSQL + MinIO + RabbitMQ):
 
 ```powershell
 cd backend
 docker compose up --build
 ```
 
-Приложение откроется на <http://localhost:8000>. Контейнер перед стартом выполняет `alembic upgrade head`.
+Приложение откроется на <http://localhost:8000>. MinIO Console доступна на
+<http://localhost:9001>, RabbitMQ Management — на <http://localhost:15672>.
+Контейнер API перед стартом выполняет `alembic upgrade head`.
 
 Без Docker достаточно переопределить строку подключения:
 

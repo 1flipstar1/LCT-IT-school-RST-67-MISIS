@@ -54,7 +54,7 @@ export function createApiClient({
 } = {}) {
   const root = baseUrl.replace(/\/$/, '');
 
-  async function request(path, { method = 'GET', body, formData, responseType = 'json', signal } = {}) {
+  async function request(path, { method = 'GET', body, formData, responseType = 'json', signal, requestTimeoutMs = timeoutMs } = {}) {
     if (!fetchImpl) throw new ApiError('Fetch API недоступен', { status: 0, code: 'network_error' });
 
     const accessToken = getAccessToken?.();
@@ -62,7 +62,7 @@ export function createApiClient({
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-    const requestSignal = createRequestSignal(signal, timeoutMs);
+    const requestSignal = createRequestSignal(signal, requestTimeoutMs);
     let response;
     try {
       response = await fetchImpl(`${root}${path}`, {
@@ -79,8 +79,8 @@ export function createApiClient({
       requestSignal.dispose();
     }
 
-    if (response.ok && responseType === 'blob') return response.blob();
-    const payload = await readPayload(response);
+    const binaryResponse = response.ok && (responseType === 'blob' || responseType === 'download');
+    const payload = binaryResponse ? await response.blob() : await readPayload(response);
     if (!response.ok) {
       const apiError = payload && typeof payload === 'object' ? payload.error : null;
       throw new ApiError(apiError?.message ?? `HTTP ${response.status}`, {
@@ -88,6 +88,12 @@ export function createApiClient({
         code: apiError?.code ?? null,
         details: apiError?.details ?? null,
       });
+    }
+    if (responseType === 'blob') return payload;
+    if (responseType === 'download') {
+      const disposition = response.headers.get('Content-Disposition') ?? '';
+      const encodedName = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+      return { blob: payload, filename: encodedName ? decodeURIComponent(encodedName) : 'download.bin' };
     }
     return payload;
   }
@@ -110,7 +116,31 @@ export function createApiClient({
       request(`/attachments/${encodeURIComponent(attachmentId)}`, { ...options, responseType: 'blob' }),
     syncIntegration: (sourceId, options = {}) =>
       request(`/integrations/${encodeURIComponent(sourceId)}/sync`, { ...options, method: 'POST' }),
+    createImport: (file, options = {}) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return request('/imports', { requestTimeoutMs: 60_000, ...options, method: 'POST', formData });
+    },
+    getImport: (jobId, options = {}) => request(`/imports/${jobId}`, options),
+    previewImport: (jobId, mapping, options = {}) => request(`/imports/${jobId}/preview`, { ...options, method: 'POST', body: { mapping } }),
+    applyImport: (jobId, mapping, options = {}) => request(`/imports/${jobId}/apply`, { ...options, method: 'POST', body: { mapping } }),
+    createReport: (payload, options = {}) => request('/report-jobs', { requestTimeoutMs: 60_000, ...options, method: 'POST', body: payload }),
+    getReport: (jobId, options = {}) => request(`/report-jobs/${jobId}`, options),
+    downloadReport: (jobId, options = {}) => request(`/report-jobs/${jobId}/download`, { requestTimeoutMs: 60_000, ...options, responseType: 'download' }),
   });
+}
+
+/** Poll a short-lived background job without keeping a request open. */
+export async function waitForJob(fetchJob, initialJob, { ready = ['completed'], timeoutMs = 120_000, intervalMs = 700 } = {}) {
+  const startedAt = Date.now();
+  let job = initialJob;
+  while (!ready.includes(job.status)) {
+    if (job.status === 'failed') throw new ApiError(job.error || 'Фоновое задание завершилось ошибкой', { status: 500, code: 'job_failed' });
+    if (Date.now() - startedAt >= timeoutMs) throw new ApiError('Фоновое задание выполняется слишком долго', { status: 408, code: 'job_timeout' });
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    job = await fetchJob(job.id);
+  }
+  return job;
 }
 
 export const apiClient = createApiClient();

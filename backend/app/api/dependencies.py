@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Annotated
 
 from fastapi import Depends
@@ -61,3 +62,16 @@ def authenticated_principal(
 
 StateAccess = Annotated[Principal | None, Depends(state_access_principal)]
 CurrentPrincipal = Annotated[Principal, Depends(authenticated_principal)]
+
+
+def require_roles(*roles: str) -> Callable[[Principal], Principal]:
+    """Build a dependency that rejects authenticated users without a role."""
+
+    allowed = frozenset(roles)
+
+    def dependency(principal: CurrentPrincipal) -> Principal:
+        if principal.role not in allowed:
+            raise APIError(403, "forbidden", "Недостаточно прав для выполнения операции.")
+        return principal
+
+    return dependency

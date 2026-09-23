@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { apiClient, apiErrorToAppError, waitForJob } from '../../api/client.js';
 import { AppError } from '../../domain/errors.js';
 import { formatFileSize, plural } from '../../domain/format.js';
-import { autoMatchColumns, IMPORT_FIELDS, planImport, SAMPLE_IMPORT_ROWS, validateMapping } from '../../domain/import.js';
+import { autoMatchColumns, IMPORT_FIELDS, SAMPLE_IMPORT_ROWS, validateMapping } from '../../domain/import.js';
 import { cn } from '../../lib/cn.js';
-import { readXlsx } from '../../lib/xlsx/readXlsx.js';
-import { useStoreState } from '../../store/StoreProvider.jsx';
-import { useActions } from '../../store/useActions.js';
+import { createXlsx } from '../../lib/export/spreadsheet.js';
+import { useStoreApi } from '../../store/StoreProvider.jsx';
 import { Badge } from '../../ui/Badge.jsx';
 import { Button, ButtonLink } from '../../ui/Button.jsx';
 import { Card } from '../../ui/Card.jsx';
@@ -22,8 +22,7 @@ const STEPS = ['Файл', 'Сопоставление', 'Проверка', 'Г
 
 /** Мастер импорта: файл → сопоставление колонок → проверка изменений → результат. */
 export function ImportPage() {
-  const state = useStoreState();
-  const actions = useActions();
+  const storeApi = useStoreApi();
   const toast = useToast();
 
   const [step, setStep] = useState(0);
@@ -31,50 +30,75 @@ export function ImportPage() {
   const [mapping, setMapping] = useState({});
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [plan, setPlan] = useState(null);
+  const [busy, setBusy] = useState(false);
 
-  const headers = source?.rows[0] ?? [];
-  const plan = useMemo(() => (step === 2 && source ? planImport(source.rows, mapping, state) : null), [step, source, mapping, state]);
+  const headers = source?.headers ?? [];
 
-  const acceptRows = (name, size, rows) => {
-    if (rows.length < 2) throw new AppError('IMPORT-400', 'В файле нет строк с данными');
-    setSource({ name, size, rows });
-    setMapping(autoMatchColumns(rows[0]));
-    setError(null);
-    setStep(1);
+  const normalizeImportError = (caught) => {
+    if (caught instanceof AppError) return caught;
+    if (caught?.status === 413) return new AppError('FILE-413', caught.details);
+    if (caught?.status === 415) return new AppError('FILE-415', caught.details);
+    if (caught?.status === 422) return new AppError('IMPORT-400', caught.details);
+    return apiErrorToAppError(caught);
   };
 
   const handleFile = async ([file]) => {
     if (!file) return;
+    setBusy(true);
     try {
-      if (!file.name.toLowerCase().endsWith('.xlsx')) throw new AppError('IMPORT-400', 'Поддерживается XLSX');
-      acceptRows(file.name, file.size, await readXlsx(file));
+      if (!/\.xlsx?$/i.test(file.name)) throw new AppError('FILE-415');
+      const queued = await apiClient.createImport(file);
+      const parsed = await waitForJob((jobId) => apiClient.getImport(jobId), queued, { ready: ['ready'] });
+      const parsedResult = parsed.result;
+      setSource({ jobId: parsed.id, name: file.name, size: file.size, headers: parsedResult.headers, previewRows: parsedResult.previewRows, rowCount: parsedResult.rowCount });
+      setMapping(autoMatchColumns(parsedResult.headers));
+      setPlan(null);
+      setError(null);
+      setStep(1);
     } catch (caught) {
-      setError(caught);
+      setError(normalizeImportError(caught));
+    } finally {
+      setBusy(false);
     }
   };
 
-  const goToCheck = () => {
+  const goToCheck = async () => {
+    setBusy(true);
     try {
       validateMapping(mapping);
+      const preview = await apiClient.previewImport(source.jobId, mapping);
+      setPlan(preview);
       setError(null);
       setStep(2);
     } catch (caught) {
-      setError(caught);
+      setError(normalizeImportError(caught));
+    } finally {
+      setBusy(false);
     }
   };
 
-  const apply = () => {
-    const { stats } = plan;
-    actions.applyImport({
-      universities: plan.universities,
-      programs: plan.programs,
-      products: plan.products,
-      interactions: plan.interactions,
-      summary: `Импорт «${source.name}»: строк ${stats.rows}, новых вузов ${stats.newUniversities}, обновлено договоров ${stats.updatedContracts}`,
-    });
-    setResult(stats);
-    setStep(3);
-    toast.success('Данные загружены');
+  const apply = async () => {
+    setBusy(true);
+    try {
+      const queued = await apiClient.applyImport(source.jobId, mapping);
+      const completed = await waitForJob((jobId) => apiClient.getImport(jobId), queued);
+      await storeApi.rehydrate();
+      setResult(completed.result.stats);
+      setError(null);
+      setStep(3);
+      toast.success('Данные загружены');
+    } catch (caught) {
+      setError(normalizeImportError(caught));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const trySample = () => {
+    const [header, ...body] = SAMPLE_IMPORT_ROWS;
+    const blob = createXlsx({ header, body }, 'Импорт');
+    handleFile([new File([blob], 'Пример.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })]);
   };
 
   return (
@@ -96,7 +120,7 @@ export function ImportPage() {
       <Card className={styles.panel}>
         {step === 0 && (
           <div className={styles.stack}>
-            <FileDropzone files={[]} multiple={false} accept=".xlsx" onChange={handleFile} title="Перетащите файл XLSX" hint="Первая строка — заголовки колонок · до 25 МБ" />
+            <FileDropzone files={[]} multiple={false} accept=".xls,.xlsx" onChange={handleFile} title={busy ? 'Загружаем и проверяем файл…' : 'Перетащите файл XLS или XLSX'} hint="Первая строка — заголовки колонок · до 25 МБ" />
             <ErrorAlert error={error} />
             <InlineAlert tone="info" title="Нет файла под рукой?">
               Скачайте шаблон с нужными колонками или попробуйте мастер на готовом примере.
@@ -105,7 +129,7 @@ export function ImportPage() {
               <Button icon={DownloadIcon} onClick={downloadImportTemplate}>
                 Скачать шаблон
               </Button>
-              <Button variant="primary" onClick={() => acceptRows('Пример.xlsx', 9_200, SAMPLE_IMPORT_ROWS)}>
+              <Button variant="primary" disabled={busy} onClick={trySample}>
                 Попробовать на примере
               </Button>
             </div>
@@ -115,7 +139,7 @@ export function ImportPage() {
         {step === 1 && source && (
           <div className={styles.stack}>
             <p className={styles.fileLine}>
-              <b>{source.name}</b> · {formatFileSize(source.size)} · {source.rows.length - 1} {plural(source.rows.length - 1, ['строка', 'строки', 'строк'])}
+              <b>{source.name}</b> · {formatFileSize(source.size)} · {source.rowCount} {plural(source.rowCount, ['строка', 'строки', 'строк'])}
             </p>
             <div className={styles.mapping} role="table" aria-label="Сопоставление полей">
               <div className={styles.mappingHead} role="row">
@@ -125,7 +149,7 @@ export function ImportPage() {
               </div>
               {IMPORT_FIELDS.map((field) => {
                 const columnIndex = mapping[field.id];
-                const sample = columnIndex === '' ? '' : source.rows[1]?.[Number(columnIndex)];
+                const sample = columnIndex === '' ? '' : source.previewRows[0]?.[Number(columnIndex)];
                 return (
                   <div key={field.id} className={styles.mappingRow} role="row">
                     <span role="cell" className={styles.fieldName}>
@@ -156,8 +180,8 @@ export function ImportPage() {
               <Button icon={ArrowLeftIcon} onClick={() => setStep(0)}>
                 Другой файл
               </Button>
-              <Button variant="primary" iconAfter={ArrowRightIcon} onClick={goToCheck}>
-                Проверить данные
+              <Button variant="primary" iconAfter={ArrowRightIcon} disabled={busy} onClick={goToCheck}>
+                {busy ? 'Проверяем…' : 'Проверить данные'}
               </Button>
             </div>
           </div>
@@ -196,8 +220,8 @@ export function ImportPage() {
               <Button icon={ArrowLeftIcon} onClick={() => setStep(1)}>
                 К сопоставлению
               </Button>
-              <Button variant="primary" onClick={apply}>
-                Загрузить данные
+              <Button variant="primary" disabled={busy} onClick={apply}>
+                {busy ? 'Загружаем…' : 'Загрузить данные'}
               </Button>
             </div>
           </div>
@@ -217,6 +241,9 @@ export function ImportPage() {
                 onClick={() => {
                   setSource(null);
                   setResult(null);
+                  setPlan(null);
+                  setMapping({});
+                  setError(null);
                   setStep(0);
                 }}
               >

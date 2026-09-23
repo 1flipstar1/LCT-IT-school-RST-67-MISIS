@@ -7,7 +7,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.models import AttachmentModel, Base, StateSnapshotModel  # noqa: F401
+from app.models import AttachmentModel, Base, JobModel, StateSnapshotModel  # noqa: F401
 
 
 # this is the Alembic Config object, which provides

@@ -73,6 +73,25 @@ class Settings(BaseSettings):
     website_api_token: str | None = None
     integration_timeout_seconds: int = 20
 
+    # Binary artifacts never live in the database. Local backends make a fresh
+    # checkout testable without infrastructure; Compose switches both values.
+    job_storage_backend: Literal["local", "s3"] = "local"
+    job_queue_backend: Literal["inline", "rabbitmq"] = "inline"
+    local_storage_path: Path = BACKEND_DIR / ".data" / "objects"
+    s3_endpoint_url: str = "http://localhost:9000"
+    s3_access_key: str = "minioadmin"
+    s3_secret_key: str = "minioadmin"
+    s3_bucket: str = "lct-artifacts"
+    s3_region: str = "us-east-1"
+    s3_secure: bool = False
+    rabbitmq_url: str = "amqp://guest:guest@localhost:5672/%2F"
+    rabbitmq_import_queue: str = "lct.imports"
+    rabbitmq_report_queue: str = "lct.reports"
+    worker_queues: str = ""
+    max_upload_bytes: int = 25 * 1024 * 1024
+    max_import_rows: int = 20_000
+    max_import_columns: int = 200
+
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_database_url(cls, value: object) -> object:

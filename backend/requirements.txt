@@ -6,6 +6,12 @@ psycopg[binary]>=3.2,<4
 pydantic-settings>=2.7,<3
 PyJWT[crypto]>=2.10,<3
 python-multipart>=0.0.20,<1
+boto3>=1.35,<2
+pika>=1.3,<2
+openpyxl>=3.1,<4
+xlrd>=2.0,<3
+xlwt>=1.3,<2
+fpdf2>=2.8,<3
 
 # Kept in the main file so a fresh clone can run the supplied smoke tests.
 httpx>=0.28,<1
