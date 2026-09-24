@@ -175,6 +175,7 @@
 .list {
   display: grid;
   gap: var(--space-1x);
+  margin: 0;
   padding-left: var(--space-5x);
 }
 
@@ -352,6 +353,7 @@ ol.list { list-style: decimal; }
 
 .tiles {
   display: grid;
+  margin: 0;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-2x);
 }
@@ -367,7 +369,7 @@ ol.list { list-style: decimal; }
 
 .tileWarning { background: var(--color-warning-soft); }
 .tile dt, .tileWarning dt { color: var(--color-text-secondary); font: var(--font-caption); }
-.tile dd, .tileWarning dd { font: var(--font-h3); }
+.tile dd, .tileWarning dd { margin: 0; font: var(--font-h3); }
 .tileWarning dd { color: var(--color-warning-text); }
 
 .bars {
@@ -421,6 +423,7 @@ ol.list { list-style: decimal; }
 .steps {
   display: grid;
   gap: var(--space-2x);
+  margin: 0;
   padding-left: var(--space-5x);
   font: var(--font-body-s);
   list-style: decimal;
@@ -483,6 +486,9 @@ ol.list { list-style: decimal; }
   font: var(--font-body-s);
   field-sizing: content;
 }
+
+/* Рамку фокуса рисует .composer — у самого поля её нет, иначе рамка двойная. */
+.input:focus-visible { box-shadow: none; }
 
 .mic { flex-shrink: 0; }
 

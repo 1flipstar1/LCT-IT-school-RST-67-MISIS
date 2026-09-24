@@ -43,8 +43,9 @@ export const CAPABILITIES = [
   '**Инструкции** — «Как сменить этап?», «Что делать на этапе подписания?»',
 ];
 
+/** keywords уже записаны основами («отчет», «выгруз») — повторно их не усекаем. */
 function entry({ id, title, keywords, steps = [], text = '', link, action }) {
-  const keywordStems = keywords.map((keyword) => tokenize(keyword).map(stem));
+  const keywordStems = keywords.map((keyword) => tokenize(keyword));
   const titleStems = tokenize(title).filter((token) => token.length > 3).map(stem);
   return { id, title, steps, text, link, action, keywordStems, titleStems };
 }
@@ -95,17 +96,21 @@ export function buildKnowledge({ userGuide = [], adminGuide = [], workflows = []
   ];
 }
 
-/** Лучшая статья по вопросу или null, если уверенного совпадения нет. */
-export function searchKnowledge(knowledge, question) {
+/**
+ * Лучшая статья по тексту или null, если уверенного совпадения нет.
+ * minScore: для явного вопроса «как…» хватает одного ключевого слова, для прочих фраз нужно больше.
+ */
+export function searchKnowledge(knowledge, question, minScore = 2) {
   const questionStems = tokenize(question).filter((token) => token.length > 2).map(stem);
-  const hits = (stems) => stems.every((keywordStem) => questionStems.some((token) => token.startsWith(keywordStem) || keywordStem.startsWith(token)));
+  const matches = (token, keywordStem) => token.startsWith(keywordStem) || (token.length >= 4 && keywordStem.startsWith(token));
+  const hits = (stems) => stems.every((keywordStem) => questionStems.some((token) => matches(token, keywordStem)));
 
   let best = null;
   for (const item of knowledge) {
     const keywordScore = item.keywordStems.filter((stems) => stems.length > 0 && hits(stems)).reduce((sum, stems) => sum + 2 * stems.length, 0);
-    const titleScore = item.titleStems.filter((titleStem) => questionStems.some((token) => token.startsWith(titleStem) || titleStem.startsWith(token))).length;
+    const titleScore = item.titleStems.filter((titleStem) => questionStems.some((token) => matches(token, titleStem))).length;
     const score = keywordScore + titleScore;
-    if (score >= 2 && (!best || score > best.score)) best = { item, score };
+    if (score >= minScore && (!best || score > best.score)) best = { item, score };
   }
   return best?.item ?? null;
 }

@@ -36,7 +36,8 @@ const GUIDE_FOR_TOOL = {
 
 const FALLBACK_SUGGESTIONS = ['Что ты умеешь?', 'Покажи просроченные', 'Как сформировать отчёт?'];
 
-function articleAnswer(article, call) {
+/** request — исходная просьба: после «Выполнить за меня» в переписке видно, что именно выполняется. */
+function articleAnswer(article, call, request) {
   return {
     text: article.text,
     card: {
@@ -44,7 +45,7 @@ function articleAnswer(article, call) {
       title: article.title,
       steps: article.steps,
       link: article.link,
-      action: call ? { label: 'Выполнить за меня', call } : article.action,
+      action: call ? { label: 'Выполнить за меня', call, request } : article.action,
     },
   };
 }
@@ -205,12 +206,12 @@ export function useAssistant({ settings, page }) {
   }, [append, reply]);
 
   /** Решение локального разбора с учётом режима «Подсказки». */
-  const answerLocally = (local, context) => {
+  const answerLocally = (local, context, message) => {
     if (local.kind === 'answer') return local.article ? articleAnswer(local.article) : local;
     const guideId = GUIDE_FOR_TOOL[local.name];
     if (context.settings.mode === 'guide' && guideId) {
       const article = context.knowledge.find((item) => item.id === guideId);
-      if (article) return articleAnswer(article, { name: local.name, args: local.args });
+      if (article) return articleAnswer(article, { name: local.name, args: local.args }, message);
     }
     return executeTool(local, context);
   };
@@ -228,7 +229,7 @@ export function useAssistant({ settings, page }) {
 
     const call = resolveModelCall(response.action, message, context);
     if (context.settings.mode === 'guide' && (MUTATING_TOOLS.has(call.name) || GUIDE_FOR_TOOL[call.name])) {
-      return answerLocally({ kind: 'tool', ...call }, context);
+      return answerLocally({ kind: 'tool', ...call }, context, message);
     }
     const result = executeTool(call, context);
     return response.message ? { ...result, text: `${response.message}\n\n${result.text}` } : result;
@@ -243,7 +244,7 @@ export function useAssistant({ settings, page }) {
     const { engine } = context.settings;
     const local = engine === 'ai' ? null : interpretLocally(message, context);
     if (local) {
-      reply(answerLocally(local, context), 'local');
+      reply(answerLocally(local, context, message), 'local');
       return;
     }
 
@@ -269,7 +270,7 @@ export function useAssistant({ settings, page }) {
 
     const fallback = engine === 'ai' ? interpretLocally(message, context) : null;
     if (fallback) {
-      reply(answerLocally(fallback, context), 'local');
+      reply(answerLocally(fallback, context, message), 'local');
       return;
     }
     reply({

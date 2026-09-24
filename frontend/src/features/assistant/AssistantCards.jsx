@@ -229,7 +229,7 @@ function GuideCard({ card, onRun, onSend }) {
       )}
       <div className={styles.cardActions}>
         {action && (
-          <Button variant="primary" size="s" icon={MagicIcon} onClick={() => (action.call ? onRun(action.call, action.label) : onSend(action.prompt))}>
+          <Button variant="primary" size="s" icon={MagicIcon} onClick={() => (action.call ? onRun(action.call, `Выполни: ${action.request ?? action.label}`) : onSend(action.prompt))}>
             {action.label}
           </Button>
         )}

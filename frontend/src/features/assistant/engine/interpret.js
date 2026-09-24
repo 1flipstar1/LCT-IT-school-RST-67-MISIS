@@ -119,7 +119,7 @@ function detectTool(message, text, tokens, context) {
   const page = detectPage(tokens);
   if (opens && page && filters.universityIds.length === 0) return { name: TOOL.openPage, args: { page: page.id } };
 
-  if (hasStem(tokens, REPORT_WORDS) || (detectFormat(text) && hasStem(tokens, ['сдела', 'сформир', 'скача', 'выгруз', 'собер', 'подготов']))) {
+  if (hasStem(tokens, REPORT_WORDS) || (detectFormat(text) && hasStem(tokens, ['сдела', 'сформир', 'скача', 'выгруз', 'собер', 'подготов', 'файл', 'нуж', 'хочу', 'дай']))) {
     return {
       name: TOOL.createReport,
       args: { filters, format: detectFormat(text), columns: detectColumns(tokens), name: detectReportName(message) },
@@ -150,12 +150,13 @@ export function interpretLocally(message, context) {
   if (THANKS.test(text) && tokens.length <= 4) return { kind: 'answer', text: 'Пожалуйста! Обращайтесь.' };
   if (ABOUT.test(text)) return { kind: 'answer', text: `Вот что я умею:\n\n${CAPABILITIES.map((line) => `- ${line}`).join('\n')}` };
 
-  if (!QUESTION.test(text)) {
+  const question = QUESTION.test(text);
+  if (!question) {
     const tool = detectTool(message, text, tokens, context);
     if (tool) return { kind: 'tool', ...tool };
   }
 
-  const article = searchKnowledge(context.knowledge, text);
+  const article = searchKnowledge(context.knowledge, text, question ? 2 : 4);
   return article ? { kind: 'answer', article } : null;
 }
 
