@@ -1,0 +1,1 @@
+{"name":"Deployment smoke","format":"xlsx","summary":"Проверка перед деплоем","table":{"header":["Вуз","Статус"],"body":[["МИСИС","Работает"]]},"filters":null,"columns":null}
