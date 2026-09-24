@@ -3,6 +3,8 @@ import logoUrl from '../../logo/logo.svg';
 import { IconButton } from '../ui/IconButton.jsx';
 import { MenuIcon } from '../ui/icons.js';
 import { Sidebar } from './Sidebar.jsx';
+import { AssistantChat } from '../features/assistant/AssistantChat.jsx';
+import { GlobalSearch } from './GlobalSearch.jsx';
 import styles from './AppLayout.module.css';
 
 /** Hash-роутер занимает #, поэтому «Перейти к содержимому» переводит фокус вручную. */
@@ -31,8 +33,10 @@ export function AppLayout({ children }) {
       {navOpen && <div className={styles.scrim} onClick={closeNav} aria-hidden="true" />}
 
       <main id="main" tabIndex={-1} className={styles.main}>
+        <div className={styles.searchBar}><GlobalSearch /></div>
         <div className={styles.content}>{children}</div>
       </main>
+      <AssistantChat />
     </div>
   );
 }

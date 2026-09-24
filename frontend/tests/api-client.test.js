@@ -50,6 +50,23 @@ describe('API client', () => {
     assert.deepEqual(JSON.parse(request.options.body), { role: 'manager' });
   });
 
+  it('отправляет вопрос помощнику с историей и Bearer-токеном', async () => {
+    let request;
+    const client = createApiClient({
+      getAccessToken: () => 'demo-token',
+      fetchImpl: async (url, options) => {
+        request = { url, options };
+        return jsonResponse({ type: 'message', message: 'Ответ' });
+      },
+    });
+
+    const payload = { message: 'Как сменить этап?', history: [], page: 'interactions' };
+    assert.deepEqual(await client.chatWithAssistant(payload), { type: 'message', message: 'Ответ' });
+    assert.equal(request.url, '/api/v1/assistant/chat');
+    assert.equal(request.options.headers.Authorization, 'Bearer demo-token');
+    assert.deepEqual(JSON.parse(request.options.body), payload);
+  });
+
   it('сохраняет код и детали ошибки сервера', async () => {
     const client = createApiClient({
       fetchImpl: async () => jsonResponse({

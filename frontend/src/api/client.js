@@ -54,7 +54,7 @@ export function createApiClient({
 } = {}) {
   const root = baseUrl.replace(/\/$/, '');
 
-  async function request(path, { method = 'GET', body, formData, responseType = 'json', signal } = {}) {
+  async function request(path, { method = 'GET', body, formData, responseType = 'json', signal, timeoutMs: requestTimeoutMs = timeoutMs } = {}) {
     if (!fetchImpl) throw new ApiError('Fetch API недоступен', { status: 0, code: 'network_error' });
 
     const accessToken = getAccessToken?.();
@@ -62,7 +62,7 @@ export function createApiClient({
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-    const requestSignal = createRequestSignal(signal, timeoutMs);
+    const requestSignal = createRequestSignal(signal, requestTimeoutMs);
     let response;
     try {
       response = await fetchImpl(`${root}${path}`, {
@@ -101,6 +101,8 @@ export function createApiClient({
         body: { state, expectedRevision, ...(force ? { force: true } : {}) },
       }),
     demoLogin: (role, options = {}) => request('/auth/demo', { ...options, method: 'POST', body: { role } }),
+    chatWithAssistant: (payload, options = {}) =>
+      request('/assistant/chat', { ...options, method: 'POST', body: payload, timeoutMs: 90_000 }),
     uploadAttachment: (file, options = {}) => {
       const formData = new FormData();
       formData.append('file', file, file.name);

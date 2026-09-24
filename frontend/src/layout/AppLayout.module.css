@@ -25,6 +25,13 @@
   outline: none;
 }
 
+.searchBar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  padding: var(--space-3x) var(--space-3x) 0;
+}
+
 .content {
   /* Нижний отступ — переменной: доска «Взаимодействий» гасит его, чтобы дотянуться до низа окна. */
   --content-padding-bottom: var(--space-16x);
@@ -46,6 +53,10 @@
   .content {
     max-width: none;
     padding: 0;
+  }
+
+  .searchBar {
+    display: none;
   }
 }
 
@@ -89,5 +100,10 @@
   .content {
     --content-padding-bottom: var(--space-12x);
     padding: var(--space-5x) var(--space-4x) var(--content-padding-bottom);
+  }
+
+  .searchBar {
+    top: 56px;
+    padding: var(--space-3x) var(--space-4x) 0;
   }
 }

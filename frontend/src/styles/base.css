@@ -25,7 +25,26 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-color: var(--color-brand) var(--color-bg);
+}
+
+::-webkit-scrollbar {
+  width: var(--space-3x);
+  height: var(--space-3x);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  border: var(--space-0_5x) solid var(--color-bg);
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-hover);
 }
 
 body {

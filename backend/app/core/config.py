@@ -73,6 +73,12 @@ class Settings(BaseSettings):
     website_api_token: str | None = None
     integration_timeout_seconds: int = 20
 
+    # The first assistant release only answers questions through a local model.
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "qwen3:4b"
+    assistant_enabled: bool = True
+    assistant_timeout_seconds: int = 60
+
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_database_url(cls, value: object) -> object:
