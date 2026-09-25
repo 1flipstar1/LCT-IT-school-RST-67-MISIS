@@ -31,6 +31,8 @@ export const PERMISSION = Object.freeze({
   manageWorkflows: 'workflows.manage',
   manageIntegrations: 'integrations.manage',
   manageUsers: 'users.manage',
+  // Руководитель заводит менеджеров своей команды, выдаёт им пароли и блокирует доступ.
+  manageTeamAccounts: 'accounts.team',
   viewAudit: 'audit.view',
 });
 
@@ -43,6 +45,7 @@ const GRANTS = {
     PERMISSION.manageWorkflows,
     PERMISSION.manageIntegrations,
     PERMISSION.viewAudit,
+    PERMISSION.manageTeamAccounts,
   ],
   [ROLE.admin]: Object.values(PERMISSION),
 };

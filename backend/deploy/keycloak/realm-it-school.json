@@ -1,0 +1,391 @@
+{
+  "realm": "it-school",
+  "displayName": "ИТ Школа Ростелекома",
+  "displayNameHtml": "<b>ИТ Школа</b> Ростелекома",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "rememberMe": false,
+  "verifyEmail": false,
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "ru",
+    "en"
+  ],
+  "defaultLocale": "ru",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "passwordPolicy": "length(12) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1) and notUsername(undefined) and notEmail(undefined) and passwordHistory(5) and forceExpiredPasswordChange(90)",
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "quickLoginCheckMilliSeconds": 1000,
+  "minimumQuickLoginWaitSeconds": 60,
+  "maxDeltaTimeSeconds": 43200,
+  "eventsEnabled": true,
+  "eventsExpiration": 15552000,
+  "eventsListeners": [
+    "jboss-logging"
+  ],
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "LOGOUT",
+    "LOGOUT_ERROR",
+    "CODE_TO_TOKEN",
+    "CODE_TO_TOKEN_ERROR",
+    "REFRESH_TOKEN",
+    "UPDATE_PASSWORD",
+    "UPDATE_PASSWORD_ERROR",
+    "UPDATE_TOTP",
+    "REMOVE_TOTP",
+    "USER_DISABLED_BY_TEMPORARY_LOCKOUT",
+    "USER_DISABLED_BY_PERMANENT_LOCKOUT"
+  ],
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true,
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA256",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "roles": {
+    "realm": [
+      {
+        "name": "kam",
+        "description": "Пользователь (КАМ, менеджер по вузам): работает со своими вузами в рамках прав."
+      },
+      {
+        "name": "manager_lead",
+        "description": "Руководитель: видит работу команды, назначает и меняет ответственных за вузы."
+      },
+      {
+        "name": "admin",
+        "description": "Администратор платформы: права пользователей, доступ к данным, настройки."
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "Менеджеры по вузам",
+      "path": "/Менеджеры по вузам",
+      "realmRoles": [
+        "kam"
+      ]
+    },
+    {
+      "name": "Руководители",
+      "path": "/Руководители",
+      "realmRoles": [
+        "manager_lead"
+      ]
+    },
+    {
+      "name": "Администраторы",
+      "path": "/Администраторы",
+      "realmRoles": [
+        "admin"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "rtk-it-school-web",
+      "name": "CRM ИТ Школы — веб-интерфейс",
+      "description": "Браузерное приложение: Authorization Code + PKCE, без секрета.",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "rootUrl": "http://localhost:5173",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://127.0.0.1:5173/*",
+        "http://localhost:8000/*",
+        "http://localhost:4173/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*##http://127.0.0.1:5173/*##http://localhost:8000/*##http://localhost:4173/*"
+      },
+      "defaultClientScopes": [
+        "basic",
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "protocolMappers": [
+        {
+          "name": "audience: rtk-it-school-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "rtk-it-school-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "rtk-it-school-api",
+      "name": "CRM ИТ Школы — API",
+      "description": "Получатель токенов (audience). Сам вход не выполняет.",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "rtk-it-school-admin",
+      "name": "CRM ИТ Школы — управление учётными записями",
+      "description": "Служебный клиент API CRM: создаёт сотрудников, назначает роли, блокирует и сбрасывает пароли. Вход пользователей через него невозможен.",
+      "enabled": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "erO_vFKbYU02YPVpAHYjoeDtTd_6OZg_tGms61ZAyw4",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "attributes": {
+        "access.token.lifespan": "300"
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-1",
+      "username": "a.voronova",
+      "email": "a.voronova@rt.ru",
+      "firstName": "Алина",
+      "lastName": "Воронова",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Менеджеры по вузам"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-2",
+      "username": "m.orlov",
+      "email": "m.orlov@rt.ru",
+      "firstName": "Михаил",
+      "lastName": "Орлов",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Менеджеры по вузам"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-3",
+      "username": "e.kim",
+      "email": "e.kim@rt.ru",
+      "firstName": "Елена",
+      "lastName": "Ким",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Менеджеры по вузам"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-4",
+      "username": "d.sokolov",
+      "email": "d.sokolov@rt.ru",
+      "firstName": "Дмитрий",
+      "lastName": "Соколов",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Менеджеры по вузам"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-5",
+      "username": "o.lebedeva",
+      "email": "o.lebedeva@rt.ru",
+      "firstName": "Ольга",
+      "lastName": "Лебедева",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Менеджеры по вузам"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-6",
+      "username": "a.kozlov",
+      "email": "a.kozlov@rt.ru",
+      "firstName": "Алексей",
+      "lastName": "Козлов",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Руководители"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-7",
+      "username": "n.belova",
+      "email": "n.belova@rt.ru",
+      "firstName": "Наталья",
+      "lastName": "Белова",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Руководители"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "id": "usr-8",
+      "username": "i.smirnova",
+      "email": "i.smirnova@rt.ru",
+      "firstName": "Ирина",
+      "lastName": "Смирнова",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ItSchool-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Администраторы"
+      ],
+      "attributes": {
+        "locale": [
+          "ru"
+        ]
+      }
+    },
+    {
+      "username": "service-account-rtk-it-school-admin",
+      "enabled": true,
+      "serviceAccountClientId": "rtk-it-school-admin",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users",
+          "query-users",
+          "query-groups"
+        ]
+      }
+    }
+  ]
+}

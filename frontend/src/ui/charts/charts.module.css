@@ -227,3 +227,15 @@
   gap: var(--space-2x);
   margin-bottom: var(--space-4x);
 }
+
+/* Карточка с действием панели в правом нижнем углу: снизу оставляем место, чтобы кнопка не закрывала график. */
+.withCornerAction {
+  position: relative;
+  padding-bottom: calc(var(--space-6x) + var(--control-height-s));
+}
+
+.cornerAction {
+  position: absolute;
+  right: var(--space-4x);
+  bottom: var(--space-4x);
+}

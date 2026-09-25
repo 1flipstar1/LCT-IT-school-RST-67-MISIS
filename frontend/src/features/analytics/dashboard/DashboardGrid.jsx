@@ -6,6 +6,8 @@ import { Flip } from 'gsap/Flip';
 import { Button } from '../../../ui/Button.jsx';
 import { AddIcon, RefreshIcon } from '../../../ui/icons.js';
 import { SidePanel } from '../../../ui/SidePanel.jsx';
+import { WidgetContext } from '../../../ui/widgetContext.js';
+import { ReportPin } from '../ReportPin.jsx';
 import { WIDGET_CATEGORY } from '../widgets/common.js';
 import { moveWidget, nextSize, resizeWidget } from './layout.js';
 import styles from '../AnalyticsPage.module.css';
@@ -301,7 +303,7 @@ function useGsapDashboardEditing({
   return gridRef;
 }
 
-export function DashboardGrid({ layout, catalog, data, editing, onMove, onResize, onRemove }) {
+export function DashboardGrid({ layout, catalog, data, editing, onMove, onResize, onRemove, reportIds = [], onToggleReport }) {
   const [previewLayout, setPreviewLayout] = useState(null);
   const renderedLayout = previewLayout ?? layout;
 
@@ -400,7 +402,16 @@ export function DashboardGrid({ layout, catalog, data, editing, onMove, onResize
               </>
             )}
             <div data-widget-content className={styles.widgetContent}>
-              <Widget data={data} />
+              <WidgetContext.Provider
+                value={{
+                  exportMode: false,
+                  action: !editing && onToggleReport ? (
+                    <ReportPin active={reportIds.includes(entry.id)} title={widget.title} onToggle={() => onToggleReport(widget)} compact={widget.rowSpan !== 2} />
+                  ) : null,
+                }}
+              >
+                <Widget data={data} />
+              </WidgetContext.Provider>
             </div>
           </div>
         );

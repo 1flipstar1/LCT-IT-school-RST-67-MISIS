@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     keycloak_jwks_url: str | None = None
     keycloak_audience: str | None = None
     keycloak_client_id: str | None = None
+    # Служебный клиент для управления учётными записями из CRM (client credentials).
+    # KEYCLOAK_ADMIN_URL — базовый адрес Keycloak для API, если он отличается от публичного (Docker).
+    keycloak_admin_url: str | None = None
+    keycloak_admin_client_id: str | None = None
+    keycloak_admin_client_secret: str | None = None
 
     seed_state_path: Path = BACKEND_DIR / "app" / "seed_state.json"
     frontend_dist_path: Path = PROJECT_DIR / "frontend" / "dist"
@@ -78,6 +83,8 @@ class Settings(BaseSettings):
     ollama_model: str = "qwen3:4b"
     assistant_enabled: bool = True
     assistant_timeout_seconds: int = 60
+    # Системный промпт с инструментами занимает ~5 тыс. токенов; окно Ollama по умолчанию (4096) мало.
+    assistant_context_tokens: int = 8192
 
     @field_validator("database_url", mode="before")
     @classmethod
@@ -99,6 +106,9 @@ class Settings(BaseSettings):
     @field_validator(
         "keycloak_issuer_url",
         "keycloak_jwks_url",
+        "keycloak_admin_url",
+        "keycloak_admin_client_id",
+        "keycloak_admin_client_secret",
         "lms_api_url",
         "lms_api_token",
         "website_api_url",
@@ -139,6 +149,24 @@ class Settings(BaseSettings):
         if self.keycloak_issuer_url:
             return f"{self.keycloak_issuer_url.rstrip('/')}/protocol/openid-connect/certs"
         return None
+
+    @property
+    def keycloak_realm(self) -> str | None:
+        if not self.keycloak_issuer_url or "/realms/" not in self.keycloak_issuer_url:
+            return None
+        return self.keycloak_issuer_url.rstrip("/").split("/realms/", 1)[1]
+
+    @property
+    def keycloak_admin_base_url(self) -> str | None:
+        if self.keycloak_admin_url:
+            return self.keycloak_admin_url.rstrip("/")
+        if not self.keycloak_issuer_url or "/realms/" not in self.keycloak_issuer_url:
+            return None
+        return self.keycloak_issuer_url.split("/realms/", 1)[0].rstrip("/")
+
+    @property
+    def keycloak_admin_configured(self) -> bool:
+        return bool(self.keycloak_admin_base_url and self.keycloak_realm and self.keycloak_admin_client_id and self.keycloak_admin_client_secret)
 
     def integration_url(self, source_id: str) -> str | None:
         return {"lms": self.lms_api_url, "site": self.website_api_url}.get(source_id)

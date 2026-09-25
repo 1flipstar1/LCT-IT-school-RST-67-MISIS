@@ -1,5 +1,7 @@
 import { lazy } from 'react';
 import { PERMISSION } from '../domain/roles.js';
+import { AssistantPage } from '../features/assistant/AssistantPage.jsx';
+import { ASSISTANT_PATH } from '../features/assistant/launch.js';
 
 /**
  * Таблица маршрутов. Страницы загружаются лениво: первый экран не тянет код админки и конструктора.
@@ -15,7 +17,18 @@ export const ROUTES = [
   { path: '/reports', component: page(() => import('../features/reports/ReportsPage.jsx'), 'ReportsPage') },
   { path: '/catalogs', component: page(() => import('../features/catalogs/CatalogsPage.jsx'), 'CatalogsPage') },
   {
+    path: '/import',
+    permission: PERMISSION.importCatalogs,
+    component: page(() => import('../features/catalogs/ImportPage.jsx'), 'ImportPage'),
+  },
+  // Прежние адреса импорта ведут на тот же мастер: на них есть ссылки в справке и закладках.
+  {
     path: '/catalogs/import',
+    permission: PERMISSION.importCatalogs,
+    component: page(() => import('../features/catalogs/ImportPage.jsx'), 'ImportPage'),
+  },
+  {
+    path: '/main/import',
     permission: PERMISSION.importCatalogs,
     component: page(() => import('../features/catalogs/ImportPage.jsx'), 'ImportPage'),
   },
@@ -31,7 +44,7 @@ export const ROUTES = [
   },
   {
     path: '/users',
-    permission: PERMISSION.manageUsers,
+    permission: PERMISSION.manageTeamAccounts,
     component: page(() => import('../features/admin/UsersPage.jsx'), 'UsersPage'),
   },
   {
@@ -39,12 +52,13 @@ export const ROUTES = [
     permission: PERMISSION.viewAudit,
     component: page(() => import('../features/admin/AuditPage.jsx'), 'AuditPage'),
   },
+  // Чат с помощником грузится сразу: переход из строки поиска анимирован и не должен ждать загрузки кода.
+  { path: ASSISTANT_PATH, component: AssistantPage },
   { path: '/help', component: page(() => import('../features/help/HelpPage.jsx'), 'HelpPage') },
   // Страницы ошибок по HTTP-статусу: «#/error/404», «#/error/503». Сюда переводит приложение при ответе сервера с ошибкой.
   { path: '/errors', component: page(() => import('../features/errors/ErrorGalleryPage.jsx'), 'ErrorGalleryPage') },
   { path: '/error/:status', component: page(() => import('../features/errors/ErrorStatusPage.jsx'), 'ErrorStatusPage') },
 
-  // Экраны прежнего дизайна (ветка main): дашборд и импорт, см. features/legacy.
+  // Экран прежнего дизайна (ветка main), см. features/legacy.
   { path: '/main/dashboard', component: page(() => import('../features/legacy/DashboardScreen.jsx'), 'DashboardScreen') },
-  { path: '/main/import', component: page(() => import('../features/legacy/ImportScreen.jsx'), 'ImportScreen') },
 ];

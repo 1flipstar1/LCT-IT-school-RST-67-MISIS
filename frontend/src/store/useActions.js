@@ -16,7 +16,7 @@ import { useStoreApi } from './StoreProvider.jsx';
  * Действия, которые можно отменить, возвращают { undo } — его вызывает кнопка «Отменить» в уведомлении.
  */
 export function useActions() {
-  const { dispatch, getState, applyServerSnapshot, flush } = useStoreApi();
+  const { dispatch, getState, getRevision, rehydrate, applyServerSnapshot, flush } = useStoreApi();
   const session = useSession();
 
   return useMemo(() => {
@@ -326,6 +326,68 @@ export function useActions() {
         });
       },
 
+      /**
+       * Импорт через backend: сначала отправляем несохранённые правки, затем исходный файл
+       * (он хранится вместе с историей), затем проверенный план. Сервер применяет его атомарно
+       * и возвращает новое состояние. При 409 данные перечитываются — план нужно проверить заново.
+       */
+      async commitImport({ file, fileName, plan, options, summary }) {
+        requirePermission(PERMISSION.importCatalogs);
+        await flush();
+        const attachment = file ? await apiClient.uploadAttachment(file) : null;
+        const changes = {
+          universities: plan.universities,
+          programs: plan.programs,
+          products: plan.products,
+          interactions: plan.interactions,
+          ...(plan.events ? { events: plan.events } : {}),
+        };
+        try {
+          const result = await apiClient.createImport({
+            fileName,
+            attachmentId: attachment?.id ?? null,
+            expectedRevision: getRevision(),
+            summary,
+            options,
+            stats: plan.stats,
+            issues: plan.issues.slice(0, 5000),
+            changes,
+          });
+          applyServerSnapshot(result.snapshot);
+          return result.job;
+        } catch (error) {
+          if (error?.status === 409) await rehydrate();
+          throw error;
+        }
+      },
+
+      /**
+       * Учётные записи меняет сервер: он синхронно обновляет Keycloak (логин, пароль, группа роли)
+       * и карточку сотрудника в CRM, а браузер получает новое состояние.
+       * Возвращает { userId, temporaryPassword, keycloak } — пароль показывается один раз.
+       */
+      async manageAccount(operation) {
+        if (!session.can(PERMISSION.manageTeamAccounts)) throw new AppError('ACCESS-403');
+        await flush();
+        const result = await operation(apiClient);
+        applyServerSnapshot(result.snapshot);
+        return { userId: result.userId, temporaryPassword: result.temporaryPassword, keycloak: result.keycloak };
+      },
+
+      /** Вводный курс пройден, пропущен или сброшен (reset — показать снова при следующем входе). */
+      async finishOnboarding(status) {
+        await flush();
+        applyServerSnapshot(await apiClient.updateOnboarding(status));
+      },
+
+      async rollbackImport(importId, { force = false } = {}) {
+        requirePermission(PERMISSION.importCatalogs);
+        await flush();
+        const result = await apiClient.rollbackImport(importId, { force });
+        applyServerSnapshot(result.snapshot);
+        return result.job;
+      },
+
       applyImport({ universities, programs, products, interactions, summary }) {
         requirePermission(PERMISSION.importCatalogs);
         const at = now();
@@ -335,5 +397,5 @@ export function useActions() {
         });
       },
     };
-  }, [dispatch, getState, applyServerSnapshot, flush, session]);
+  }, [dispatch, getState, getRevision, rehydrate, applyServerSnapshot, flush, session]);
 }

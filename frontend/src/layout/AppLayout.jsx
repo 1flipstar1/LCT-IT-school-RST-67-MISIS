@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { useRouter } from '../app/router.jsx';
+import { cn } from '../lib/cn.js';
 import logoUrl from '../../logo/logo.svg';
 import { IconButton } from '../ui/IconButton.jsx';
 import { MenuIcon } from '../ui/icons.js';
 import { Sidebar } from './Sidebar.jsx';
-import { AssistantChat } from '../features/assistant/AssistantChat.jsx';
+import { ASSISTANT_PATH } from '../features/assistant/launch.js';
+import { OnboardingTour } from '../features/onboarding/OnboardingTour.jsx';
 import { GlobalSearch } from './GlobalSearch.jsx';
 import styles from './AppLayout.module.css';
 
@@ -16,7 +20,25 @@ function focusMainContent(event) {
 /** Каркас: навигация слева, контент справа. На телефоне и планшете навигация открывается кнопкой в шапке. */
 export function AppLayout({ children }) {
   const [navOpen, setNavOpen] = useState(false);
+  const { pathname } = useRouter();
   const closeNav = () => setNavOpen(false);
+  // В чате строка поиска становится полем ввода внизу экрана (features/assistant/AssistantPage.jsx).
+  const chat = pathname === ASSISTANT_PATH;
+  const contentRef = useRef(null);
+  const previousPathRef = useRef(pathname);
+
+  // Вход в чат: снимаем растворение прежней страницы (launch.js). Возврат: страница проявляется из размытия.
+  useLayoutEffect(() => {
+    const cameFromChat = previousPathRef.current === ASSISTANT_PATH && !chat;
+    previousPathRef.current = pathname;
+    if (chat) gsap.set(contentRef.current, { clearProps: 'all' });
+    if (!cameFromChat || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    gsap.fromTo(
+      contentRef.current,
+      { autoAlpha: 0, y: 16, filter: 'blur(12px)' },
+      { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.65, ease: 'power2.out', clearProps: 'all' },
+    );
+  }, [pathname, chat]);
 
   return (
     <div className={styles.shell}>
@@ -33,10 +55,10 @@ export function AppLayout({ children }) {
       {navOpen && <div className={styles.scrim} onClick={closeNav} aria-hidden="true" />}
 
       <main id="main" tabIndex={-1} className={styles.main}>
-        <div className={styles.searchBar}><GlobalSearch /></div>
-        <div className={styles.content}>{children}</div>
+        {!chat && <div className={styles.searchBar}><GlobalSearch /></div>}
+        <div ref={contentRef} className={cn(styles.content, chat && styles.chat)} data-app-content>{children}</div>
       </main>
-      <AssistantChat />
+      <OnboardingTour />
     </div>
   );
 }

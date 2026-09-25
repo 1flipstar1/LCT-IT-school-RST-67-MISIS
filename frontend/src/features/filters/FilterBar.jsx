@@ -44,7 +44,7 @@ export function FilterBar({
   const fields = <FilterFields filters={filters} set={set} show={show} stages={stages} fieldClassName={inPanel ? styles.panelField : undefined} />;
 
   if (inPanel) {
-    return <FilterPanelBar search={search} fields={fields} activeCount={activeCount} onReset={reset} resultLabel={resultLabel} />;
+    return <FilterPanelBar search={search} fields={fields} activeCount={activeCount} onReset={reset} resultLabel={resultLabel} actions={actions} />;
   }
 
   return (
@@ -87,8 +87,8 @@ function FilterFields({ filters, set, show, stages, fieldClassName }) {
   );
 }
 
-/** Поиск + кнопка «Фильтры» с числом активных фильтров; поля — в панели справа. */
-function FilterPanelBar({ search, fields, activeCount, onReset, resultLabel }) {
+/** Поиск + кнопка «Фильтры» с числом активных фильтров; поля — в панели справа, actions — справа в той же строке. */
+function FilterPanelBar({ search, fields, activeCount, onReset, resultLabel, actions }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -98,6 +98,7 @@ function FilterPanelBar({ search, fields, activeCount, onReset, resultLabel }) {
         Фильтры
         {activeCount > 0 && <span className={styles.badge}>{activeCount}</span>}
       </Button>
+      {actions && <div className={styles.actions}>{actions}</div>}
 
       <SidePanel
         open={open}

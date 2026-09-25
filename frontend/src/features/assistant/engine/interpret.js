@@ -2,6 +2,7 @@ import { EMPTY_FILTERS } from '../../../domain/filters.js';
 import { DEFAULT_REPORT_COLUMNS, REPORT_COLUMNS, REPORT_FORMATS } from '../../../domain/reports.js';
 import { ENTITY_TYPES } from './entities.js';
 import { CAPABILITIES, searchKnowledge } from './knowledge.js';
+import { isOutOfScope, OUT_OF_SCOPE_SUGGESTIONS, OUT_OF_SCOPE_TEXT } from './scope.js';
 import { parsePeriod } from './period.js';
 import { PAGES, STAGE_MOVE, TOOL } from './tools.js';
 import { extractQuoted, hasStem, normalize, tokenize, tokenMatches } from './text.js';
@@ -26,6 +27,10 @@ const ATTENTION_WORDS = ['просроч', 'срочн', 'горящ', 'сорв
 const STAGE_VERBS = ['переведи', 'перевед', 'перевести', 'передвин', 'продвин', 'сдвин', 'перемест', 'подвин', 'двигай', 'перекин', 'пропусти', 'пропуст', 'верни', 'вернуть', 'откат', 'заверши', 'завершить'];
 const COMMENT_VERBS = /(добав|остав|напиш|запиш|внеси|сохрани)[а-я]*\s+(?:[а-я]+\s+)?(комментар|заметк|примечан)|прокомментир/;
 const REPEAT_REPORT = /(повтор|снова|еще раз|заново)[а-я ]*отчет|последн[а-я]* отчет/;
+const CONTACT_WORDS = ['контакт', 'телефон', 'почт', 'email', 'мейл', 'позвон', 'звонить', 'связат', 'дозвон'];
+const WORKLOAD = ['нагрузк', 'загрузк', 'загружен', 'по менеджер', 'кто сколько', 'рейтинг менеджер', 'по ответственн'];
+const DETAILS = ['что с', 'как дела', 'как там', 'статус', 'подробн', 'расскаж', 'истори', 'где сейчас', 'на каком этап', 'инфо'];
+const DAILY_PLAN = /(план на (день|сегодня|неделю)|что мне (сегодня )?(делать|сделать)|что (делать|сделать) сегодня|мои задачи|задачи на сегодня|что горит|чем (мне )?(сегодня )?заняться)/;
 
 const hasPhrase = (tokens, phrase) => {
   const parts = phrase.split(' ');
@@ -91,6 +96,20 @@ export function extractFilters(text, { matcher, userId, now, previousFilters }) 
 
 const hasEntities = (filters) => ENTITY_TYPES.some(({ key }) => filters[key].length > 0);
 
+/**
+ * Справочные действия без изменений данных. Проверяются раньше вопросов «как…»:
+ * «Как дела у КФУ?» — это сводка по вузу, а не инструкция.
+ */
+function detectInfoTool(message, text, tokens, context) {
+  if (DAILY_PLAN.test(text)) return { name: TOOL.dailyPlan, args: {} };
+  if (hasAny(tokens, WORKLOAD)) return { name: TOOL.managerWorkload, args: { filters: extractFilters(message, context) } };
+  const filters = extractFilters(message, context);
+  if (filters.universityIds.length === 0) return null;
+  if (hasStem(tokens, CONTACT_WORDS)) return { name: TOOL.universityContacts, args: { filters } };
+  if (hasAny(tokens, DETAILS) && !hasStem(tokens, STAGE_VERBS) && !hasStem(tokens, REPORT_WORDS)) return { name: TOOL.interactionDetails, args: { filters } };
+  return null;
+}
+
 /** Вуз и направление ищем только до текста комментария: «к КФУ: обсудили DevOps» — это не фильтр по DevOps. */
 const beforeQuote = (message, quote) => (quote ? message.slice(0, message.indexOf(quote)) : message);
 
@@ -149,6 +168,10 @@ export function interpretLocally(message, context) {
   }
   if (THANKS.test(text) && tokens.length <= 4) return { kind: 'answer', text: 'Пожалуйста! Обращайтесь.' };
   if (ABOUT.test(text)) return { kind: 'answer', text: `Вот что я умею:\n\n${CAPABILITIES.map((line) => `- ${line}`).join('\n')}` };
+  if (isOutOfScope(text)) return { kind: 'answer', text: OUT_OF_SCOPE_TEXT, suggestions: OUT_OF_SCOPE_SUGGESTIONS };
+
+  const info = detectInfoTool(message, text, tokens, context);
+  if (info) return { kind: 'tool', ...info };
 
   const question = QUESTION.test(text);
   if (!question) {
@@ -173,7 +196,13 @@ export function resolveModelCall({ name, arguments: args = {} }, message, contex
 
   // Модель иногда добавляет условия от себя. Берём только названия, которые пользователь действительно упомянул.
   const messageTokens = tokenize(message);
-  const mentioned = (name) => typeof name === 'string' && tokenize(name).some((token) => token.length > 2 && messageTokens.some((word) => tokenMatches(word, token)));
+  const sharesRoot = (word, token) => {
+    let length = 0;
+    while (length < word.length && word[length] === token[length]) length += 1;
+    return length >= 5;
+  };
+  const mentioned = (name) => typeof name === 'string'
+    && tokenize(name).some((token) => token.length > 2 && messageTokens.some((word) => tokenMatches(word, token) || sharesRoot(word, token)));
 
   const modelKeys = { universities: 'universityIds', directions: 'directionIds', products: 'productIds', programs: 'programIds', managers: 'managerIds', stages: 'stageIds' };
   for (const [argName, key] of Object.entries(modelKeys)) {
@@ -183,7 +212,9 @@ export function resolveModelCall({ name, arguments: args = {} }, message, contex
     unknown.push(...resolved.unknown);
   }
 
-  if (filters.period.preset === 'all' && !/(все|весь) (время|период)/.test(normalize(message))) {
+  // Период от модели — только если пользователь вообще говорил о времени: «нагрузка» не значит «за 30 дней».
+  const mentionsTime = /(дн|недел|месяц|квартал|год|лет|сегодн|вчера|январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр|\d{1,2}[./]\d{1,2})/.test(normalize(message));
+  if (mentionsTime && filters.period.preset === 'all' && !/(все|весь) (время|период)/.test(normalize(message))) {
     if (args.date_from || args.date_to) filters.period = { preset: 'custom', from: args.date_from ?? '', to: args.date_to ?? '' };
     else if (['30d', '90d', '365d'].includes(args.period)) filters.period = { preset: args.period, from: '', to: '' };
   }

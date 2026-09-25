@@ -89,6 +89,98 @@ export class PdfDocument {
     this.cursorY += drawHeight + gapAfter;
   }
 
+  /** Скруглённая карточка: фон и тонкая рамка. */
+  card(x, y, width, height, { fill = '#ffffff', stroke = COLORS.border, radius = 8 } = {}) {
+    const { context } = this;
+    context.beginPath();
+    context.roundRect(x, y, width, height, radius);
+    context.fillStyle = fill;
+    context.fill();
+    context.strokeStyle = stroke;
+    context.lineWidth = 0.75;
+    context.stroke();
+  }
+
+  /** Строка текста в заданной точке, обрезанная по ширине многоточием. */
+  label(value, x, y, maxWidth, { size = 10, weight = 400, color = COLORS.text } = {}) {
+    const { context } = this;
+    context.font = `${weight} ${size}px ${FONT}`;
+    context.fillStyle = color;
+    let text = String(value ?? '');
+    while (text.length > 1 && context.measureText(text).width > maxWidth) text = `${text.slice(0, -2)}…`;
+    context.fillText(text, x, y);
+  }
+
+  /**
+   * Плитки ключевых показателей сеткой: название, крупное число, подпись.
+   * items: [{ label, value, caption }].
+   */
+  tiles(items, { columns = 4, height = 70, gap = 10, gapAfter = 18 } = {}) {
+    const width = (this.contentWidth - gap * (columns - 1)) / columns;
+    for (let start = 0; start < items.length; start += columns) {
+      this.ensureSpace(height);
+      items.slice(start, start + columns).forEach((item, index) => {
+        const x = MARGIN + index * (width + gap);
+        const y = this.cursorY;
+        this.card(x, y, width, height, { fill: '#f8f1ff', stroke: COLORS.headerFill });
+        this.label(item.label, x + 10, y + 9, width - 20, { size: 8.5, weight: 700, color: COLORS.secondary });
+        this.label(item.value, x + 10, y + 24, width - 20, { size: 20, weight: 700, color: COLORS.brand });
+        this.label(item.caption, x + 10, y + 52, width - 20, { size: 7.5, color: COLORS.secondary });
+      });
+      this.cursorY += height + gap;
+    }
+    this.cursorY += gapAfter - gap;
+  }
+
+  /**
+   * Графики сеткой в карточках с заголовком. Широкие (wide) занимают всю строку.
+   * Изображение вписывается в ячейку с сохранением пропорций; строка не разрывается между страницами.
+   * items: [{ title, image, width, height, wide }].
+   */
+  figures(items, { columns = 2, gap = 14, maxImageHeight = 190, gapAfter = 18 } = {}) {
+    const padding = 10;
+    const titleHeight = 18;
+    const rows = [];
+    let row = [];
+    items.forEach((item) => {
+      if (item.wide) {
+        if (row.length) rows.push(row);
+        rows.push([item]);
+        row = [];
+        return;
+      }
+      row.push(item);
+      if (row.length === columns) {
+        rows.push(row);
+        row = [];
+      }
+    });
+    if (row.length) rows.push(row);
+
+    rows.forEach((cells) => {
+      const cellColumns = cells[0].wide ? 1 : columns;
+      const cellWidth = (this.contentWidth - gap * (cellColumns - 1)) / cellColumns;
+      const layouts = cells.map((item) => {
+        // Высокие графики (списки этапов, тепловые карты) получают почти всю страницу, чтобы текст не мельчал.
+        const tall = item.height > item.width * 0.75;
+        const heightLimit = tall ? this.height - MARGIN * 2 - titleHeight - padding * 2 - 40 : maxImageHeight;
+        const scale = Math.min((cellWidth - padding * 2) / item.width, heightLimit / item.height);
+        return { item, drawWidth: item.width * scale, drawHeight: item.height * scale };
+      });
+      const rowHeight = padding * 2 + titleHeight + Math.max(...layouts.map((layout) => layout.drawHeight));
+      this.ensureSpace(rowHeight);
+      layouts.forEach(({ item, drawWidth, drawHeight }, index) => {
+        const x = MARGIN + index * (cellWidth + gap);
+        const y = this.cursorY;
+        this.card(x, y, cellWidth, rowHeight);
+        this.label(item.title, x + padding, y + padding, cellWidth - padding * 2, { size: 10.5, weight: 700 });
+        this.context.drawImage(item.image, x + (cellWidth - drawWidth) / 2, y + padding + titleHeight, drawWidth, drawHeight);
+      });
+      this.cursorY += rowHeight + gap;
+    });
+    this.cursorY += gapAfter - gap;
+  }
+
   /** Таблица с переносом текста в ячейках; шапка повторяется на каждой новой странице. */
   table({ header, body }, { size = 8.5, gapAfter = 16 } = {}) {
     const padding = 5;

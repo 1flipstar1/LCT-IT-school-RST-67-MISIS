@@ -32,7 +32,7 @@ export const NAVIGATION = [
       { to: '/analytics', label: 'Аналитика', icon: AnalyticsIcon },
       { to: '/reports', label: 'Отчёты', icon: ReportIcon },
       { to: '/catalogs', label: 'Справочники', icon: CatalogIcon },
-      { to: '/main/import', label: 'Импорт данных', icon: UploadIcon },
+      { to: '/import', label: 'Импорт данных', icon: UploadIcon, permission: PERMISSION.importCatalogs },
     ],
   },
   {
@@ -41,7 +41,7 @@ export const NAVIGATION = [
     items: [
       { to: '/workflows', label: 'Этапы работы', icon: WorkflowIcon, permission: PERMISSION.manageWorkflows },
       { to: '/integrations', label: 'Интеграции', icon: IntegrationIcon, permission: PERMISSION.manageIntegrations, badge: 'inbox' },
-      { to: '/users', label: 'Пользователи и доступ', icon: UsersIcon, permission: PERMISSION.manageUsers },
+      { to: '/users', label: 'Пользователи и доступ', icon: UsersIcon, permission: PERMISSION.manageTeamAccounts },
       { to: '/audit', label: 'Журнал действий', icon: HistoryIcon, permission: PERMISSION.viewAudit },
     ],
   },

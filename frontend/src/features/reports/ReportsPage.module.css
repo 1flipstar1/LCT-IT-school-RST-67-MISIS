@@ -145,3 +145,102 @@
     width: 100%;
   }
 }
+
+/* ---------- Сцена для снимков графиков в PDF: вне экрана, но с реальными размерами ---------- */
+.stage {
+  position: fixed;
+  top: 0;
+  left: -20000px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-6x);
+  width: 1320px;
+  pointer-events: none;
+}
+
+.stageItem {
+  width: 640px;
+}
+
+.stageWide {
+  width: 1320px;
+}
+
+/* ---------- Шаг «Графики и показатели» ---------- */
+.widgetEmpty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3x);
+  padding: var(--space-4x);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-l);
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.widgetPicker {
+  display: grid;
+  gap: var(--space-3x);
+}
+
+.widgetList {
+  display: grid;
+  gap: var(--space-2x);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: widget;
+}
+
+.widgetItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  padding: var(--space-2x) var(--space-2x) var(--space-2x) var(--space-3x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+}
+
+.widgetIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--control-height-s);
+  height: var(--control-height-s);
+  border-radius: var(--radius-m);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.widgetText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.widgetTitle {
+  overflow: hidden;
+  font: var(--font-body-s-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widgetFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.widgetHint {
+  margin-right: auto;
+  color: var(--color-warning-text);
+  font: var(--font-caption-strong);
+  text-align: left;
+}
+
+.widgetHint:hover {
+  text-decoration: underline;
+}

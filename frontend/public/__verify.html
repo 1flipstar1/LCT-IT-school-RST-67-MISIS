@@ -1,0 +1,9 @@
+<!doctype html><script>
+const params = new URLSearchParams(location.search);
+fetch('/api/v1/auth/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: params.get('role') || 'lead' }) })
+  .then((r) => r.json())
+  .then((a) => {
+    sessionStorage.setItem('crm.session', JSON.stringify({ role: a.user.role, user: a.user, accessToken: a.accessToken, tokenType: 'Bearer', expiresAt: Date.now() + a.expiresIn * 1000 }));
+    location.replace('/#' + (params.get('to') || '/'));
+  });
+</script>

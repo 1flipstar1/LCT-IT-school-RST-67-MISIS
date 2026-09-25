@@ -166,7 +166,7 @@ export function StoreProvider({ children }) {
   }, [queueStateSave]);
 
   const api = useMemo(
-    () => ({ dispatch, getState: () => stateRef.current, rehydrate, applyServerSnapshot, flush: flushPendingState }),
+    () => ({ dispatch, getState: () => stateRef.current, getRevision: () => revisionRef.current, rehydrate, applyServerSnapshot, flush: flushPendingState }),
     [rehydrate, applyServerSnapshot, flushPendingState],
   );
 

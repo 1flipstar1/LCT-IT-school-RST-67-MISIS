@@ -5,14 +5,13 @@ import { useSession } from '../../auth/SessionProvider.jsx';
 import { describeError } from '../../domain/errors.js';
 import { filterInteractionRows } from '../../domain/filters.js';
 import { createId, formatDate, formatRelativeDateTime } from '../../domain/format.js';
-import { PERMISSION } from '../../domain/roles.js';
 import { downloadBlob, safeFileName } from '../../lib/download.js';
 import { localStore, sessionStore } from '../../lib/storage.js';
 import { usePersistentState, writePersistentState } from '../../lib/usePersistentState.js';
 import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selectors.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
 import { useActions } from '../../store/useActions.js';
-import { ADMIN_GUIDE, USER_GUIDE } from '../help/guides.js';
+import { articlesFor } from '../help/articles/index.js';
 import { exportReport } from '../reports/reportExport.js';
 import { createEntityMatcher } from './engine/entities.js';
 import { executeTool } from './engine/execute.js';
@@ -93,11 +92,7 @@ export function useAssistant({ settings, page }) {
     () => createEntityMatcher({ universities, users, directions, products, programs, workflows }),
     [universities, users, directions, products, programs, workflows],
   );
-  const canManage = can(PERMISSION.manageWorkflows);
-  const knowledge = useMemo(
-    () => buildKnowledge({ userGuide: USER_GUIDE, adminGuide: canManage ? ADMIN_GUIDE : [], workflows }),
-    [canManage, workflows],
-  );
+  const knowledge = useMemo(() => buildKnowledge({ articles: articlesFor(can), workflows }), [can, workflows]);
 
   // Асинхронные ответы должны видеть свежие данные, а не данные момента отправки.
   const contextRef = useRef(null);
@@ -282,6 +277,9 @@ export function useAssistant({ settings, page }) {
   }, [append, reply, busy, model, page]);
 
   const stop = useCallback(() => abortRef.current?.abort(), []);
+
+  // Чат закрыли во время ответа — запрос к модели больше никому не нужен.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const clear = useCallback(() => {
     abortRef.current?.abort();

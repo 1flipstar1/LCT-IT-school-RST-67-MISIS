@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useRouter } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
+import { PERMISSION } from '../../domain/roles.js';
 import { BASE_WORKFLOW } from '../../data/workflows.js';
 import { formatDays, formatRelativeDateTime } from '../../domain/format.js';
 import { PHASES, SLA_STATE, getStageIndex, isFinalStage, needsAttention } from '../../domain/workflow.js';
@@ -36,7 +37,7 @@ const DONUT_CIRCUMFERENCE = 559.2;
 export function DashboardScreen() {
   useDocumentTitle('Дашборд');
   const { navigate } = useRouter();
-  const { user } = useSession();
+  const { user, can } = useSession();
   const { events } = useStoreState();
   const { users } = useCatalogIndex();
   const interactions = useVisibleInteractionRows().filter((row) => row.workflowId === BASE_WORKFLOW.id);
@@ -116,15 +117,17 @@ export function DashboardScreen() {
         <LegacyButton icon={<FilterIcon size={16} fill="currentColor" />}>
           Все менеджеры
         </LegacyButton>
-        <LegacyButton onClick={() => navigate('/main/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
-          Импортировать
-        </LegacyButton>
+        {can(PERMISSION.importCatalogs) && (
+          <LegacyButton onClick={() => navigate('/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
+            Импортировать
+          </LegacyButton>
+        )}
         <LegacyButton primary onClick={() => setCreating(true)} icon={<AddIcon size={16} fill="currentColor" />}>
           Новое взаимодействие
         </LegacyButton>
       </PageHeader>
 
-      <section ref={chartRef} className="panel stage-stats">
+      <section ref={chartRef} className="panel stage-stats" data-tour="stage-stats">
         <div className="panel-head">
           <div>
             <Hint text="Сколько заявок на каждом из этапов обработки. Наведите на столбец или сектор, чтобы увидеть этап и число заявок.">
@@ -215,7 +218,7 @@ export function DashboardScreen() {
           </section>
         </div>
         <div className="dash-right">
-          <section className="panel dash-feed-panel dash-attention-panel" aria-labelledby="dash-attention-title">
+          <section className="panel dash-feed-panel dash-attention-panel" aria-labelledby="dash-attention-title" data-tour="attention">
             <div className="panel-head dash-feed-head">
               <div>
                 <Hint text="Взаимодействия, у которых срок этапа истёк или истекает в ближайшие дни. Начните с верхних — у них меньше всего времени.">

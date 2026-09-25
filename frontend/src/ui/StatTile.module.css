@@ -83,3 +83,25 @@
     font: var(--font-h1);
   }
 }
+
+/* Плитка с действием (например, «В отчёт» на панели аналитики): кнопка в правом нижнем углу.
+   Подпись освобождает под неё место, стрелка-ссылка прячется — вся плитка и так ссылка. */
+.withAction {
+  position: relative;
+  display: grid;
+  height: 100%;
+}
+
+.withAction .hint {
+  padding-right: calc(var(--control-height-s) + var(--space-2x));
+}
+
+.withAction .arrow {
+  display: none;
+}
+
+.action {
+  position: absolute;
+  right: var(--space-4x);
+  bottom: var(--space-4x);
+}

@@ -20,7 +20,7 @@ from app.schemas.attachment import AttachmentResponse
 
 
 ALLOWED_EXTENSIONS = {
-    "png", "jpg", "jpeg", "pdf", "zip", "gz", "gzip", "rar", "doc", "docx", "xls", "xlsx"
+    "png", "jpg", "jpeg", "pdf", "zip", "gz", "gzip", "rar", "doc", "docx", "xls", "xlsx", "csv"
 }
 CHUNK_SIZE = 1024 * 1024
 
