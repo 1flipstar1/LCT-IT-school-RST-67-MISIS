@@ -107,6 +107,7 @@ export function GlobalSearch() {
   };
 
   return <div className={styles.root} ref={rootRef} data-print-hidden>
+    <div className={`${styles.backdrop} ${open ? styles.backdropOpen : ''}`} aria-hidden="true" onPointerDown={() => setOpen(false)} />
     <div className={`${styles.field} ${scrolled ? styles.scrolled : ''}`}>
       <span className={styles.searchMark} aria-hidden="true">
         <SearchIcon size={20} fill="currentColor" />

@@ -1,5 +1,7 @@
 ﻿.root { position: relative; z-index: var(--z-sticky); }
-.field { display: flex; align-items: center; gap: var(--space-3x); min-height: 52px; padding: 0 var(--space-4x); border: 1px solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); color: var(--color-text-tertiary); box-shadow: none; transition: box-shadow var(--duration-base) var(--easing); }
+.field { position: relative; z-index: 1; display: flex; align-items: center; gap: var(--space-3x); min-height: 52px; padding: 0 var(--space-4x); border: 1px solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); color: var(--color-text-tertiary); box-shadow: none; transition: box-shadow var(--duration-base) var(--easing); }
+.backdrop { position: fixed; inset: 0; z-index: 0; background: color-mix(in srgb, var(--color-overlay) 40%, transparent); opacity: 0; pointer-events: none; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); transition: opacity var(--duration-base) var(--easing), backdrop-filter var(--duration-base) var(--easing), -webkit-backdrop-filter var(--duration-base) var(--easing); }
+.backdropOpen { opacity: 1; pointer-events: auto; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .searchMark { position: relative; flex: 0 0 24px; height: 24px; }
 .searchMark > svg { position: absolute; left: 0; top: var(--space-0_5x); }
 .aiMark { position: absolute; left: calc(var(--space-5x) - var(--space-0_5x)); bottom: calc(-1 * var(--space-0_5x)); z-index: 1; background: transparent; color: var(--color-brand); font: var(--font-body-s-strong); mix-blend-mode: multiply; }
@@ -9,7 +11,7 @@
 .field input:focus-visible { outline: 0; box-shadow: none; }
 .field input::placeholder { color: var(--color-text-tertiary); }
 .field kbd { padding: var(--space-1x) var(--space-2x); border: 1px solid var(--color-border); border-radius: var(--radius-s); color: var(--color-text-tertiary); font: var(--font-caption); }
-.results { position: absolute; top: calc(100% + var(--space-2x)); left: 0; right: 0; max-height: min(65vh, 520px); overflow-y: auto; padding: var(--space-2x); border: 1px solid var(--color-border); border-radius: var(--radius-l); background: var(--color-surface); box-shadow: var(--shadow-l); }
+.results { position: absolute; z-index: 1; top: calc(100% + var(--space-2x)); left: 0; right: 0; max-height: min(65vh, 520px); overflow-y: auto; padding: var(--space-2x); border: 1px solid var(--color-border); border-radius: var(--radius-l); background: var(--color-surface); box-shadow: var(--shadow-l); }
 .result { display: flex; align-items: center; width: 100%; gap: var(--space-3x); padding: var(--space-3x); border: 0; border-radius: var(--radius-m); background: transparent; color: var(--color-text); text-align: left; cursor: pointer; }
 .result:hover, .result:focus-visible { background: var(--color-brand-softer); outline: none; }
 .result span:nth-child(1), .result span:nth-child(2) { min-width: 0; }
