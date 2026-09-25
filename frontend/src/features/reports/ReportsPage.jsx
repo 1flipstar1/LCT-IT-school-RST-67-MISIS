@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useSession } from '../../auth/SessionProvider.jsx';
 import { EMPTY_FILTERS, filterInteractionRows } from '../../domain/filters.js';
 import { formatDate, formatRelativeDateTime, plural } from '../../domain/format.js';
 import { DEFAULT_REPORT_COLUMNS, REPORT_COLUMNS, REPORT_FORMATS } from '../../domain/reports.js';
@@ -8,20 +9,24 @@ import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selector
 import { useStoreState } from '../../store/StoreProvider.jsx';
 import { useActions } from '../../store/useActions.js';
 import { Badge } from '../../ui/Badge.jsx';
-import { Button } from '../../ui/Button.jsx';
+import { Button, ButtonLink } from '../../ui/Button.jsx';
+import { IconButton } from '../../ui/IconButton.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
 import { Hint } from '../../ui/Hint.jsx';
 import { DataTable } from '../../ui/DataTable.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
 import { Checkbox, TextField } from '../../ui/Field.jsx';
-import { DownloadIcon, ReportIcon } from '../../ui/icons.js';
+import { AnalyticsIcon, ArrowDownIcon, ArrowUpIcon, DownloadIcon, ReportIcon, TrashIcon } from '../../ui/icons.js';
 import { ErrorAlert } from '../../ui/InlineAlert.jsx';
 import { PageHeader } from '../../ui/PageHeader.jsx';
 import { useToast } from '../../ui/Toast.jsx';
 import { FilterBar } from '../filters/FilterBar.jsx';
 import { describeFilters } from '../filters/describeFilters.js';
 import { useFilters } from '../filters/useFilters.js';
+import { useReportWidgets } from '../analytics/reportWidgets.js';
+import { ANALYTICS_WIDGETS } from '../analytics/widgets/catalog.js';
 import { exportReport } from './reportExport.js';
+import { ReportVisualsStage } from './ReportVisualsStage.jsx';
 import styles from './ReportsPage.module.css';
 
 const PREVIEW_ROWS = 5;
@@ -39,6 +44,18 @@ export function ReportsPage() {
   const [name, setName] = useState(`Взаимодействия с вузами — ${formatDate(new Date())}`);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const { can } = useSession();
+  const reportWidgets = useReportWidgets();
+  const widgetCatalog = useMemo(() => new Map(ANALYTICS_WIDGETS.filter((widget) => !widget.permission || can(widget.permission)).map((widget) => [widget.id, widget])), [can]);
+  const selectedWidgets = reportWidgets.ids.map((id) => widgetCatalog.get(id)).filter(Boolean);
+  const [stage, setStage] = useState(null);
+  const stageResolverRef = useRef(null);
+
+  /** Рисует выбранные виджеты вне экрана по фильтрам отчёта и возвращает их снимки для PDF. */
+  const captureVisuals = (widgets, reportFilters) => new Promise((resolve) => {
+    stageResolverRef.current = resolve;
+    setStage({ widgets, filters: reportFilters });
+  });
 
   const rows = useMemo(() => filterInteractionRows(allRows, filters), [allRows, filters]);
   const summary = describeFilters(filters, index);
@@ -51,10 +68,14 @@ export function ReportsPage() {
     if (busy) return;
     setBusy(true);
     try {
-      const rowCount = await exportReport(config);
-      actions.recordReport({ name: config.name, format: config.format, rowCount, summary: config.summary, filters: config.filters, columns: config.columns });
+      const widgets = (config.widgetIds ?? []).map((id) => widgetCatalog.get(id)).filter(Boolean);
+      const visuals = config.format === 'pdf' && widgets.length > 0 ? await captureVisuals(widgets, config.filters) : null;
+      const rowCount = await exportReport({ ...config, visuals });
+      actions.recordReport({ name: config.name, format: config.format, rowCount, summary: config.summary, filters: config.filters, columns: config.columns, widgetIds: config.widgetIds ?? [] });
       setError(null);
-      toast.success(`Файл скачан: ${rowCount} ${plural(rowCount, ['строка', 'строки', 'строк'])}`);
+      const extra = visuals ? ` и ${visuals.kpis.length + visuals.figures.length + visuals.tables.length} ${plural(visuals.kpis.length + visuals.figures.length + visuals.tables.length, ['график или показатель', 'графика или показателя', 'графиков и показателей'])}` : '';
+      toast.success(`Файл скачан: ${rowCount} ${plural(rowCount, ['строка', 'строки', 'строк'])}${extra}`);
+      if (visuals?.skipped.length) toast.error(`Не удалось добавить: ${visuals.skipped.join(', ')}`);
     } catch (caught) {
       setError(caught);
     } finally {
@@ -71,6 +92,7 @@ export function ReportsPage() {
       name: report.name,
       summary: report.summary,
       filters: reportFilters,
+      widgetIds: report.widgetIds ?? [],
     });
   };
 
@@ -92,7 +114,16 @@ export function ReportsPage() {
             </div>
           </Step>
 
-          <Step number={3} title="Формат файла" hint="В каком файле скачать отчёт: XLSX или XLS — для работы в таблицах, PDF — для печати и отправки.">
+          <Step
+            number={3}
+            title="Графики и показатели"
+            hint="Отметьте на странице «Аналитика» кнопкой «В отчёт» нужные плитки и графики — в PDF они будут в начале, посчитанные по фильтрам этого отчёта."
+            description={selectedWidgets.length ? `Выбрано: ${selectedWidgets.length}. Попадут в начало PDF, по два графика в ряд.` : 'Необязательно. Добавляются только в PDF.'}
+          >
+            <ReportWidgetList widgets={selectedWidgets} selection={reportWidgets} pdf={format === 'pdf'} onUsePdf={() => setFormat('pdf')} />
+          </Step>
+
+          <Step number={4} title="Формат файла" hint="В каком файле скачать отчёт: XLSX или XLS — для работы в таблицах, PDF — для печати и отправки.">
             <div className={styles.formats} role="radiogroup" aria-label="Формат файла">
               {REPORT_FORMATS.map((item) => (
                 <label key={item.id} className={cn(styles.format, format === item.id && styles.formatChecked)}>
@@ -113,9 +144,9 @@ export function ReportsPage() {
               size="l"
               icon={DownloadIcon}
               disabled={busy}
-              onClick={() => generate({ rows, columns, format, name: name.trim() || 'Отчёт', summary, filters })}
+              onClick={() => generate({ rows, columns, format, name: name.trim() || 'Отчёт', summary, filters, widgetIds: selectedWidgets.map((widget) => widget.id) })}
             >
-              {busy ? 'Формируем файл…' : `Скачать ${REPORT_FORMATS.find((item) => item.id === format).label}`}
+              {busy ? (stage ? 'Рисуем графики…' : 'Формируем файл…') : `Скачать ${REPORT_FORMATS.find((item) => item.id === format).label}`}
             </Button>
           </div>
         </Card>
@@ -133,6 +164,17 @@ export function ReportsPage() {
           )}
         </Card>
       </div>
+
+      {stage && (
+        <ReportVisualsStage
+          widgets={stage.widgets}
+          filters={stage.filters}
+          onCaptured={(visuals) => {
+            setStage(null);
+            stageResolverRef.current?.(visuals);
+          }}
+        />
+      )}
 
       <Card padding="none">
         <CardHeader title="История отчётов" hint="Отчёты, которые уже формировали. Любой можно собрать заново по актуальным данным." description="Отчёт можно сформировать заново — с теми же фильтрами и колонками, но по актуальным данным." />
@@ -173,9 +215,50 @@ export function ReportsPage() {
   );
 }
 
+function ReportWidgetList({ widgets, selection, pdf, onUsePdf }) {
+  if (widgets.length === 0) {
+    return (
+      <div className={styles.widgetEmpty}>
+        <p>На странице «Аналитика» у каждого графика и показателя есть кнопка «В отчёт».</p>
+        <ButtonLink to="/analytics" icon={AnalyticsIcon} size="s">Выбрать в «Аналитике»</ButtonLink>
+      </div>
+    );
+  }
+  return (
+    <div className={styles.widgetPicker}>
+      <ol className={styles.widgetList}>
+        {widgets.map((widget, index) => {
+          const Icon = widget.icon ?? AnalyticsIcon;
+          return (
+            <li key={widget.id} className={styles.widgetItem}>
+              <span className={styles.widgetIcon}><Icon size={18} fill="currentColor" /></span>
+              <span className={styles.widgetText}>
+                <span className={styles.widgetTitle}>{widget.title}</span>
+                <span className={styles.secondary}>{widget.metric ? 'Показатель' : widget.chartType ?? 'График'}</span>
+              </span>
+              <IconButton size="s" icon={ArrowUpIcon} label="Выше" disabled={index === 0} onClick={() => selection.move(widget.id, -1)} />
+              <IconButton size="s" icon={ArrowDownIcon} label="Ниже" disabled={index === widgets.length - 1} onClick={() => selection.move(widget.id, 1)} />
+              <IconButton size="s" icon={TrashIcon} label="Убрать из отчёта" onClick={() => selection.remove(widget.id)} />
+            </li>
+          );
+        })}
+      </ol>
+      <div className={styles.widgetFooter}>
+        {!pdf && (
+          <button type="button" className={styles.widgetHint} onClick={onUsePdf}>
+            Графики попадают только в PDF — выбрать PDF
+          </button>
+        )}
+        <ButtonLink to="/analytics" size="s" variant="ghost">Добавить ещё</ButtonLink>
+        <Button size="s" variant="ghost" onClick={selection.clear}>Очистить</Button>
+      </div>
+    </div>
+  );
+}
+
 function Step({ number, title, description, hint, children }) {
   return (
-    <section className={styles.step}>
+    <section className={styles.step} data-tour={`report-step-${number}`}>
       <header className={styles.stepHeader}>
         <span className={styles.stepNumber}>{number}</span>
         <div>

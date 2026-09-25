@@ -1,0 +1,151 @@
+/* Слой тура: затемнение с «окном» над подсвеченным элементом, кольцо, подсказки и карточка шага. */
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-toast) + 10);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shadeFill {
+  fill: color-mix(in srgb, var(--color-text) 62%, transparent);
+}
+
+.ring {
+  position: absolute;
+  border: 2px solid var(--color-brand);
+  border-radius: 14px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand) 25%, transparent), 0 0 32px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.cues {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(360px, calc(100vw - var(--space-8x)));
+  padding: var(--space-5x);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-l);
+}
+
+.content {
+  display: grid;
+  gap: var(--space-3x);
+}
+
+.progress {
+  display: flex;
+  gap: var(--space-1x);
+}
+
+.dotDone,
+.dotTodo {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-full);
+  transition: background var(--duration-base);
+}
+
+.dotDone {
+  background: linear-gradient(90deg, var(--color-brand), var(--color-accent));
+}
+
+.dotTodo {
+  background: var(--color-neutral-soft);
+}
+
+.counter {
+  color: var(--color-text-tertiary);
+  font: var(--font-caption-strong);
+}
+
+.title {
+  font: var(--font-h3);
+}
+
+.text {
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  margin-top: var(--space-1x);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.skip {
+  color: var(--color-text-tertiary);
+  font: var(--font-caption-strong);
+}
+
+.skip:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.focusAnchor {
+  width: 0;
+  height: 0;
+  outline: none;
+}
+
+/* ---------- Элементы анимаций-подсказок (cues.js) ---------- */
+.sweep {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.typing {
+  position: absolute;
+  transform: translateY(-50%);
+  color: var(--color-text);
+  font: var(--font-body-s);
+  white-space: nowrap;
+}
+
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--color-brand);
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 25%));
+}
+
+.ripple {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-brand) 45%, transparent);
+}
+
+.dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+}

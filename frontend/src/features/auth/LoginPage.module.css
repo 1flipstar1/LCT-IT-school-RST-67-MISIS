@@ -1,33 +1,84 @@
 .page {
   display: grid;
   grid-template-columns: minmax(360px, 5fr) 7fr;
+  align-items: start;
   min-height: 100vh;
   background: var(--color-surface);
 }
 
-/* ---------- Промо-панель ---------- */
+/* ---------- Промо-панель: фирменный градиент на всю высоту окна, медленно «переливается» ---------- */
 .promo {
-  position: relative;
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 100vh;
+  height: 100dvh;
   padding: var(--space-10x);
   overflow: hidden;
-  background: linear-gradient(160deg, #8a14ff 0%, var(--color-brand) 45%, #4a0094 100%);
+  isolation: isolate;
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-active) 0%,
+    var(--color-brand) 30%,
+    var(--color-accent) 55%,
+    var(--color-brand-hover) 80%,
+    var(--color-brand-active) 100%
+  );
+  background-size: 300% 300%;
   color: var(--color-text-on-brand);
+  animation: promoFlow 16s ease-in-out infinite;
+}
+
+/* Два размытых «пятна» — фиолетовое и оранжевое — плывут навстречу друг другу поверх градиента. */
+.promo::before,
+.promo::after {
+  position: absolute;
+  z-index: -1;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  content: '';
+  filter: blur(72px);
+  opacity: 0.75;
+}
+
+.promo::before {
+  top: -20%;
+  left: -20%;
+  background: var(--color-brand);
+  animation: promoBlobA 18s ease-in-out infinite;
 }
 
 .promo::after {
-  content: '';
-  position: absolute;
-  right: -160px;
-  bottom: -160px;
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
+  right: -25%;
+  bottom: -20%;
   background: var(--color-accent);
-  opacity: 0.9;
-  filter: blur(4px);
+  animation: promoBlobB 22s ease-in-out infinite;
+}
+
+@keyframes promoFlow {
+  0%, 100% { background-position: 0% 30%; }
+  50% { background-position: 100% 70%; }
+}
+
+@keyframes promoBlobA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(35%, 55%) scale(1.2); }
+}
+
+@keyframes promoBlobB {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-40%, -45%) scale(0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo,
+  .promo::before,
+  .promo::after {
+    animation: none;
+  }
 }
 
 .promoLogo {
@@ -71,6 +122,8 @@
   display: grid;
   place-items: center;
   align-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
   gap: var(--space-6x);
   padding: var(--space-8x) var(--space-6x);
 }

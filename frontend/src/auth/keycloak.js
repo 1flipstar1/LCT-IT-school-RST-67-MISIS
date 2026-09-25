@@ -70,9 +70,21 @@ export function hasKeycloakCallback() {
   return query.has('code') || query.has('error');
 }
 
-export async function finishKeycloakLogin(fetchImpl = fetch) {
-  if (!keycloakConfigured || !hasKeycloakCallback()) return null;
+/**
+ * Код авторизации можно обменять на токен только один раз, а React в режиме разработки
+ * запускает эффекты дважды. Поэтому повторный вызов для того же кода получает тот же промис.
+ */
+let inFlight = null;
+
+export function finishKeycloakLogin(fetchImpl = fetch) {
+  if (!keycloakConfigured || !hasKeycloakCallback()) return Promise.resolve(null);
   const query = new URLSearchParams(window.location.search);
+  const key = query.get('code') ?? query.get('error');
+  if (inFlight?.key !== key) inFlight = { key, promise: exchangeCode(query, fetchImpl) };
+  return inFlight.promise;
+}
+
+async function exchangeCode(query, fetchImpl) {
   const saved = JSON.parse(sessionStorage.getItem(CALLBACK_KEY) ?? 'null');
   sessionStorage.removeItem(CALLBACK_KEY);
   if (query.get('error')) throw new Error(query.get('error_description') || query.get('error'));

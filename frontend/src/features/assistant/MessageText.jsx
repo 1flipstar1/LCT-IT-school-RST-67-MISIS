@@ -1,4 +1,4 @@
-import styles from './AssistantChat.module.css';
+import styles from './Assistant.module.css';
 
 /**
  * Упрощённая разметка ответов: абзацы, списки «- » и «1. », **жирный** и `код`.
@@ -35,7 +35,7 @@ function toBlocks(text) {
 export function MessageText({ text }) {
   if (!text) return null;
   return (
-    <div className={styles.text}>
+    <div className={styles.text} data-text>
       {toBlocks(text).map((block, index) => {
         if (block.kind === 'p') return <p key={index}>{block.items.map((line, lineIndex) => <span key={lineIndex}>{lineIndex > 0 && <br />}{inline(line)}</span>)}</p>;
         const List = block.kind;

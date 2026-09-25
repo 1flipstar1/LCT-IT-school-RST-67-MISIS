@@ -111,7 +111,7 @@
 /* ---------- Проверка ---------- */
 .summary {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
   gap: var(--space-3x);
 }
 
@@ -199,4 +199,86 @@
   .actions > * {
     flex: 1;
   }
+}
+
+/* ---------- Сопоставление: предпросмотр файла ---------- */
+.preview {
+  display: grid;
+  gap: var(--space-2x);
+  overflow-x: auto;
+}
+
+/* ---------- Проверка ---------- */
+.options {
+  display: grid;
+  gap: var(--space-3x);
+  padding: var(--space-4x);
+  border-radius: var(--radius-l);
+  background: var(--color-surface-muted);
+}
+
+.summaryDanger strong {
+  color: var(--color-danger);
+}
+
+.checkTabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3x);
+}
+
+.rowFilter {
+  justify-self: start;
+}
+
+.emptyNote {
+  padding: var(--space-4x);
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.before {
+  color: var(--color-text-tertiary);
+  text-decoration: line-through;
+}
+
+.after {
+  color: var(--color-success);
+  font: var(--font-body-s-strong);
+}
+
+.doneHint {
+  color: var(--color-text-tertiary);
+  font: var(--font-caption);
+}
+
+/* ---------- История импортов ---------- */
+.history {
+  margin-top: var(--space-6x);
+}
+
+.historyNote {
+  padding: 0 var(--space-6x) var(--space-6x);
+}
+
+.historyFile {
+  display: grid;
+  gap: var(--space-0_5x);
+}
+
+.historyMeta {
+  color: var(--color-text-secondary);
+  font: var(--font-caption);
+}
+
+.historyActions {
+  display: inline-flex;
+  gap: var(--space-1x);
+}
+
+.dialogText {
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
 }

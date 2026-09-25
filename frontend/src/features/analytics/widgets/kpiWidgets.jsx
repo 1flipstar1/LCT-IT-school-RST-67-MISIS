@@ -142,6 +142,8 @@ export const KPI_WIDGETS = KPI.map(({ id, title, description, icon, tone, value,
   rowSpan: 1,
   sizes: KPI_SIZES,
   defaultSize: WIDGET_SIZE.s,
+  // Значение и подпись для PDF: плитки рисуются в отчёте текстом, а не картинкой.
+  metric: (data) => ({ value: value(data), caption: caption(data) }),
   Component: ({ data }) => (
     <StatTile label={title} hint={description} value={value(data)} caption={caption(data)} icon={icon} tone={tone} href={href} />
   ),

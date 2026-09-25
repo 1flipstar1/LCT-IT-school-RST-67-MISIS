@@ -38,7 +38,7 @@ function NavigationGroup({ group, pathname, badges, onNavigate }) {
           const Icon = item.icon;
           return (
             <li key={item.to}>
-              <Link to={item.to} className={cn(styles.item, active && styles.active)} aria-current={active ? 'page' : undefined} onClick={onNavigate}>
+              <Link to={item.to} data-tour={`nav:${item.to}`} className={cn(styles.item, active && styles.active)} aria-current={active ? 'page' : undefined} onClick={onNavigate}>
                 <Icon size={20} fill="currentColor" />
                 <span className={styles.itemLabel}>{item.label}</span>
                 {count > 0 && <span className={styles.badge}>{count}</span>}
@@ -98,7 +98,7 @@ export function Sidebar({ open, onNavigate }) {
         <img src={logoUrl} alt="Ростелеком. ИТ Школа — на главную" className={styles.logo} />
       </Link>
 
-      <nav className={styles.nav}>
+      <nav className={styles.nav} data-tour="sidebar">
         {groups
           .filter((group) => group.id !== 'admin')
           .map((group) => <NavigationGroup key={group.id} group={group} pathname={pathname} badges={badges} onNavigate={onNavigate} />)}
@@ -106,6 +106,7 @@ export function Sidebar({ open, onNavigate }) {
         {adminGroup && <section className={styles.accordion}>
           <button
             type="button"
+            data-tour="nav-settings"
             className={cn(styles.accordionToggle, hasActiveSettingsItem && styles.accordionActive)}
             aria-expanded={settingsOpen}
             aria-controls="sidebar-settings"
@@ -152,7 +153,7 @@ export function Sidebar({ open, onNavigate }) {
       </nav>
 
       <div className={styles.footer}>
-        <Link to="/help" className={cn(styles.help, pathname === '/help' && styles.helpActive)} onClick={onNavigate}>
+        <Link to="/help" data-tour="help" className={cn(styles.help, pathname === '/help' && styles.helpActive)} onClick={onNavigate}>
           <span className={styles.helpIcon}>
             <HelpIcon size={20} fill="currentColor" />
           </span>

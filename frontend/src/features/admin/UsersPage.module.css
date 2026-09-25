@@ -5,3 +5,70 @@
 .muted {
   color: var(--color-text-tertiary);
 }
+
+.status {
+  margin-bottom: var(--space-4x);
+}
+
+.consoleLink {
+  color: var(--color-brand);
+  font: var(--font-body-s-strong);
+  white-space: nowrap;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1_5x);
+}
+
+.fieldLabel {
+  font: var(--font-body-s-strong);
+}
+
+/* ---------- Выданный пароль ---------- */
+.issued {
+  display: grid;
+  gap: var(--space-4x);
+}
+
+.issuedText {
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.credentials {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: var(--space-3x) var(--space-4x);
+  margin: 0;
+  padding: var(--space-4x);
+  border-radius: var(--radius-l);
+  background: var(--color-brand-softer);
+}
+
+.credentials dt {
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.credentials dd {
+  margin: 0;
+  font: var(--font-body-m-strong);
+}
+
+.password {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.password code {
+  padding: var(--space-1x) var(--space-2x);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  font: var(--font-h4);
+  letter-spacing: 0.4px;
+  user-select: all;
+}

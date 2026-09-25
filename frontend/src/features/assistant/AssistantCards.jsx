@@ -4,14 +4,15 @@ import { formatNumber, formatRelativeDateTime, plural } from '../../domain/forma
 import { REPORT_FORMATS } from '../../domain/reports.js';
 import { getStage, requiresComment } from '../../domain/workflow.js';
 import { writePersistentState } from '../../lib/usePersistentState.js';
-import { useVisibleInteractionRows } from '../../store/selectors.js';
+import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selectors.js';
+import { useStoreState } from '../../store/StoreProvider.jsx';
 import { Button } from '../../ui/Button.jsx';
 import { TextAreaField } from '../../ui/Field.jsx';
-import { ArrowRightIcon, CheckIcon, DownloadIcon, HelpIcon, MagicIcon, ReportIcon } from '../../ui/icons.js';
+import { ArrowRightIcon, CheckIcon, DownloadIcon, HelpIcon, MagicIcon, MailIcon, PhoneIcon, ReportIcon, UniversityIcon, UsersIcon } from '../../ui/icons.js';
 import { SegmentedControl } from '../../ui/SegmentedControl.jsx';
 import { SlaBadge } from '../interactions/components/SlaBadge.jsx';
 import { rowLabel } from './engine/execute.js';
-import styles from './AssistantChat.module.css';
+import styles from './Assistant.module.css';
 
 /**
  * Карточки результатов в чате. Хранят только данные (их можно сохранить в историю),
@@ -66,8 +67,8 @@ function ReportCard({ id, card, actions }) {
   return (
     <CardShell icon={ReportIcon} title={card.spec.name} meta={`${card.spec.summary} · ${rowsWord(card.rowCount)} · колонок: ${card.spec.columns.length}`}>
       <SegmentedControl label="Формат файла" value={format} onChange={setFormat} options={REPORT_FORMATS.map((item) => ({ value: item.id, label: item.label }))} className={styles.formats} />
-      <div className={styles.cardActions}>
-        <Button variant="primary" size="s" icon={DownloadIcon} onClick={download} disabled={busy}>
+      <div className={styles.cardActionsStacked}>
+        <Button variant="primary" size="l" icon={DownloadIcon} onClick={download} disabled={busy} className={styles.mainAction}>
           {busy ? 'Формируем файл…' : `Скачать ${formatLabel}`}
         </Button>
         <Button variant="ghost" size="s" onClick={openInBuilder}>Открыть в конструкторе</Button>
@@ -227,9 +228,9 @@ function GuideCard({ card, onRun, onSend }) {
           {card.steps.map((step) => <li key={step}>{step.split(/(\*\*[^*]+\*\*)/g).map((part, index) => (part.startsWith('**') ? <strong key={index}>{part.slice(2, -2)}</strong> : part))}</li>)}
         </ol>
       )}
-      <div className={styles.cardActions}>
+      <div className={styles.cardActionsStacked}>
         {action && (
-          <Button variant="primary" size="s" icon={MagicIcon} onClick={() => (action.call ? onRun(action.call, `Выполни: ${action.request ?? action.label}`) : onSend(action.prompt))}>
+          <Button variant="primary" size="l" icon={MagicIcon} className={styles.mainAction} onClick={() => (action.call ? onRun(action.call, `Выполни: ${action.request ?? action.label}`) : onSend(action.prompt))}>
             {action.label}
           </Button>
         )}
@@ -252,6 +253,93 @@ function ChoiceCard({ card, onRun }) {
   );
 }
 
+const EVENT_LABEL = { created: 'Создано', transition: 'Смена этапа', comment: 'Комментарий', completed: 'Завершено' };
+
+/** Сводка по взаимодействию: этап и прогресс, срок, ответственный, последние события и следующий шаг. */
+function DetailsCard({ card }) {
+  const rows = useVisibleInteractionRows();
+  const { events } = useStoreState();
+  const index = useCatalogIndex();
+  const row = rows.find((item) => item.id === card.interactionId);
+  if (!row) return <CardShell><Status tone="error">Взаимодействие больше недоступно.</Status></CardShell>;
+
+  const next = row.workflow.stages[row.progress.step];
+  const recent = events.filter((event) => event.interactionId === row.id).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 3);
+  return (
+    <CardShell icon={UniversityIcon} title={rowLabel(row)} meta={`${row.program?.name ?? '—'} · ${row.product.name}`}>
+      <div className={styles.detailsStage}>
+        <div className={styles.detailsStageHead}>
+          <span>Этап {row.progress.step} из {row.progress.total}: <strong>{row.stage.name}</strong></span>
+          <SlaBadge sla={row.sla} compact />
+        </div>
+        <span className={styles.barTrack} aria-hidden="true"><span className={styles.barFill} style={{ width: `${row.progress.percent}%` }} /></span>
+      </div>
+      <dl className={styles.facts}>
+        <div><dt>Ответственный</dt><dd>{row.manager?.name ?? 'не назначен'}</dd></div>
+        <div><dt>Договор</dt><dd>{row.contract.number || 'нет номера'}</dd></div>
+        {next && <div><dt>Следующий этап</dt><dd>{next.name}</dd></div>}
+      </dl>
+      {row.stage.hint && <p className={styles.cardMeta}>Что сделать сейчас: {row.stage.hint}</p>}
+      {recent.length > 0 && (
+        <ul className={styles.timeline} aria-label="Последние события">
+          {recent.map((event) => (
+            <li key={event.id}>
+              <span className={styles.rowTitle}>{EVENT_LABEL[event.type] ?? 'Событие'}</span>
+              <span className={styles.rowMeta}> · {formatRelativeDateTime(event.at)} · {index.users.get(event.userId)?.name ?? '—'}</span>
+              {event.comment && <p className={styles.timelineText}>{event.comment}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link to={`/interactions/${row.id}`} className={styles.cardLink}>Открыть карточку взаимодействия</Link>
+    </CardShell>
+  );
+}
+
+function ContactsCard({ card }) {
+  const index = useCatalogIndex();
+  const universities = card.universityIds.map((id) => index.universities.get(id)).filter(Boolean);
+  return (
+    <CardShell icon={UsersIcon} title="Контакты в вузе">
+      {universities.map((university) => (
+        <section key={university.id} className={styles.contacts}>
+          <p className={styles.rowTitle}>{university.name}</p>
+          {(university.contacts ?? []).map((contact) => (
+            <div key={contact.id} className={styles.contact}>
+              <span className={styles.rowTitle}>{contact.name}</span>
+              {contact.position && <span className={styles.rowMeta}>{contact.position}</span>}
+              <span className={styles.contactLinks}>
+                {contact.email && <a href={`mailto:${contact.email}`} className={styles.cardLink}><MailIcon size={16} fill="currentColor" aria-hidden="true" /> {contact.email}</a>}
+                {contact.phone && <a href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`} className={styles.cardLink}><PhoneIcon size={16} fill="currentColor" aria-hidden="true" /> {contact.phone}</a>}
+              </span>
+            </div>
+          ))}
+        </section>
+      ))}
+    </CardShell>
+  );
+}
+
+function WorkloadCard({ card }) {
+  const max = Math.max(1, ...card.items.map((item) => item.active));
+  return (
+    <CardShell icon={UsersIcon} title="Нагрузка по ответственным" meta="Активные взаимодействия; оранжевым — просроченные">
+      <ul className={styles.bars}>
+        {card.items.map((item) => (
+          <li key={item.name} className={styles.workloadBar}>
+            <span className={styles.barLabel}>{item.name}</span>
+            <span className={styles.barTrack} aria-hidden="true">
+              <span className={styles.barFill} style={{ width: `${(item.active / max) * 100}%` }} />
+              {item.overdue > 0 && <span className={styles.barOverdue} style={{ width: `${(item.overdue / max) * 100}%` }} />}
+            </span>
+            <span className={styles.barValue}>{item.active}{item.overdue > 0 && <span className={styles.overdueCount}> · {item.overdue}</span>}</span>
+          </li>
+        ))}
+      </ul>
+    </CardShell>
+  );
+}
+
 export function AssistantCard({ message, actions, onRun, onSend }) {
   const { card, id } = message;
   switch (card.kind) {
@@ -262,6 +350,9 @@ export function AssistantCard({ message, actions, onRun, onSend }) {
     case 'comment': return <ChangeCard id={id} card={card} actions={actions} />;
     case 'guide': return <GuideCard card={card} onRun={onRun} onSend={onSend} />;
     case 'choice': return <ChoiceCard card={card} onRun={onRun} />;
+    case 'details': return <DetailsCard card={card} />;
+    case 'contacts': return <ContactsCard card={card} />;
+    case 'workload': return <WorkloadCard card={card} />;
     default: return null;
   }
 }

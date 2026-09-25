@@ -40,6 +40,12 @@
   padding: var(--space-8x) var(--space-8x) var(--content-padding-bottom);
 }
 
+/* Экран чата: без нижнего отступа — поле ввода прижато к низу окна. */
+.content.chat {
+  --content-padding-bottom: 0px;
+  padding-top: 0;
+}
+
 .mobileBar,
 .scrim {
   display: none;

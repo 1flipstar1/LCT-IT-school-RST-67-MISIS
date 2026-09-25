@@ -21,9 +21,16 @@ services:
 
       ATTACHMENT_STORAGE_PATH: /app/data/attachments
 
-      KEYCLOAK_ISSUER_URL: ${KEYCLOAK_ISSUER_URL:-http://keycloak:8080/realms/it-school}
-      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-}
+      # Браузер получает токены с адреса localhost:8080 — это и есть issuer в токене.
+      # Ключи подписи API забирает напрямую из контейнера keycloak по внутренней сети.
+      KEYCLOAK_ISSUER_URL: ${KEYCLOAK_ISSUER_URL:-http://localhost:8080/realms/it-school}
+      KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/realms/it-school/protocol/openid-connect/certs}
+      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-rtk-it-school-api}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-rtk-it-school-web}
+      # Создание сотрудников из CRM: Admin API Keycloak по внутренней сети, секрет — из realm-it-school.json.
+      KEYCLOAK_ADMIN_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_CLIENT_ID: rtk-it-school-admin
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?укажите секрет клиента rtk-it-school-admin}
 
     depends_on:
       postgres:
@@ -47,6 +54,8 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Отдельная база для Keycloak создаётся при первой инициализации тома.
+      - ./deploy/keycloak/init-keycloak-db.sql:/docker-entrypoint-initdb.d/10-keycloak.sql:ro
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d lct_db"]
@@ -55,13 +64,27 @@ services:
       retries: 10
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    # Версия зафиксирована: realm-it-school.json проверен на ней.
+    image: quay.io/keycloak/keycloak:26.7.4
 
-    command: start-dev
+    # При первом старте импортирует realm «it-school»: роли, группы, клиенты и пользователей CRM.
+    command: ["start-dev", "--import-realm", "--hostname=http://localhost:8080", "--hostname-backchannel-dynamic=true"]
 
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_HEALTH_ENABLED: "true"
+
+    volumes:
+      - ./deploy/keycloak/realm-it-school.json:/opt/keycloak/data/import/realm-it-school.json:ro
+
+    depends_on:
+      postgres:
+        condition: service_healthy
 
     ports:
       - "8080:8080"

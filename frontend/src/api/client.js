@@ -111,6 +111,20 @@ export function createApiClient({
     },
     downloadAttachment: (attachmentId, options = {}) =>
       request(`/attachments/${encodeURIComponent(attachmentId)}`, { ...options, responseType: 'blob' }),
+    updateOnboarding: (status, options = {}) => request('/me/onboarding', { ...options, method: 'PUT', body: { status } }),
+    getAccountsStatus: (options = {}) => request('/accounts/status', options),
+    createAccount: (payload, options = {}) => request('/accounts', { ...options, method: 'POST', body: payload, timeoutMs: 20_000 }),
+    setAccountRole: (userId, role, options = {}) =>
+      request(`/accounts/${encodeURIComponent(userId)}/role`, { ...options, method: 'PUT', body: { role }, timeoutMs: 20_000 }),
+    setAccountStatus: (userId, active, options = {}) =>
+      request(`/accounts/${encodeURIComponent(userId)}/status`, { ...options, method: 'PUT', body: { active }, timeoutMs: 20_000 }),
+    resetAccountPassword: (userId, options = {}) =>
+      request(`/accounts/${encodeURIComponent(userId)}/password`, { ...options, method: 'POST', timeoutMs: 20_000 }),
+    createImport: (payload, options = {}) => request('/imports', { ...options, method: 'POST', body: payload, timeoutMs: 60_000 }),
+    listImports: (options = {}) => request('/imports', options),
+    getImport: (importId, options = {}) => request(`/imports/${encodeURIComponent(importId)}`, options),
+    rollbackImport: (importId, { force = false } = {}, options = {}) =>
+      request(`/imports/${encodeURIComponent(importId)}/rollback`, { ...options, method: 'POST', body: { force } }),
     syncIntegration: (sourceId, options = {}) =>
       request(`/integrations/${encodeURIComponent(sourceId)}/sync`, { ...options, method: 'POST' }),
   });

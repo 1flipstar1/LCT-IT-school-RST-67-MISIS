@@ -13,6 +13,10 @@ export const TOOL = Object.freeze({
   openInteraction: 'open_interaction',
   changeStage: 'change_stage',
   addComment: 'add_comment',
+  interactionDetails: 'interaction_details',
+  universityContacts: 'university_contacts',
+  managerWorkload: 'manager_workload',
+  dailyPlan: 'daily_plan',
 });
 
 /** Действия, которые меняют данные: по умолчанию выполняются только после подтверждения. */
@@ -26,7 +30,7 @@ export const PAGES = [
   { id: 'dashboard', path: '/', label: 'Дашборд', stems: ['дашборд', 'главн'] },
   { id: 'analytics', path: '/analytics', label: 'Аналитика', stems: ['аналитик', 'график'] },
   { id: 'reports', path: '/reports', label: 'Отчёты', stems: ['отчет', 'конструктор отчет'] },
-  { id: 'import', path: '/main/import', label: 'Импорт данных', stems: ['импорт'] },
+  { id: 'import', path: '/import', label: 'Импорт данных', stems: ['импорт', 'загрузк excel', 'загрузи файл'], permission: PERMISSION.importCatalogs },
   { id: 'catalogs', path: '/catalogs', label: 'Справочники', stems: ['справочник'] },
   { id: 'workflows', path: '/workflows', label: 'Этапы работы', stems: ['этапы работы', 'конструктор этап', 'настройк этап'], permission: PERMISSION.manageWorkflows },
   { id: 'integrations', path: '/integrations', label: 'Интеграции', stems: ['интеграц', 'lms'], permission: PERMISSION.manageIntegrations },

@@ -22,17 +22,19 @@ export async function svgToImage(svg) {
 }
 
 /**
- * Сохраняет в PNG все SVG-графики внутри контейнера — на тех же местах, что и на экране
- * (например, кольцевая диаграмма и столбцы рядом). Сверху — заголовок, чтобы картинка была понятна вне системы.
+ * Все SVG-графики контейнера на одном холсте — на тех же местах, что и на экране
+ * (например, кольцевая диаграмма и легенда рядом). Сверху — заголовок, если он передан.
+ * Возвращает null, если в контейнере нет видимых графиков.
  */
-export async function downloadChartAsPng(container, { title, fileName }) {
+export async function renderChartCanvas(container, { title, padding = PADDING } = {}) {
   const bounds = container.getBoundingClientRect();
   const svgs = [...container.querySelectorAll('svg')].filter((svg) => svg.getBoundingClientRect().width > 0);
+  if (svgs.length === 0) return null;
   const titleHeight = title ? TITLE_HEIGHT : 0;
 
   const canvas = document.createElement('canvas');
-  canvas.width = (bounds.width + PADDING * 2) * SCALE;
-  canvas.height = (bounds.height + PADDING * 2 + titleHeight) * SCALE;
+  canvas.width = (bounds.width + padding * 2) * SCALE;
+  canvas.height = (bounds.height + padding * 2 + titleHeight) * SCALE;
 
   const context = canvas.getContext('2d');
   context.scale(SCALE, SCALE);
@@ -41,15 +43,21 @@ export async function downloadChartAsPng(container, { title, fileName }) {
   if (title) {
     context.fillStyle = '#1d1d22';
     context.font = '700 18px RostelecomBasis, sans-serif';
-    context.fillText(title, PADDING, PADDING + 18);
+    context.fillText(title, padding, padding + 18);
   }
 
   for (const svg of svgs) {
     const rect = svg.getBoundingClientRect();
     const { image, width, height } = await svgToImage(svg);
-    context.drawImage(image, PADDING + rect.left - bounds.left, PADDING + titleHeight + rect.top - bounds.top, width, height);
+    context.drawImage(image, padding + rect.left - bounds.left, padding + titleHeight + rect.top - bounds.top, width, height);
   }
+  return canvas;
+}
 
+/** Сохраняет графики контейнера в PNG с заголовком, чтобы картинка была понятна вне системы. */
+export async function downloadChartAsPng(container, { title, fileName }) {
+  const canvas = await renderChartCanvas(container, { title });
+  if (!canvas) return;
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
   downloadBlob(blob, fileName);
 }

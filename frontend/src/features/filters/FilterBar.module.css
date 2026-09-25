@@ -110,3 +110,13 @@
 .panelField .dateRange {
   width: 100%;
 }
+
+@media (max-width: 760px) {
+  .panelBar {
+    flex-wrap: wrap;
+  }
+
+  .panelBar .search {
+    flex-basis: 100%;
+  }
+}

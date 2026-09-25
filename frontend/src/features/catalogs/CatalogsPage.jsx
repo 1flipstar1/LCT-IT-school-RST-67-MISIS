@@ -130,7 +130,7 @@ export function CatalogsPage() {
               <Button icon={DownloadIcon} onClick={downloadImportTemplate}>
                 Шаблон Excel
               </Button>
-              <ButtonLink to="/catalogs/import" variant="primary" icon={UploadIcon}>
+              <ButtonLink to="/import" variant="primary" icon={UploadIcon}>
                 Загрузить из Excel
               </ButtonLink>
             </>

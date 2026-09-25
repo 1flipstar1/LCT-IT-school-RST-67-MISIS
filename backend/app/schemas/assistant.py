@@ -31,6 +31,10 @@ ActionName = Literal[
     "open_interaction",
     "change_stage",
     "add_comment",
+    "interaction_details",
+    "university_contacts",
+    "manager_workload",
+    "daily_plan",
 ]
 
 

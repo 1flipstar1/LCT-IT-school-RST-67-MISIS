@@ -1,6 +1,7 @@
 import { cn } from '../lib/cn.js';
 import { Hint } from './Hint.jsx';
 import { ArrowRightIcon } from './icons.js';
+import { useWidgetContext } from './widgetContext.js';
 import styles from './StatTile.module.css';
 
 /**
@@ -10,7 +11,8 @@ import styles from './StatTile.module.css';
  */
 export function StatTile({ label, value, caption, hint, icon: Icon, tone = 'brand', href }) {
   const Tag = href ? 'a' : 'div';
-  return (
+  const { action } = useWidgetContext();
+  const tile = (
     <Tag className={cn(styles.tile, href && styles.link)} href={href ? `#${href}` : undefined}>
       <div className={styles.top}>
         <Hint text={hint}>
@@ -30,5 +32,13 @@ export function StatTile({ label, value, caption, hint, icon: Icon, tone = 'bran
         </span>
       )}
     </Tag>
+  );
+  // Кнопка действия не может быть внутри ссылки — кладём её поверх плитки.
+  if (!action) return tile;
+  return (
+    <div className={styles.withAction}>
+      {tile}
+      <div className={styles.action}>{action}</div>
+    </div>
   );
 }

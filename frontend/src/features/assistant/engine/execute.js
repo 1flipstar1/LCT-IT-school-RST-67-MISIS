@@ -1,5 +1,5 @@
 import { EMPTY_FILTERS, filterInteractionRows } from '../../../domain/filters.js';
-import { formatDate, plural } from '../../../domain/format.js';
+import { formatDate, formatDays, plural } from '../../../domain/format.js';
 import { DEFAULT_REPORT_COLUMNS, REPORT_FORMATS } from '../../../domain/reports.js';
 import { getTransitionTargets, isFinalStage, PHASES, requiresComment, SLA_STATE, TRANSITION_KIND } from '../../../domain/workflow.js';
 import { describeFilters } from '../../filters/describeFilters.js';
@@ -109,6 +109,19 @@ const MOVE_REFUSAL = {
   [STAGE_MOVE.next]: 'Следующего этапа нет.',
 };
 
+const slaText = (sla) => {
+  if (sla.state === SLA_STATE.overdue) return `просрочено на ${formatDays(-sla.daysLeft)}`;
+  if (sla.state === SLA_STATE.soon) return sla.daysLeft === 0 ? 'срок сегодня' : `осталось ${formatDays(sla.daysLeft)}`;
+  if (sla.state === SLA_STATE.done) return 'завершено';
+  return `в срок, осталось ${formatDays(sla.daysLeft)}`;
+};
+
+/** Мои взаимодействия, если я их веду; иначе — всё, что я вижу (руководитель, администратор). */
+const myRows = (context) => {
+  const own = context.rows.filter((row) => row.managerId === context.userId);
+  return own.length > 0 ? own : context.rows;
+};
+
 const HANDLERS = {
   [TOOL.createReport]: (args, context) => reportResult(args, context),
 
@@ -186,6 +199,73 @@ const HANDLERS = {
         : `${rowLabel(row)}: ${destination}. Проверьте и подтвердите.`,
       card,
       effect: !needsComment && !context.settings.confirmChanges ? { type: 'commit' } : undefined,
+    };
+  },
+
+  [TOOL.interactionDetails]: (args, context) => {
+    const { row, result } = pickInteraction(args, context, TOOL.interactionDetails);
+    if (!row) return result;
+    const next = row.workflow.stages[row.progress.step];
+    return {
+      text: `${rowLabel(row)}: этап ${row.progress.step} из ${row.progress.total} — «${row.stage.name}», ${slaText(row.sla)}. Ответственный — ${row.manager?.name ?? 'не назначен'}.${next ? ` Дальше: «${next.name}».` : ''}`,
+      card: { kind: 'details', interactionId: row.id },
+      suggestions: [
+        ...(row.completedAt ? [] : [{ label: 'Перевести на следующий этап', call: { name: TOOL.changeStage, args: { interactionId: row.id, move: STAGE_MOVE.next } } }]),
+        { label: 'Контакты вуза', call: { name: TOOL.universityContacts, args: { filters: { ...EMPTY_FILTERS, universityIds: [row.universityId] } } } },
+        { label: 'Отчёт по вузу', call: { name: TOOL.createReport, args: { filters: { ...EMPTY_FILTERS, universityIds: [row.universityId] } } } },
+      ],
+    };
+  },
+
+  [TOOL.universityContacts]: ({ filters }, context) => {
+    const universities = filters.universityIds.map((id) => context.index.universities.get(id)).filter(Boolean).slice(0, 3);
+    if (universities.length === 0) return { text: 'Уточните вуз. Например: «Контакты КФУ».' };
+    const count = universities.reduce((sum, university) => sum + (university.contacts?.length ?? 0), 0);
+    if (count === 0) return { text: `В справочнике нет контактов: ${universities.map((university) => university.shortName ?? university.name).join(', ')}. Их можно добавить в «Справочниках».` };
+    return {
+      text: `Контакты: ${universities.map((university) => university.shortName ?? university.name).join(', ')}.`,
+      card: { kind: 'contacts', universityIds: universities.map((university) => university.id) },
+    };
+  },
+
+  [TOOL.managerWorkload]: ({ filters }, context) => {
+    const rows = filterInteractionRows(context.rows, filters, context.now).filter((row) => !row.completedAt);
+    const byManager = new Map();
+    rows.forEach((row) => {
+      const entry = byManager.get(row.managerId) ?? { name: row.manager?.name ?? 'Без ответственного', active: 0, overdue: 0, soon: 0 };
+      entry.active += 1;
+      if (row.sla.state === SLA_STATE.overdue) entry.overdue += 1;
+      if (row.sla.state === SLA_STATE.soon) entry.soon += 1;
+      byManager.set(row.managerId, entry);
+    });
+    const items = [...byManager.values()].sort((a, b) => b.active - a.active || b.overdue - a.overdue);
+    if (items.length === 0) return { text: 'Активных взаимодействий нет — нагрузку считать не по чему.' };
+    const mostOverdue = [...items].sort((a, b) => b.overdue - a.overdue)[0];
+    return {
+      text: `Больше всего в работе: ${items[0].name} — ${interactionsWord(items[0].active)}.${mostOverdue.overdue ? ` Больше всего просрочек: ${mostOverdue.name} — ${mostOverdue.overdue}.` : ' Просрочек нет.'}`,
+      card: { kind: 'workload', items },
+      suggestions: ['Покажи просроченные', 'Статистика'],
+    };
+  },
+
+  [TOOL.dailyPlan]: (_args, context) => {
+    const urgent = myRows(context).filter((row) => !row.completedAt && (row.sla.state === SLA_STATE.overdue || row.sla.state === SLA_STATE.soon)).sort(byUrgency);
+    if (urgent.length === 0) return { text: 'Срочного нет: все этапы в срок. Можно заняться взаимодействиями, где давно не было движения, или подготовить отчёт.', suggestions: ['Статистика', 'Сформируй отчёт за последний месяц'] };
+    const overdue = urgent.filter((row) => row.sla.state === SLA_STATE.overdue).length;
+    const first = urgent[0];
+    const filters = { ...EMPTY_FILTERS, onlyAttention: true, managerIds: first.managerId === context.userId ? [context.userId] : [] };
+    return {
+      text: [
+        `План на сегодня: ${urgent.length} ${plural(urgent.length, ['срочный этап', 'срочных этапа', 'срочных этапов'])}${overdue ? `, из них просрочено ${overdue}` : ''}.`,
+        `Начните с **${rowLabel(first)}** — «${first.stage.name}», ${slaText(first.sla)}.`,
+        first.stage.hint ? `Что сделать: ${first.stage.hint}` : '',
+      ].filter(Boolean).join('\n'),
+      card: { kind: 'interactions', filters, ids: urgent.slice(0, PREVIEW_LIMIT).map((row) => row.id), total: urgent.length },
+      filters,
+      suggestions: [
+        { label: `Как дела у ${first.university.shortName ?? first.university.name}?`, call: { name: TOOL.interactionDetails, args: { interactionId: first.id } } },
+        reportSuggestion(filters),
+      ],
     };
   },
 

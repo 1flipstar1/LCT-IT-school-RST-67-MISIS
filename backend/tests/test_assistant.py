@@ -123,3 +123,15 @@ def test_status_reports_whether_the_model_is_pulled(client: TestClient, manager_
 
     mock_ollama(monkeypatch, offline)
     assert client.get("/api/v1/assistant/status", headers=manager_headers).json()["available"] is False
+
+
+def test_off_topic_requests_never_reach_the_model(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "4"}))
+
+    for message in ("2 + 2", "Сколько будет 7*8?", "Напиши код на Python", "какая погода в Казани"):
+        response = client.post("/api/v1/assistant/chat", json={"message": message}, headers=manager_headers)
+        assert response.status_code == 200
+        assert response.json()["message"] == assistant.OUT_OF_SCOPE
+
+    assert requests == []
+    assert not assistant.is_out_of_scope("Отчёт по КФУ за 2025 год в PDF")

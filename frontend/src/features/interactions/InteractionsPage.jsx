@@ -69,12 +69,15 @@ export function InteractionsPage() {
         hint="Работа с вузами по ИТ-направлениям, учебным программам и продуктам. Откройте карточку, чтобы сменить этап, оставить комментарий или приложить файлы."
         meta={<span className={styles.resultCount}>{countLabel}</span>}
         actions={
-          <Button variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>
-            Новое взаимодействие
-          </Button>
+          <span data-tour="new-interaction">
+            <Button variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>
+              Новое взаимодействие
+            </Button>
+          </span>
         }
       />
 
+      <div data-tour="filters">
       <FilterBar
         variant="panel"
         filters={filters}
@@ -82,32 +85,34 @@ export function InteractionsPage() {
         show={{ stages: true, attention: true }}
         stages={workflow.stages}
         resultLabel={countLabel}
-      />
-
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarControls}>
-          {view === 'table' ? (
-            <SelectField
-              className={styles.sort}
-              aria-label="Сортировка"
-              value={sort}
-              onChange={(event) => setSort(event.target.value)}
-              options={Object.entries(SORTS).map(([value, { label }]) => ({ value, label }))}
-            />
-          ) : (
-            workflows.length > 1 && (
+        actions={
+          <>
+            {view === 'table' ? (
               <SelectField
                 className={styles.sort}
-                aria-label="Набор этапов"
-                value={workflow.id}
-                onChange={(event) => setWorkflowId(event.target.value)}
-                options={workflows.map((item) => ({ value: item.id, label: item.name }))}
+                aria-label="Сортировка"
+                value={sort}
+                onChange={(event) => setSort(event.target.value)}
+                options={Object.entries(SORTS).map(([value, { label }]) => ({ value, label }))}
               />
-            )
-          )}
-          <SegmentedControl label="Вид списка" options={VIEWS} value={view} onChange={setView} />
-        </div>
+            ) : (
+              workflows.length > 1 && (
+                <SelectField
+                  className={styles.sort}
+                  aria-label="Набор этапов"
+                  value={workflow.id}
+                  onChange={(event) => setWorkflowId(event.target.value)}
+                  options={workflows.map((item) => ({ value: item.id, label: item.name }))}
+                />
+              )
+            )}
+            <span data-tour="view-toggle"><SegmentedControl label="Вид списка" options={VIEWS} value={view} onChange={setView} /></span>
+          </>
+        }
+      />
       </div>
+
+      <div className={styles.listGap} />
 
       {view === 'table' ? (
         <Card padding="none">

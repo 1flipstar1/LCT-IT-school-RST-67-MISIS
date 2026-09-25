@@ -3,19 +3,8 @@
   color: var(--color-text-secondary);
 }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4x);
-  margin: var(--space-5x) 0 var(--space-3x);
-}
-
-.toolbarControls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3x);
-  margin-left: auto;
+.listGap {
+  height: var(--space-4x);
 }
 
 .sort {
@@ -23,14 +12,7 @@
 }
 
 @media (max-width: 760px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .toolbarControls {
-    flex-direction: column-reverse;
-    align-items: stretch;
-    margin-left: 0;
+  .sort {
+    min-width: 0;
   }
 }

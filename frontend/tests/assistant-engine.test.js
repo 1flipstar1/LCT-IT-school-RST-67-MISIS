@@ -9,14 +9,15 @@ import { executeTool } from '../src/features/assistant/engine/execute.js';
 import { interpretLocally, resolveModelCall } from '../src/features/assistant/engine/interpret.js';
 import { buildKnowledge } from '../src/features/assistant/engine/knowledge.js';
 import { parsePeriod } from '../src/features/assistant/engine/period.js';
+import { OUT_OF_SCOPE_TEXT } from '../src/features/assistant/engine/scope.js';
 import { STAGE_MOVE, TOOL } from '../src/features/assistant/engine/tools.js';
 import { DEFAULT_SETTINGS } from '../src/features/assistant/settings.js';
-import { ADMIN_GUIDE, USER_GUIDE } from '../src/features/help/guides.js';
+import { HELP_ARTICLES } from '../src/features/help/articles/index.js';
 
 const now = new Date('2026-09-24T12:00:00');
 const state = createSeedState(now);
 const matcher = createEntityMatcher(state);
-const knowledge = buildKnowledge({ userGuide: USER_GUIDE, adminGuide: ADMIN_GUIDE, workflows: state.workflows });
+const knowledge = buildKnowledge({ articles: HELP_ARTICLES, workflows: state.workflows });
 const parse = (text, extra = {}) => interpretLocally(text, { matcher, knowledge, userId: 'usr-1', now, ...extra });
 
 const indexById = (items) => new Map(items.map((item) => [item.id, item]));
@@ -141,8 +142,24 @@ describe('interpretLocally', () => {
     assert.equal(report.args.filters.onlyAttention, true);
   });
 
+  it('понимает сводку по вузу, контакты, план на день и нагрузку', () => {
+    assert.equal(parse('Как дела у КФУ?').name, TOOL.interactionDetails);
+    assert.equal(parse('что с ИТМО').name, TOOL.interactionDetails);
+    assert.equal(parse('контакты ТПУ').name, TOOL.universityContacts);
+    assert.equal(parse('Что мне сегодня делать?').name, TOOL.dailyPlan);
+    assert.equal(parse('нагрузка по менеджерам').name, TOOL.managerWorkload);
+    assert.equal(parse('что делать на этапе подписания документов?').kind, 'answer', 'вопрос об этапе — не план на день');
+  });
+
+  it('не отвечает на посторонние запросы', () => {
+    for (const text of ['2+2', 'сколько будет 7*8', 'напиши код на питоне', 'расскажи анекдот', 'какая погода завтра']) {
+      assert.equal(parse(text).text, OUT_OF_SCOPE_TEXT, text);
+    }
+    assert.equal(parse('Отчёт по КФУ за 2025 год').name, TOOL.createReport);
+  });
+
   it('незнакомое оставляет модели', () => {
-    assert.equal(parse('расскажи анекдот'), null);
+    assert.equal(parse('посоветуй стратегию переговоров с ректором'), null);
     assert.equal(parse('привет').kind, 'answer');
   });
 });
@@ -188,6 +205,21 @@ describe('executeTool', () => {
     assert.deepEqual(run(TOOL.openPage, { page: 'board' }).effect, { type: 'navigate', path: '/interactions', view: 'board' });
   });
 
+  it('сводка, контакты, нагрузка и план на день', () => {
+    const details = run(TOOL.interactionDetails, { interactionId: 'i1' });
+    assert.equal(details.card.kind, 'details');
+    assert.match(details.text, /этап 6 из 14/);
+
+    const contacts = run(TOOL.universityContacts, { filters: { ...EMPTY_FILTERS, universityIds: ['u1'] } });
+    assert.deepEqual(contacts.card, { kind: 'contacts', universityIds: ['u1'] });
+
+    const workload = run(TOOL.managerWorkload, { filters: {} });
+    assert.equal(workload.card.items.reduce((sum, item) => sum + item.active, 0), rows.filter((row) => !row.completedAt).length);
+
+    const plan = run(TOOL.dailyPlan, {}, { userId: 'usr-1' });
+    assert.ok(plan.card.ids.every((id) => rows.find((row) => row.id === id).managerId === 'usr-1'));
+  });
+
   it('статистика считает просрочки и фазы', () => {
     const { card } = run(TOOL.showStats, { filters: {} });
     assert.equal(card.stats.total, rows.length);
@@ -207,8 +239,13 @@ describe('resolveModelCall', () => {
     assert.deepEqual(call.args.filters.stageIds, []);
   });
 
+  it('не берёт от модели период, если пользователь не говорил о времени', () => {
+    const call = resolve({ name: TOOL.managerWorkload, arguments: { period: '30d' } }, 'кто у нас больше всех загружен');
+    assert.equal(call.args.filters.period.preset, 'all');
+  });
+
   it('дополняет разбор форматом и периодом от модели', () => {
-    const call = resolve({ name: TOOL.createReport, arguments: { universities: ['КФУ'], format: 'pdf', period: '90d' } }, 'файлик для начальства по казанскому вузу');
+    const call = resolve({ name: TOOL.createReport, arguments: { universities: ['КФУ'], format: 'pdf', period: '90d' } }, 'файлик для начальства по казанскому вузу, разбивка по месяцам');
     assert.deepEqual(call.args.filters.universityIds, ['u1']);
     assert.equal(call.args.format, 'pdf');
     assert.equal(call.args.filters.period.preset, '90d');

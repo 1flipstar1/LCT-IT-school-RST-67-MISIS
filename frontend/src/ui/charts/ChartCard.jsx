@@ -7,6 +7,7 @@ import { DataTable } from '../DataTable.jsx';
 import { IconButton } from '../IconButton.jsx';
 import { DownloadIcon } from '../icons.js';
 import { SegmentedControl } from '../SegmentedControl.jsx';
+import { useWidgetContext } from '../widgetContext.js';
 import styles from './charts.module.css';
 
 const VIEWS = [
@@ -20,7 +21,9 @@ const VIEWS = [
  * toolbar — элементы управления самим графиком (например, выбор вуза), выводятся над ним.
  */
 export function ChartCard({ id, title, description, hint, chart, table, toolbar, footer }) {
-  const [view, setView] = usePersistentState(`chart-view:${id}`, 'chart');
+  const [storedView, setView] = usePersistentState(`chart-view:${id}`, 'chart');
+  const { action, exportMode } = useWidgetContext();
+  const view = exportMode ? 'chart' : storedView;
   const chartRef = useRef(null);
 
   const exportPng = () => {
@@ -28,16 +31,18 @@ export function ChartCard({ id, title, description, hint, chart, table, toolbar,
   };
 
   return (
-    <Card>
+    <Card className={action && !exportMode ? styles.withCornerAction : undefined}>
       <CardHeader
         title={title}
         description={description}
         hint={hint}
         actions={
-          <>
-            <SegmentedControl label={`Вид: ${title}`} options={VIEWS} value={view} onChange={setView} />
-            {view === 'chart' && <IconButton icon={DownloadIcon} label="Скачать график в PNG" onClick={exportPng} />}
-          </>
+          !exportMode && (
+            <>
+              <SegmentedControl label={`Вид: ${title}`} options={VIEWS} value={view} onChange={setView} />
+              {view === 'chart' && <IconButton icon={DownloadIcon} label="Скачать график в PNG" onClick={exportPng} />}
+            </>
+          )
         }
       />
       {toolbar && <div className={styles.toolbar}>{toolbar}</div>}
@@ -52,6 +57,8 @@ export function ChartCard({ id, title, description, hint, chart, table, toolbar,
         </div>
       )}
       {footer && <div className={styles.footer}>{footer}</div>}
+      {/* Действие панели (например, «В отчёт») — в правом нижнем углу карточки. */}
+      {action && !exportMode && <div className={styles.cornerAction}>{action}</div>}
     </Card>
   );
 }

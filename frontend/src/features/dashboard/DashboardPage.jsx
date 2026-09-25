@@ -65,7 +65,7 @@ export function DashboardPage() {
         </h1>
         <div className={styles.actions}>
           {can(PERMISSION.importCatalogs) ? (
-            <ButtonLink to="/catalogs/import" icon={UploadIcon}>
+            <ButtonLink to="/import" icon={UploadIcon}>
               Импортировать
             </ButtonLink>
           ) : (

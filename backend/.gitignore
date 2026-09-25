@@ -9,3 +9,6 @@ __pycache__/
 data/
 tests/test_attachments/
 .coverage
+
+# Локальный дистрибутив Keycloak (deploy/keycloak/run-local.sh)
+deploy/keycloak/.local/

@@ -3,7 +3,7 @@ import { Switch } from '../../ui/Field.jsx';
 import { SegmentedControl } from '../../ui/SegmentedControl.jsx';
 import { DEFAULT_SETTINGS, SETTING_OPTIONS } from './settings.js';
 import { speechOutputSupported } from './speech.js';
-import styles from './AssistantChat.module.css';
+import styles from './Assistant.module.css';
 
 const MODEL_STATE_TEXT = {
   checking: 'Проверяем подключение…',

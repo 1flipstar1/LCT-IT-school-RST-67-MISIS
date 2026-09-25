@@ -1,10 +1,11 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useRouter } from '../app/router.jsx';
 import { useSession } from '../auth/SessionProvider.jsx';
-import { ADMIN_GUIDE, USER_GUIDE } from '../features/help/guides.js';
+import { articlesFor } from '../features/help/articles/index.js';
+import { openAssistant, takeReturnOrigin } from '../features/assistant/launch.js';
 import { NAVIGATION } from './navigation.js';
-import { HelpIcon, SearchIcon } from '../ui/icons.js';
+import { MagicIcon, SearchIcon } from '../ui/icons.js';
 import styles from './GlobalSearch.module.css';
 
 const BLOCKS = [
@@ -47,15 +48,31 @@ export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => window.scrollY > 0);
   const rootRef = useRef(null);
+  const fieldRef = useRef(null);
   const inputRef = useRef(null);
   const pendingRef = useRef(null);
   const entries = useMemo(() => [
     ...NAVIGATION.flatMap((group) => group.items.filter((item) => can(item.permission)).map((item) => ({ title: item.label, path: item.to, type: 'Раздел' }))),
     ...BLOCKS.filter((block) => !['/integrations', '/workflows'].includes(block.path) || can(NAVIGATION[2].items.find((item) => item.to === block.path)?.permission)).map((block) => ({ ...block, type: 'Блок' })),
-    ...USER_GUIDE.map((guide) => ({ title: guide.title, hint: guide.hint, path: `/help?section=user`, target: `help-${guide.id}`, type: 'Статья' })),
-    ...(can(NAVIGATION[2].items[0].permission) ? ADMIN_GUIDE.map((guide) => ({ title: guide.title, hint: guide.hint, path: '/help?section=admin', target: `help-${guide.id}`, type: 'Статья' })) : []),
+    ...articlesFor(can).map((article) => ({ title: article.title, hint: article.summary, path: `/help?article=${article.id}`, type: 'Статья' })),
   ], [can]);
   const results = query.trim() ? entries.filter((entry) => normalize(`${entry.title} ${entry.hint || ''}`).includes(normalize(query))).slice(0, 8) : entries.filter((entry) => entry.type === 'Раздел').slice(0, 5);
+
+  // Возврат из чата: строка поиска летит на своё место из поля ввода чата, пока страница проявляется.
+  useLayoutEffect(() => {
+    const origin = takeReturnOrigin();
+    if (!origin || !fieldRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const target = fieldRef.current.getBoundingClientRect();
+    gsap.from(fieldRef.current, {
+      x: origin.left - target.left,
+      y: origin.top - target.top,
+      width: origin.width,
+      boxShadow: 'none',
+      duration: 0.65,
+      ease: 'power3.inOut',
+      clearProps: 'transform,width,boxShadow',
+    });
+  }, []);
 
   useEffect(() => {
     const updateScroll = () => setScrolled(window.scrollY > 0);
@@ -84,6 +101,7 @@ export function GlobalSearch() {
   useEffect(() => {
     const onKey = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.code === 'KeyK') { event.preventDefault(); setOpen(true); inputRef.current?.focus(); }
+      if ((event.ctrlKey || event.metaKey) && event.code === 'Slash') { event.preventDefault(); openAssistant({ from: fieldRef.current }); }
       if (event.key === 'Escape') setOpen(false);
     };
     const onPointer = (event) => { if (!rootRef.current?.contains(event.target)) setOpen(false); };
@@ -95,7 +113,8 @@ export function GlobalSearch() {
   const select = (entry) => {
     setOpen(false);
     setQuery('');
-    if (entry.type === 'AI') { window.dispatchEvent(new CustomEvent('open-assistant', { detail: { question: query.trim() } })); return; }
+    // Строка поиска «уезжает» вниз и становится полем ввода чата — см. features/assistant/launch.js.
+    if (entry.type === 'AI') { openAssistant({ question: query, from: fieldRef.current }); return; }
     if (entry.path === path || entry.path === pathname) {
       if (entry.target) {
         const node = document.getElementById(entry.target);
@@ -107,17 +126,21 @@ export function GlobalSearch() {
   };
 
   return <div className={styles.root} ref={rootRef} data-print-hidden>
-    <div className={`${styles.field} ${scrolled ? styles.scrolled : ''}`}>
+    <div ref={fieldRef} data-tour="search" className={`${styles.field} ${scrolled ? styles.scrolled : ''}`}>
       <span className={styles.searchMark} aria-hidden="true">
         <SearchIcon size={20} fill="currentColor" />
         <span className={styles.aiMark}>Ai</span>
       </span>
-      <input ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={() => setOpen(true)} placeholder="Найти раздел, блок или статью" aria-label="Поиск по программе и базе знаний" aria-expanded={open} aria-controls="global-search-results" />
+      <input ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={() => setOpen(true)} placeholder="Найдите раздел или спросите ИИ-помощника" aria-label="Поиск по программе и базе знаний" aria-expanded={open} aria-controls="global-search-results" onKeyDown={(event) => { if (event.key === 'Enter' && query.trim()) { event.preventDefault(); select({ type: 'AI' }); } }} />
       <kbd>Ctrl K</kbd>
+      <button type="button" data-tour="open-chat" className={styles.chatButton} onClick={() => select({ type: 'AI' })} title="Открыть чат с ИИ-помощником · Ctrl + /">
+        <MagicIcon size={18} fill="currentColor" aria-hidden="true" />
+        <span>Открыть чат</span>
+      </button>
     </div>
     {open && <div id="global-search-results" className={styles.results} role="listbox" aria-label="Результаты поиска">
       {results.length ? results.map((entry, index) => <button role="option" aria-selected="false" type="button" key={`${entry.type}-${entry.title}-${index}`} className={styles.result} onClick={() => select(entry)}><span><strong>{entry.title}</strong><small>{entry.type}{entry.hint ? ` · ${entry.hint}` : ''}</small></span><span className={styles.arrow}>↗</span></button>) : <p className={styles.empty}>Ничего не найдено</p>}
-      <button type="button" className={`${styles.result} ${styles.ai}`} onClick={() => select({ type: 'AI' })}><HelpIcon size={20} fill="currentColor" /><span><strong>Спросить у AI помощника</strong><small>{query.trim() ? `Вопрос: ${query.trim()}` : 'Поможет разобраться с задачей'}</small></span><span className={styles.arrow}>↗</span></button>
+      <button type="button" className={`${styles.result} ${styles.ai}`} onClick={() => select({ type: 'AI' })}><MagicIcon size={20} fill="currentColor" /><span><strong>Спросить у ИИ-помощника</strong><small>{query.trim() ? `Вопрос: ${query.trim()} · Enter` : 'Объяснит, как сделать, или сделает сам'}</small></span><span className={styles.arrow}>↗</span></button>
     </div>}
   </div>;
 }

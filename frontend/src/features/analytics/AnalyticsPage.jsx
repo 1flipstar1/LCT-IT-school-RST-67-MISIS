@@ -2,9 +2,9 @@ import { useMemo, useRef, useState } from 'react';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { usePersistentState } from '../../lib/usePersistentState.js';
 import { useCatalogIndex } from '../../store/selectors.js';
-import { Button } from '../../ui/Button.jsx';
+import { Button, ButtonLink } from '../../ui/Button.jsx';
 import { IconButton } from '../../ui/IconButton.jsx';
-import { AddIcon, DownloadIcon, SettingsIcon } from '../../ui/icons.js';
+import { AddIcon, DownloadIcon, ReportIcon, SettingsIcon } from '../../ui/icons.js';
 import { PageHeader } from '../../ui/PageHeader.jsx';
 import { useToast } from '../../ui/Toast.jsx';
 import { describeFilters } from '../filters/describeFilters.js';
@@ -13,6 +13,7 @@ import { useFilters } from '../filters/useFilters.js';
 import { downloadAnalyticsPdf } from './analyticsPdf.js';
 import { DashboardGrid, WidgetCatalogPanel } from './dashboard/DashboardGrid.jsx';
 import { addWidget, moveWidget, normalizeLayout, removeWidget, resizeWidget } from './dashboard/layout.js';
+import { useReportWidgets } from './reportWidgets.js';
 import { useAnalyticsData } from './useAnalyticsData.js';
 import { ANALYTICS_WIDGETS, DEFAULT_ANALYTICS_LAYOUT } from './widgets/catalog.js';
 import styles from './AnalyticsPage.module.css';
@@ -27,6 +28,7 @@ export function AnalyticsPage() {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [filters, setFilters] = useFilters('analytics');
   const data = useAnalyticsData(filters);
+  const reportWidgets = useReportWidgets();
 
   const availableWidgets = useMemo(() => ANALYTICS_WIDGETS.filter((widget) => !widget.permission || can(widget.permission)), [can]);
   const catalog = useMemo(() => new Map(availableWidgets.map((widget) => [widget.id, widget])), [availableWidgets]);
@@ -56,6 +58,12 @@ export function AnalyticsPage() {
   const handleMove = (id, toIndex) => updateLayout((current) => moveWidget(current, id, toIndex));
   const handleResize = (id, size) => updateLayout((current) => resizeWidget(current, id, size));
   const handleAdd = (widget) => updateLayout((current) => addWidget(current, widget));
+  const toggleReport = (widget) => {
+    const adding = !reportWidgets.has(widget.id);
+    reportWidgets.toggle(widget.id);
+    toast.success(adding ? `«${widget.title}» будет в PDF-отчёте` : `«${widget.title}» убран из отчёта`);
+  };
+
   const handleReset = () => {
     setStoredLayout(defaultLayout);
     toast.success('Стандартная панель восстановлена');
@@ -69,6 +77,13 @@ export function AnalyticsPage() {
         meta={<span className={styles.headerHint}>{editing ? 'Режим редактирования: меняйте порядок, размер и состав панели' : `${layout.length} виджетов на панели`}</span>}
         actions={
           <>
+            {reportWidgets.ids.length > 0 && (
+              <ButtonLink to="/reports" icon={ReportIcon}>
+                <span className={styles.reportLink}>
+                  В отчёте <span className={styles.reportCount}>{reportWidgets.ids.length}</span>
+                </span>
+              </ButtonLink>
+            )}
             <Button icon={DownloadIcon} onClick={exportPdf} disabled={exporting}>
               {exporting ? 'Формируем PDF…' : 'Скачать PDF'}
             </Button>
@@ -106,6 +121,8 @@ export function AnalyticsPage() {
         onMove={handleMove}
         onResize={handleResize}
         onRemove={handleRemove}
+        reportIds={reportWidgets.ids}
+        onToggleReport={toggleReport}
       />
 
       <WidgetCatalogPanel

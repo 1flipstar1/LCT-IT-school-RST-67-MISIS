@@ -7,6 +7,7 @@ resolves names against catalogs, checks the user's rights and executes the actio
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from typing import Any, get_args
 
@@ -119,6 +120,15 @@ TOOLS = [
         ["move"],
     ),
     _tool(
+        "interaction_details",
+        "Сводка по взаимодействию вуза: этап, срок, ответственный, договор, последние события, следующий шаг. "
+        "Вызывай на «как дела у…», «что с…», «статус…», «расскажи про…».",
+        _TARGET_PROPERTIES,
+    ),
+    _tool("university_contacts", "Контакты представителей вуза: ФИО, должность, почта, телефон.", {"universities": _FILTER_PROPERTIES["universities"]}, ["universities"]),
+    _tool("manager_workload", "Нагрузка по ответственным: сколько взаимодействий в работе и просрочено у каждого.", _FILTER_PROPERTIES),
+    _tool("daily_plan", "План на день для пользователя: просроченные и срочные этапы и с чего начать.", {}),
+    _tool(
         "add_comment",
         "Добавить комментарий к взаимодействию вуза. Пользователь подтвердит действие в интерфейсе.",
         {**_TARGET_PROPERTIES, "text": {"type": "string", "description": "Текст комментария"}},
@@ -127,6 +137,26 @@ TOOLS = [
 ]
 
 ACTION_NAMES = set(get_args(ActionName))
+
+# Помощник работает только с CRM. Очевидно посторонние запросы отсекаются до модели: так маленькая
+# модель не решает примеры и не пишет код. Правила совпадают с frontend/.../engine/scope.js.
+OFF_TOPIC = [
+    re.compile(r"^[\s\d+\-*/×÷^().,=?%]*\d\s*[+\-*/×÷^%]\s*\d[\s\d+\-*/×÷^().,=?%]*$"),
+    re.compile(r"сколько будет\s*\d|(реши|вычисли|посчитай)\s+(\d|уравнен|пример|задач|интеграл)|корень из|факториал|интеграл|производн"),
+    re.compile(r"(python|питон|javascript|джаваскрипт|typescript|golang|kotlin|c\+\+|c#|php|регулярн[а-я]* выражен|regex)"),
+    re.compile(r"(напиши|сгенерируй|создай|покажи|дай)\s+(мне\s+)?(код|скрипт|функци|класс|алгоритм|программу на|sql[- ]запрос)"),
+    re.compile(r"(погод|анекдот|шутк|рецепт|стих|сочини|песн|гороскоп|курс (доллар|евро|валют|биткоин|рубл)|фильм|сериал|футбол|сочинени|реферат|эссе|переведи на (англ|немец|франц|китай)|translate)"),
+]
+
+OUT_OF_SCOPE = (
+    "Я помогаю только с работой в системе ИТ Школы Ростелекома: отчёты, взаимодействия с вузами, "
+    "этапы, статистика, контакты и справка. С этим вопросом не подскажу."
+)
+
+
+def is_out_of_scope(message: str) -> bool:
+    text = message.lower().replace("ё", "е").strip()
+    return any(pattern.search(text) for pattern in OFF_TOPIC)
 
 
 def _names(items: object, *, key: str = "name", limit: int = 60) -> str:
@@ -169,11 +199,13 @@ def _workflow_context(state: dict) -> str:
 def _system_prompt(state: dict, payload: ChatRequest) -> str:
     if payload.mode == "agent":
         role = (
-            "Ты — помощник-агент системы «ИТ Школа Ростелекома», как на Госуслугах: "
-            "объясняешь, как что-то сделать, или делаешь это сам с помощью инструментов. "
-            "Если пользователь просит выполнить действие (сделать отчёт, найти, показать, открыть, "
-            "перевести этап, добавить комментарий) — вызови ровно один подходящий инструмент. "
+            "Ты — помощник-агент CRM «ИТ Школа Ростелекома», как на Госуслугах: "
+            "объясняешь, как что-то сделать в системе, или делаешь это сам с помощью инструментов. "
+            "Умеешь: отчёты в XLSX/XLS/PDF, поиск взаимодействий, статистику, сводку по вузу, "
+            "контакты вуза, нагрузку по менеджерам, план на день, смену этапа, комментарии, навигацию по разделам. "
+            "Если пользователь просит выполнить действие — вызови ровно один подходящий инструмент. "
             "Просьба о файле, выгрузке, таблице, PDF или Excel — это create_report. "
+            "«Как дела у вуза», «что с вузом», «статус вуза» — interaction_details. "
             "Если спрашивает «как…» — ответь текстом по справке ниже. "
             "Передавай в инструменты названия так, как их назвал пользователь; не выдумывай условия, "
             "которых он не называл. Даты периода считай от сегодняшней."
@@ -185,6 +217,10 @@ def _system_prompt(state: dict, payload: ChatRequest) -> str:
         )
     return (
         f"{role}\n"
+        "СТРОГОЕ ПРАВИЛО: ты отвечаешь только на вопросы о работе в этой системе — вузы, взаимодействия, "
+        "этапы, отчёты, аналитика, справочники, роли и права. На всё остальное (математика, программирование, "
+        "общие знания, развлечения, советы не по работе) не отвечай по сути и не вызывай инструменты — "
+        f"ответь дословно: «{OUT_OF_SCOPE}» "
         "Отвечай по-русски, практично и без воды. Не придумывай статусы, цифры, документы, права, "
         "ссылки или правила. Ты не видишь записи о взаимодействиях — числа и списки показывают инструменты. "
         "Если сведений недостаточно, задай один уточняющий вопрос. "
@@ -223,6 +259,8 @@ def _require_enabled() -> None:
 
 async def chat(payload: ChatRequest, state: dict) -> ChatResponse:
     _require_enabled()
+    if is_out_of_scope(payload.message):
+        return ChatResponse(message=OUT_OF_SCOPE)
 
     messages = [{"role": "system", "content": _system_prompt(state, payload)}]
     messages.extend(turn.model_dump() for turn in payload.history)
@@ -233,7 +271,11 @@ async def chat(payload: ChatRequest, state: dict) -> ChatResponse:
         "messages": messages,
         "stream": False,
         "think": False,
-        "options": {"num_predict": 700 if payload.detail == "detailed" else 400, "temperature": 0.2},
+        "options": {
+            "num_predict": 700 if payload.detail == "detailed" else 400,
+            "num_ctx": settings.assistant_context_tokens,
+            "temperature": 0.2,
+        },
     }
     if payload.mode == "agent":
         request["tools"] = TOOLS
