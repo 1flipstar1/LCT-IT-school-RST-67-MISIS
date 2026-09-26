@@ -48,6 +48,10 @@ socket.addEventListener('message', (event) => {
     pending.get(message.id)(message);
     pending.delete(message.id);
   }
+  // Окна с несохранённым черновиком спрашивают «Покинуть страницу?» — соглашаемся, ничего не сохраняя.
+  if (message.method === 'Page.javascriptDialogOpening') {
+    socket.send(JSON.stringify({ id: ++messageId, sessionId: message.sessionId, method: 'Page.handleJavaScriptDialog', params: { accept: true } }));
+  }
 });
 const send = (method, params = {}, session = sessionId) => new Promise((resolve) => {
   const id = ++messageId;
@@ -67,8 +71,11 @@ await send('Runtime.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false });
 
 // ---------- Действия на странице ----------
+/** Каждый экран — с перезагрузкой: окна и уведомления предыдущего экрана не попадут в кадр. */
 const open = async (path, wait = 1800) => {
   await send('Page.navigate', { url: `${BASE_URL}/#${path}` });
+  await sleep(300);
+  await send('Page.reload');
   await sleep(wait);
 };
 const shot = async (name) => {
@@ -149,7 +156,7 @@ try {
   await click('Далее', '[role=dialog]');
   await sleep(1800);
   await shot('tour.png');
-  await evaluate(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))`);
+  // Отметка «пройден» без кнопки «Пропустить» — иначе в следующие кадры попадёт уведомление.
   await api('/me/onboarding', { method: 'PUT', body: JSON.stringify({ status: 'completed' }) });
 
   await open('/interactions');
