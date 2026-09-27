@@ -1,0 +1,90 @@
+name: rtk-it-school
+
+services:
+  proxy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - api
+      - keycloak
+
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+      args:
+        VITE_KEYCLOAK_URL: ${PUBLIC_URL}/auth
+        VITE_KEYCLOAK_REALM: it-school
+        VITE_KEYCLOAK_CLIENT_ID: rtk-it-school-web
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://rtk:${POSTGRES_PASSWORD}@postgres:5432/lct_db
+      ATTACHMENT_STORAGE_PATH: /app/data/attachments
+      KEYCLOAK_ISSUER_URL: ${PUBLIC_URL}/auth/realms/it-school
+      KEYCLOAK_JWKS_URL: http://keycloak:8080/auth/realms/it-school/protocol/openid-connect/certs
+      KEYCLOAK_ADMIN_URL: http://keycloak:8080/auth
+      KEYCLOAK_AUDIENCE: rtk-it-school-api
+      KEYCLOAK_CLIENT_ID: rtk-it-school-web
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - attachments:/app/data/attachments
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      ollama:
+        condition: service_started
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rtk
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: lct_db
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ../backend/deploy/keycloak/init-keycloak-db.sql:/docker-entrypoint-initdb.d/10-keycloak.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rtk -d lct_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.4
+    command: ["start", "--import-realm", "--http-enabled=true", "--http-relative-path=/auth", "--hostname=${PUBLIC_URL}/auth", "--proxy-headers=xforwarded"]
+    restart: unless-stopped
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: rtk
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HEALTH_ENABLED: "true"
+      JAVA_OPTS_APPEND: -Xms128m -Xmx768m
+    volumes:
+      - ./generated/realm-it-school.json:/opt/keycloak/data/import/realm-it-school.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: 5m
+
+volumes:
+  postgres:
+  attachments:
+  ollama:

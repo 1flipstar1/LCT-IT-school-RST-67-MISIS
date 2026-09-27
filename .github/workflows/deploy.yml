@@ -1,0 +1,54 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci && npm test && npm run build
+        working-directory: frontend
+      - run: pip install -r requirements.txt && pip install pytest && python -m pytest -q
+        working-directory: backend
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY_V2 }}
+        run: |
+          test -n "$DEPLOY_SSH_KEY"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          cp deploy/known_hosts ~/.ssh/known_hosts
+      - name: Sync code
+        run: |
+          rsync -az --delete \
+            --exclude='.git/' --exclude='**/.env' --exclude='**/.env.local' \
+            --exclude='deploy/generated/' --exclude='**/.local/' --exclude='**/node_modules/' \
+            --exclude='**/.venv*/' --exclude='frontend/dist/' \
+            --exclude='backend/data/' --exclude='tmp/' --exclude='screenshots/' \
+            ./ admin67@158.160.222.79:/home/admin67/rtk-it-school/
+      - name: Start services and verify health
+        run: ssh admin67@158.160.222.79 'cd ~/rtk-it-school && bash deploy/deploy.sh'

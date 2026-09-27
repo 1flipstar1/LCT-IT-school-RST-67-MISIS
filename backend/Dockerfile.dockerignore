@@ -7,6 +7,12 @@ backend/__pycache__
 backend/**/*.pyc
 backend/*.db*
 backend/data
+backend/.env
+backend/.env.local
+frontend/.env
+frontend/.env.local
+deploy/.env
+deploy/generated
 frontend/node_modules
 frontend/dist
 screenshots
