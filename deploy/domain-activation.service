@@ -1,0 +1,9 @@
+[Unit]
+Description=Activate rtk-itschool.ru after DNS propagation
+ConditionPathExists=!/home/admin67/rtk-it-school/deploy/generated/domain-active
+
+[Service]
+Type=oneshot
+User=admin67
+WorkingDirectory=/home/admin67/rtk-it-school
+ExecStart=/usr/bin/flock -n /run/lock/rtk-domain-activation.lock /usr/bin/python3 /home/admin67/rtk-it-school/deploy/activate-domain.py

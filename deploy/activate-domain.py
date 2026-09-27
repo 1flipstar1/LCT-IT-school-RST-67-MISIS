@@ -107,6 +107,7 @@ def main() -> None:
         discovery = json.load(response)
     if discovery.get("issuer") != f"{PUBLIC_URL}/auth/realms/it-school":
         raise SystemExit("Keycloak advertises the wrong issuer after deployment")
+    (DEPLOY / "generated/domain-active").touch()
     print(f"Domain active: {PUBLIC_URL}")
 
 

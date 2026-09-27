@@ -1,0 +1,10 @@
+[Unit]
+Description=Check DNS and activate rtk-itschool.ru
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+Unit=domain-activation.service
+
+[Install]
+WantedBy=timers.target
