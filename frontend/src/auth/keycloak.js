@@ -1,3 +1,5 @@
+import { sha256 } from '@noble/hashes/sha2.js';
+
 const CALLBACK_KEY = 'crm.keycloak.callback';
 
 const env = import.meta.env ?? {};
@@ -20,9 +22,13 @@ function randomValue(length = 48) {
   return base64Url(bytes);
 }
 
-async function challengeFor(verifier) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
-  return base64Url(new Uint8Array(digest));
+export async function challengeFor(verifier) {
+  const bytes = new TextEncoder().encode(verifier);
+  if (globalThis.crypto?.subtle) {
+    const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+    return base64Url(new Uint8Array(digest));
+  }
+  return base64Url(sha256(bytes));
 }
 
 function decodeToken(token) {

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import logoUrl from '../../../logo/logo.svg';
 import { apiErrorToAppError } from '../../api/client.js';
 import { useSession } from '../../auth/SessionProvider.jsx';
+import { keycloakConfigured } from '../../auth/keycloak.js';
 import { ROLE, ROLE_INFO } from '../../domain/roles.js';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { Button } from '../../ui/Button.jsx';
@@ -19,7 +20,7 @@ const BENEFITS = [
 
 export function LoginPage() {
   useDocumentTitle('Вход');
-  const keycloakAvailable = Boolean(globalThis.crypto?.subtle);
+  const keycloakAvailable = keycloakConfigured && Boolean(globalThis.crypto?.getRandomValues);
   const { login, loginWithKeycloak, keycloakError } = useSession();
   const [ssoUnavailable, setSsoUnavailable] = useState(false);
   const [loginError, setLoginError] = useState(null);
@@ -111,8 +112,8 @@ export function LoginPage() {
             Войти через Keycloak
           </Button>
           {!keycloakAvailable && (
-            <InlineAlert tone="info" title="Доступен после подключения HTTPS">
-              Пока открывайте демо-доступ по роли выше.
+            <InlineAlert tone="info" title="Корпоративный вход недоступен">
+              Выберите демо-роль выше для входа.
             </InlineAlert>
           )}
           {ssoUnavailable && (
