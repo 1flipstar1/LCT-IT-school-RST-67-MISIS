@@ -306,6 +306,7 @@ def _system_prompt(state: dict, payload: ChatRequest, role: str, articles: list[
         + (f"Правила переходов: {TRANSITION_RULES}\n" if needs_transitions else "")
         + (f"Работа с отчётами: {REPORT_GUIDE}\n" if not articles and explanation and ("отчёт" in question or "отчет" in question) else "")
         + (f"Актуальные этапы:\n{_workflow_context(state)}" if needs_stages else "")
+        + ("\nОтветь связным абзацем своими словами, без нумерации и маркеров." if payload.detail == "short" else "")
     )
 
 
