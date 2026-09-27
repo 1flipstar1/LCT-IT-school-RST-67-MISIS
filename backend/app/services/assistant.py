@@ -140,11 +140,38 @@ ACTION_NAMES = set(get_args(ActionName))
 TOOL_BY_NAME = {tool["function"]["name"]: tool for tool in TOOLS}
 
 
+def _report_tool(message: str) -> dict:
+    """Only expose report arguments mentioned in this request; the browser resolves filters too."""
+    fields = {"universities", "format"}
+    optional = {
+        "directions": ("направлен",),
+        "products": ("продукт",),
+        "programs": ("программ",),
+        "managers": ("ответствен", "менеджер"),
+        "stages": ("этап",),
+        "period": ("месяц", "квартал", "год", "дн", "недел"),
+        "date_from": ("дат", "числ", " с "),
+        "date_to": ("дат", "числ", " по "),
+        "only_attention": ("просроч", "срочн"),
+        "columns": ("колонк", "столбц", "полей"),
+        "name": ("назови", "название", "именем"),
+    }
+    for field, words in optional.items():
+        if any(word in message for word in words):
+            fields.add(field)
+    original = TOOL_BY_NAME["create_report"]["function"]["parameters"]["properties"]
+    properties = {key: {part: value for part, value in original[key].items() if part != "description"}
+                  for key in fields}
+    return _tool("create_report", "Сформировать и скачать отчёт.", properties)
+
+
 def _tools_for(message: str) -> list[dict]:
     """Send only relevant schemas so a small CPU model can answer before the browser times out."""
     text = message.lower().replace("ё", "е")
     if any(word in text for word in ("отчет", "pdf", "excel", "xlsx", "xls", "выгруз", "скача")):
-        names = ("create_report", "repeat_last_report")
+        if any(word in text for word in ("повтор", "последн", "заново")):
+            return [TOOL_BY_NAME["repeat_last_report"]]
+        return [_report_tool(text)]
     elif any(word in text for word in ("комментар", "примечан")):
         names = ("add_comment", "open_interaction")
     elif any(word in text for word in ("этап", "перевед", "пропуст", "доработ")):

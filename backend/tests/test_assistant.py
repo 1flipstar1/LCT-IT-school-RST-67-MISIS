@@ -74,7 +74,8 @@ def test_tool_call_becomes_action_for_the_browser(client: TestClient, manager_he
         "message": "",
         "action": {"name": "create_report", "arguments": {"universities": ["КФУ"], "format": "pdf"}},
     }
-    assert {tool["function"]["name"] for tool in requests[0]["tools"]} == {"create_report", "repeat_last_report"}
+    assert {tool["function"]["name"] for tool in requests[0]["tools"]} == {"create_report"}
+    assert set(requests[0]["tools"][0]["function"]["parameters"]["properties"]) == {"universities", "format"}
 
 
 def test_unknown_tool_is_ignored_and_guide_mode_sends_no_tools(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
