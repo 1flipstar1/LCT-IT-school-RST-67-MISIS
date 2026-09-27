@@ -160,7 +160,10 @@ def _tools_for(message: str) -> list[dict]:
     elif any(word in text for word in ("найди", "покажи", "список", "взаимодейств")):
         names = ("find_interactions", "open_interaction", "interaction_details")
     else:
-        return TOOLS
+        # Questions without an action verb need a text answer, not twelve tool schemas.
+        if not any(word in text for word in ("сделай", "создай", "выполни", "открой", "дай ", "выведи")):
+            return []
+        names = ("find_interactions", "show_stats", "open_page", "create_report")
     return [TOOL_BY_NAME[name] for name in names]
 
 # Помощник работает только с CRM. Очевидно посторонние запросы отсекаются до модели: так маленькая
@@ -276,7 +279,7 @@ async def chat(payload: ChatRequest, state: dict) -> ChatResponse:
         return ChatResponse(message=OUT_OF_SCOPE)
 
     messages = [{"role": "system", "content": _system_prompt(state, payload)}]
-    messages.extend(turn.model_dump() for turn in payload.history[-4:])
+    messages.extend({"role": turn.role, "content": turn.content[:500]} for turn in payload.history[-4:])
     messages.append({"role": "user", "content": payload.message.strip()})
 
     request: dict[str, Any] = {
@@ -285,7 +288,7 @@ async def chat(payload: ChatRequest, state: dict) -> ChatResponse:
         "stream": False,
         "think": False,
         "options": {
-            "num_predict": 220 if payload.detail == "detailed" else 100,
+            "num_predict": 220 if payload.detail == "detailed" else 90,
             "num_ctx": settings.assistant_context_tokens,
             "num_thread": 2,
             "temperature": 0.2,
@@ -293,7 +296,9 @@ async def chat(payload: ChatRequest, state: dict) -> ChatResponse:
         "keep_alive": -1,
     }
     if payload.mode == "agent" and not _is_explanation(payload.message):
-        request["tools"] = _tools_for(payload.message)
+        relevant_tools = _tools_for(payload.message)
+        if relevant_tools:
+            request["tools"] = relevant_tools
 
     try:
         async with httpx.AsyncClient(timeout=settings.assistant_timeout_seconds, trust_env=False) as client:

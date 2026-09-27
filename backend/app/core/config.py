@@ -84,7 +84,7 @@ class Settings(BaseSettings):
     ollama_model: str = "qwen2.5:1.5b-instruct"
     assistant_enabled: bool = True
     assistant_timeout_seconds: int = 60
-    assistant_context_tokens: int = 4096
+    assistant_context_tokens: int = 2048
 
     # Telegram-бот уведомляет руководителя, когда его менеджер переводит заявку на другой этап.
     # Токен выдаёт @BotFather; без него бот выключен, а CRM работает как обычно.

@@ -53,7 +53,7 @@ def main() -> None:
         "DEMO_AUTH_ENABLED": "true",
         "ASSISTANT_ENABLED": "true",
         "OLLAMA_MODEL": "qwen2.5:1.5b-instruct",
-        "ASSISTANT_CONTEXT_TOKENS": "4096",
+        "ASSISTANT_CONTEXT_TOKENS": "2048",
         "ASSISTANT_TIMEOUT_SECONDS": "60",
         "PUBLIC_APP_URL": public_url,
     }

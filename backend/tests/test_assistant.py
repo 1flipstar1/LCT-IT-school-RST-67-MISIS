@@ -103,6 +103,17 @@ def test_explanation_uses_a_short_prompt_without_tools(client: TestClient, manag
     assert len(sent["messages"][0]["content"]) < 3500
 
 
+def test_open_question_does_not_send_all_tool_schemas(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "Начните с обсуждения задачи вуза."}))
+    response = client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "Посоветуй стратегию переговоров с ректором"},
+        headers=manager_headers,
+    )
+    assert response.status_code == 200
+    assert "tools" not in requests[0]
+
+
 def test_chat_requires_auth_and_limits_input(client: TestClient, manager_headers: dict[str, str]) -> None:
     assert client.post("/api/v1/assistant/chat", json={"message": "Привет"}).status_code == 401
     assert client.get("/api/v1/assistant/status").status_code == 401
