@@ -15,7 +15,14 @@ if ! docker compose --env-file deploy/.env -f deploy/compose.yml exec -T ollama 
 fi
 
 for attempt in $(seq 1 40); do
-  if curl --fail --silent --show-error --max-time 5 http://127.0.0.1/api/v1/health >/dev/null 2>&1; then
+  if grep -qx 'PUBLIC_URL=https://rtk-itschool.ru' deploy/.env; then
+    health_url=https://rtk-itschool.ru/api/v1/health
+    health_resolve=(--resolve rtk-itschool.ru:443:127.0.0.1)
+  else
+    health_url=http://127.0.0.1/api/v1/health
+    health_resolve=(-H 'Host: 158.160.222.79')
+  fi
+  if curl --fail --silent --show-error --max-time 5 "${health_resolve[@]}" "$health_url" >/dev/null 2>&1; then
     echo "Deployment healthy"
     exit 0
   fi
