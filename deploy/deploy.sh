@@ -22,7 +22,11 @@ fi
 # Keep the configured model in memory so the first user request does not pay its load time.
 docker compose --env-file deploy/.env -f deploy/compose.yml exec -T api python3 -c '
 import json, os, urllib.request
-body = json.dumps({"model": os.environ["OLLAMA_MODEL"], "keep_alive": -1}).encode()
+body = json.dumps({
+    "model": os.environ["OLLAMA_MODEL"],
+    "keep_alive": -1,
+    "options": {"num_ctx": int(os.environ.get("ASSISTANT_CONTEXT_TOKENS", "2048")), "num_thread": 2},
+}).encode()
 request = urllib.request.Request("http://ollama:11434/api/generate", data=body,
                                  headers={"Content-Type": "application/json"})
 with urllib.request.urlopen(request, timeout=90) as response:
