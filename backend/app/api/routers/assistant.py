@@ -21,8 +21,10 @@ router = APIRouter(prefix="/assistant", tags=["assistant"])
 )
 async def assistant_chat(payload: ChatRequest, db: DbSession, principal: CurrentPrincipal) -> ChatResponse:
     state = get_state(db).state
-    find_principal_user(state, principal)
-    return await assistant.chat(payload, state)
+    user = find_principal_user(state, principal)
+    # A stale token must never grant more assistant access than the current CRM role.
+    role = user.get("role") if user.get("role") == principal.role else "manager"
+    return await assistant.chat(payload, state, role)
 
 
 @router.get(

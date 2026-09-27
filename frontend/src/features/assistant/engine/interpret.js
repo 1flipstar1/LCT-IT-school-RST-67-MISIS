@@ -167,7 +167,7 @@ export function interpretLocally(message, context) {
     return { kind: 'answer', text: 'Здравствуйте! Я могу объяснить, как что-то сделать, или сделать это сам. Например, сформировать отчёт или найти просроченные этапы.', suggestions: ['Что ты умеешь?', 'Покажи просроченные', 'Как сформировать отчёт?'] };
   }
   if (THANKS.test(text) && tokens.length <= 4) return { kind: 'answer', text: 'Пожалуйста! Обращайтесь.' };
-  if (ABOUT.test(text)) return { kind: 'answer', text: `Вот что я умею:\n\n${CAPABILITIES.map((line) => `- ${line}`).join('\n')}` };
+  if (ABOUT.test(text)) return { kind: 'answer', source: 'capabilities', text: `Вот что я умею:\n\n${CAPABILITIES.map((line) => `- ${line}`).join('\n')}` };
   if (isOutOfScope(text)) return { kind: 'answer', text: OUT_OF_SCOPE_TEXT, suggestions: OUT_OF_SCOPE_SUGGESTIONS };
 
   const info = detectInfoTool(message, text, tokens, context);

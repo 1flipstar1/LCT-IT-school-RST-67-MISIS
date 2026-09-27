@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test \"tests/**/*.test.js\"",
+    "export:assistant-knowledge": "node scripts/export-assistant-knowledge.mjs",
+    "check:assistant-knowledge": "node scripts/export-assistant-knowledge.mjs --check",
     "build:error-pages": "node scripts/build-error-pages.mjs",
     "capture:help": "node scripts/capture-help-screenshots.mjs"
   },

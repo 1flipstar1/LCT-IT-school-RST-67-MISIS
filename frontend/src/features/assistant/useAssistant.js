@@ -18,6 +18,7 @@ import { createEntityMatcher } from './engine/entities.js';
 import { executeTool } from './engine/execute.js';
 import { interpretLocally, resolveModelCall } from './engine/interpret.js';
 import { buildKnowledge } from './engine/knowledge.js';
+import { shouldExplainWithModel } from './engine/routing.js';
 import { MUTATING_TOOLS, TOOL } from './engine/tools.js';
 import { speak } from './speech.js';
 
@@ -244,7 +245,8 @@ export function useAssistant({ settings, page }) {
     const context = executionContext();
     const { engine } = context.settings;
     const local = engine === 'ai' ? null : interpretLocally(message, context);
-    if (local) {
+    const explainWithModel = shouldExplainWithModel(engine, local, model);
+    if (local && !explainWithModel) {
       reply(answerLocally(local, context, message), 'local');
       return;
     }
@@ -271,7 +273,7 @@ export function useAssistant({ settings, page }) {
       }
     }
 
-    const fallback = engine === 'ai' ? interpretLocally(message, context) : null;
+    const fallback = local ?? (engine === 'ai' ? interpretLocally(message, context) : null);
     if (fallback) {
       reply(answerLocally(fallback, context, message), 'local');
       return;

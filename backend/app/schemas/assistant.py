@@ -9,6 +9,7 @@ ChatText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1,
 
 AssistantPage = Literal[
     "dashboard",
+    "profile",
     "interactions",
     "analytics",
     "reports",

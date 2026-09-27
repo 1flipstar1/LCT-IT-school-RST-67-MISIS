@@ -9,6 +9,7 @@ import { executeTool } from '../src/features/assistant/engine/execute.js';
 import { interpretLocally, resolveModelCall } from '../src/features/assistant/engine/interpret.js';
 import { buildKnowledge } from '../src/features/assistant/engine/knowledge.js';
 import { parsePeriod } from '../src/features/assistant/engine/period.js';
+import { shouldExplainWithModel } from '../src/features/assistant/engine/routing.js';
 import { OUT_OF_SCOPE_TEXT } from '../src/features/assistant/engine/scope.js';
 import { STAGE_MOVE, TOOL } from '../src/features/assistant/engine/tools.js';
 import { DEFAULT_SETTINGS } from '../src/features/assistant/settings.js';
@@ -165,6 +166,16 @@ describe('interpretLocally', () => {
   });
 });
 
+describe('assistant routing', () => {
+  it('отдаёт вопросы по справке и возможностям модели, команды выполняет сразу', () => {
+    const online = { state: 'online', stale: false };
+    assert.equal(shouldExplainWithModel('auto', parse('Как сформировать отчёт?'), online), true);
+    assert.equal(shouldExplainWithModel('auto', parse('Что ты умеешь?'), online), true);
+    assert.equal(shouldExplainWithModel('auto', parse('Сделай отчёт по КФУ'), online), false);
+    assert.equal(shouldExplainWithModel('auto', parse('Как сформировать отчёт?'), { state: 'offline', stale: false }), false);
+  });
+});
+
 describe('executeTool', () => {
   it('отчёт: карточка со строками и форматом по умолчанию', () => {
     const result = run(TOOL.createReport, { filters: { ...EMPTY_FILTERS, universityIds: ['u1'] } });
@@ -201,8 +212,9 @@ describe('executeTool', () => {
   });
 
   it('раздел без прав не открывается', () => {
-    const denied = run(TOOL.openPage, { page: 'users' }, { can: (permission) => permission !== PERMISSION.manageUsers });
+    const denied = run(TOOL.openPage, { page: 'users' }, { can: (permission) => permission !== PERMISSION.manageTeamAccounts });
     assert.equal(denied.effect, undefined);
+    assert.equal(run(TOOL.openPage, { page: 'users' }, { can: (permission) => permission === PERMISSION.manageTeamAccounts }).effect.path, '/users');
     assert.deepEqual(run(TOOL.openPage, { page: 'board' }).effect, { type: 'navigate', path: '/interactions', view: 'board' });
   });
 

@@ -41,6 +41,7 @@ const PAGE_BY_SECTION = {
   integrations: 'integrations',
   users: 'users',
   audit: 'audit',
+  profile: 'profile',
 };
 
 /** Раздел для контекста модели: '#/interactions/i1' → 'interactions'. */

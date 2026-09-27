@@ -9,6 +9,7 @@ import httpx
 from fastapi.testclient import TestClient
 
 from app.services import assistant
+from app.services.assistant_knowledge import allowed_pages, knowledge, retrieve
 
 
 REAL_ASYNC_CLIENT = httpx.AsyncClient
@@ -149,6 +150,51 @@ def test_status_reports_whether_the_model_is_pulled(client: TestClient, manager_
     mock_ollama(monkeypatch, offline)
     assert client.get("/api/v1/assistant/status", headers=manager_headers).json()["available"] is False
 
+
+def test_knowledge_covers_help_and_respects_roles() -> None:
+    assert len(knowledge()["articles"]) >= 90
+    assert "users" not in allowed_pages("manager")
+    assert "users" in allowed_pages("lead")
+    assert "users" in allowed_pages("admin")
+    manager_docs, manager_denial = retrieve("Как сменить роль сотрудника?", "manager")
+    assert manager_denial["id"] == "access-roles"
+    assert all(article["id"] != "access-roles" for article in manager_docs)
+    assert retrieve("Как сменить роль сотрудника?", "admin")[0][0]["id"] == "access-roles"
+
+
+def test_manager_cannot_get_admin_instructions_or_open_admin_page(
+    client: TestClient, manager_headers: dict[str, str], monkeypatch,
+) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "Нажмите управление ролями."}))
+    response = client.post("/api/v1/assistant/chat", json={"message": "Как сменить роль сотрудника?"}, headers=manager_headers)
+    assert response.status_code == 200
+    assert "недоступна" in response.json()["message"]
+    assert requests == []
+
+    call = {"function": {"name": "open_page", "arguments": {"page": "users"}}}
+    requests = mock_ollama(monkeypatch, reply({"content": "", "tool_calls": [call]}))
+    response = client.post("/api/v1/assistant/chat", json={"message": "Открой пользователей"}, headers=manager_headers)
+    assert response.status_code == 200
+    assert response.json()["type"] == "message"
+    assert "недоступен" in response.json()["message"]
+    assert "users" not in requests[0]["tools"][0]["function"]["parameters"]["properties"]["page"]["enum"]
+
+
+def test_role_grounded_prompt_uses_relevant_help_article(client: TestClient, admin_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "Откройте строку сотрудника и выберите роль."}))
+    response = client.post("/api/v1/assistant/chat", json={"message": "Как сменить роль сотрудника?"}, headers=admin_headers)
+    assert response.status_code == 200
+    prompt = requests[0]["messages"][0]["content"]
+    assert "Роль пользователя: Администратор" in prompt
+    assert "Как сменить роль сотрудника" in prompt
+    assert "Свою роль изменить нельзя" in prompt
+
+
+def test_deleting_employee_is_not_claimed_as_a_feature(client: TestClient, admin_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "Удалено."}))
+    response = client.post("/api/v1/assistant/chat", json={"message": "Как удалить пользователя?"}, headers=admin_headers)
+    assert "не предусмотрено" in response.json()["message"]
+    assert requests == []
 
 def test_off_topic_requests_never_reach_the_model(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
     requests = mock_ollama(monkeypatch, reply({"content": "4"}))
