@@ -52,7 +52,7 @@ TRANSITION_RULES = (
 )
 
 DETAIL_RULES = {
-    "short": "Ответь максимум тремя предложениями и закончи мысль. Без длинного списка.",
+    "short": "Ответь одним абзацем, максимум двумя предложениями, без списка и нумерации. Закончи мысль.",
     "detailed": "Отвечай подробно: по шагам, с пояснением, где находится каждая кнопка.",
 }
 
@@ -342,10 +342,10 @@ async def chat(payload: ChatRequest, state: dict, role: str = "manager") -> Chat
         "stream": False,
         "think": False,
         "options": {
-            "num_predict": 220 if payload.detail == "detailed" else 90,
+            "num_predict": 220 if payload.detail == "detailed" else 115,
             "num_ctx": settings.assistant_context_tokens,
             "num_thread": 2,
-            "temperature": 0.2,
+            "temperature": 0.35,
         },
         "keep_alive": -1,
     }

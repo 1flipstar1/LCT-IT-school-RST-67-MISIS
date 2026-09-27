@@ -83,15 +83,24 @@ def navigation_target(message: str) -> dict | None:
 def article_context(articles: list[dict], *, detailed: bool = False) -> str:
     chunks = []
     for article in articles:
-        steps = " ".join(step.replace("**", "")[:170] for step in article["steps"][:5 if detailed else 4])
+        source_steps = article["steps"][:5] if detailed else (article["steps"][:2] + article["steps"][-1:] if len(article["steps"]) > 2 else article["steps"])
+        if detailed:
+            steps = " ".join(step.replace("**", "")[:170] for step in source_steps)
+        else:
+            brief = []
+            for step in source_steps:
+                clean = re.sub(r"^Шаг\s+\d+\.\s*", "", step.replace("**", ""))
+                brief.append(re.split(r"(?<=[.!?])\s+", clean, maxsplit=1)[0])
+            steps = " ".join(brief)
         tips = " ".join(tip[:140] for tip in article["tips"][:1]) if detailed else ""
-        chunks.append(f"{article['title']}: {article['summary']} {steps} {tips}"[:1000 if detailed else 650])
+        chunks.append(f"{article['title']}: {article['summary'][:150]} {steps} {tips}"[:1000 if detailed else 600])
     return "\n".join(chunks)
 
 
 def access_denial(article: dict, role: str) -> str:
     data = knowledge()
-    permitted = [info["label"].lower() for name, info in data["roles"].items()
+    role_genitive = {"manager": "менеджера", "lead": "руководителя", "admin": "администратора"}
+    permitted = [role_genitive[name] for name, info in data["roles"].items()
                  if article["permission"] in info["permissions"] and name != role]
     owners = " и ".join(permitted)
     return (f"В вашей роли эта функция недоступна. Доступ к «{article['title']}» есть у {owners}. "
