@@ -1,3 +1,4 @@
+import { ProfileProvider } from '../features/profile/ProfileProvider.jsx';
 import { Suspense } from 'react';
 import { SessionProvider, useSession } from '../auth/SessionProvider.jsx';
 import { ErrorBoundary } from '../features/errors/ErrorBoundary.jsx';
@@ -14,11 +15,13 @@ export function App() {
   return (
     <StoreProvider>
       <SessionProvider>
+        <ProfileProvider>
         <RouterProvider>
           <ToastProvider>
             <AppRoutes />
           </ToastProvider>
         </RouterProvider>
+        </ProfileProvider>
       </SessionProvider>
     </StoreProvider>
   );

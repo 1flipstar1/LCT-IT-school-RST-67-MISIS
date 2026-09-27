@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../lib/motion.js';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { apiClient } from '../../api/client.js';
@@ -50,7 +51,7 @@ export function UsersPage() {
 
   useLayoutEffect(() => {
     const body = tableBodyRef.current;
-    if (!body || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    if (!body || shouldReduceMotion()) return undefined;
     const context = gsap.context(() => {
       gsap.fromTo(Array.from(body.rows), { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.07, ease: 'power3.out', clearProps: 'transform,opacity,visibility' });
     }, body);

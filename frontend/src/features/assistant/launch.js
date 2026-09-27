@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../lib/motion.js';
 import { gsap } from 'gsap';
 
 /**
@@ -30,7 +31,7 @@ export function openAssistant({ question = '', from = null } = {}) {
 
   const go = () => { window.location.hash = ASSISTANT_PATH; };
   const content = document.querySelector('[data-app-content]');
-  if (!content || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (!content || shouldReduceMotion()) {
     go();
     return;
   }

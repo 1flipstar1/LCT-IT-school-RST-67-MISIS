@@ -5,7 +5,7 @@ import { useSession } from '../../auth/SessionProvider.jsx';
 import { ROLE, ROLE_INFO } from '../../domain/roles.js';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { Button } from '../../ui/Button.jsx';
-import { ArrowRightIcon, CheckIcon, ShieldIcon, UserIcon, UsersIcon, SettingsIcon } from '../../ui/icons.js';
+import { ArrowRightIcon, CheckIcon, UserIcon, UsersIcon, SettingsIcon } from '../../ui/icons.js';
 import { ErrorAlert, InlineAlert } from '../../ui/InlineAlert.jsx';
 import styles from './LoginPage.module.css';
 
@@ -74,7 +74,7 @@ export function LoginPage() {
           <h1 className={styles.title}>Вход в систему</h1>
           <p className={styles.subtitle}>Используйте корпоративную учётную запись Ростелекома.</p>
 
-          <Button variant="primary" size="l" icon={ShieldIcon} fullWidth onClick={handleSso}>
+          <Button variant="primary" size="l" fullWidth onClick={handleSso}>
             Войти через Keycloak
           </Button>
 

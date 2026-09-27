@@ -1,3 +1,5 @@
+import { shouldReduceMotion } from '../lib/motion.js';
+import { useProfile } from '../features/profile/ProfileProvider.jsx';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import logoUrl from '../../logo/logo.svg';
@@ -9,7 +11,7 @@ import { cn } from '../lib/cn.js';
 import { useVisibleInteractionRows } from '../store/selectors.js';
 import { useStoreState } from '../store/StoreProvider.jsx';
 import { Avatar } from '../ui/Avatar.jsx';
-import { avatarImageAt } from '../ui/avatarImages.js';
+import { avatarImageAt, avatarImageFor } from '../ui/avatarImages.js';
 import { IconButton } from '../ui/IconButton.jsx';
 import { ArrowRightIcon, ChevronDownIcon, HelpIcon, SettingsIcon, SignOutIcon } from '../ui/icons.js';
 import { isNavItemActive, NAVIGATION } from './navigation.js';
@@ -55,8 +57,10 @@ export function Sidebar({ open, onNavigate }) {
   const { pathname } = useRouter();
   const { user, role, can, logout } = useSession();
   const { users } = useStoreState();
-  const badges = useNavigationBadges();
-  const avatarSrc = avatarImageAt(users.findIndex((item) => item.id === user.id));
+  const { preferences } = useProfile();
+  const allBadges = useNavigationBadges();
+  const badges = preferences.showBadges ? allBadges : {};
+  const avatarSrc = avatarImageFor(preferences.avatar) ?? avatarImageAt(users.findIndex((item) => item.id === user.id));
 
   const groups = NAVIGATION.map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) })).filter(
     (group) => group.items.length > 0,
@@ -71,9 +75,10 @@ export function Sidebar({ open, onNavigate }) {
     if (!content) return undefined;
 
     const items = content.querySelectorAll('li');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = shouldReduceMotion();
     if (reduceMotion) {
-      gsap.set(content, { clearProps: 'height,opacity', display: settingsOpen ? 'grid' : 'none' });
+      gsap.set(items, { clearProps: 'all' });
+      gsap.set(content, { clearProps: 'height,opacity,visibility', display: settingsOpen ? 'grid' : 'none' });
       return undefined;
     }
 
@@ -90,7 +95,7 @@ export function Sidebar({ open, onNavigate }) {
     }
 
     return () => timeline.kill();
-  }, [settingsOpen]);
+  }, [settingsOpen, preferences.reduceMotion]);
 
   return (
     <aside className={cn(styles.sidebar, open && styles.open)} aria-label="Основная навигация" data-print-hidden>
@@ -164,11 +169,13 @@ export function Sidebar({ open, onNavigate }) {
           <ArrowRightIcon size={16} fill="currentColor" className={styles.helpArrow} />
         </Link>
         <div className={styles.user}>
+          <Link to="/profile" className={styles.profileLink} onClick={onNavigate} aria-label="Настройки профиля">
           <Avatar name={user.name} src={avatarSrc} variant="brand" />
           <div className={styles.userText}>
             <span className={styles.userName}>{user.name}</span>
-            <span className={styles.userRole}>{ROLE_INFO[role].label}</span>
+            <span className={styles.userRole}>{ROLE_INFO[role].label} · Настройки</span>
           </div>
+          </Link>
           <IconButton icon={SignOutIcon} label="Выйти из системы" onClick={logout} />
         </div>
       </div>

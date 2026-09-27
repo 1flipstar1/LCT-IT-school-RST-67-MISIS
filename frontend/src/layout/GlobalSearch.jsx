@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../lib/motion.js';
 ﻿import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useRouter } from '../app/router.jsx';
@@ -33,8 +34,8 @@ function reveal(label) {
     const target = findTarget(label);
     if (!target && attempts++ < 30) return window.setTimeout(check, 100);
     if (!target) return;
-    target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'center' });
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    target.scrollIntoView({ behavior: shouldReduceMotion() ? 'instant' : 'smooth', block: 'center' });
+    if (!shouldReduceMotion()) {
       gsap.fromTo(target, { boxShadow: '0 0 0 0 var(--color-brand)' }, { boxShadow: '0 0 0 6px var(--focus-soft)', duration: 0.45, repeat: 1, yoyo: true, repeatDelay: 0.55, clearProps: 'boxShadow' });
     }
   };
@@ -61,7 +62,7 @@ export function GlobalSearch() {
   // Возврат из чата: строка поиска летит на своё место из поля ввода чата, пока страница проявляется.
   useLayoutEffect(() => {
     const origin = takeReturnOrigin();
-    if (!origin || !fieldRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!origin || !fieldRef.current || shouldReduceMotion()) return;
     const target = fieldRef.current.getBoundingClientRect();
     gsap.from(fieldRef.current, {
       x: origin.left - target.left,
@@ -90,8 +91,8 @@ export function GlobalSearch() {
         const node = document.getElementById(target);
         if (!node && attempts++ < 30) return window.setTimeout(check, 100);
         if (node) {
-          node.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'center' });
-          if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.fromTo(node, { boxShadow: '0 0 0 0 var(--color-brand)' }, { boxShadow: '0 0 0 6px var(--focus-soft)', duration: 0.45, repeat: 1, yoyo: true, repeatDelay: 0.55, clearProps: 'boxShadow' });
+          node.scrollIntoView({ behavior: shouldReduceMotion() ? 'instant' : 'smooth', block: 'center' });
+          if (!shouldReduceMotion()) gsap.fromTo(node, { boxShadow: '0 0 0 0 var(--color-brand)' }, { boxShadow: '0 0 0 6px var(--focus-soft)', duration: 0.45, repeat: 1, yoyo: true, repeatDelay: 0.55, clearProps: 'boxShadow' });
         }
       };
       window.setTimeout(check, 80);
@@ -118,8 +119,8 @@ export function GlobalSearch() {
     if (entry.path === path || entry.path === pathname) {
       if (entry.target) {
         const node = document.getElementById(entry.target);
-        node?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        if (node) gsap.fromTo(node, { boxShadow: '0 0 0 0 var(--color-brand)' }, { boxShadow: '0 0 0 6px var(--focus-soft)', duration: 0.45, repeat: 1, yoyo: true, repeatDelay: 0.55, clearProps: 'boxShadow' });
+        node?.scrollIntoView({ behavior: shouldReduceMotion() ? 'instant' : 'smooth', block: 'center' });
+        if (node && !shouldReduceMotion()) gsap.fromTo(node, { boxShadow: '0 0 0 0 var(--color-brand)' }, { boxShadow: '0 0 0 6px var(--focus-soft)', duration: 0.45, repeat: 1, yoyo: true, repeatDelay: 0.55, clearProps: 'boxShadow' });
       } else reveal(entry.match || entry.title);
     }
     else { pendingRef.current = { label: entry.match || entry.title, target: entry.target }; navigate(entry.path); }

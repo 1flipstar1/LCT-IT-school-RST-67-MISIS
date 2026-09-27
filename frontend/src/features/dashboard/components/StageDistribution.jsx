@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../../lib/motion.js';
 import { gsap } from 'gsap';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { countByStage } from '../../../domain/analytics.js';
@@ -23,7 +24,7 @@ const BAR_GAP = 6;
 const AXIS_HEIGHT = 32;
 const MIN_BAR = 4;
 
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = () => shouldReduceMotion();
 
 /**
  * «Распределение по этапам»: кольцевая диаграмма показывает доли, столбцы — сколько взаимодействий

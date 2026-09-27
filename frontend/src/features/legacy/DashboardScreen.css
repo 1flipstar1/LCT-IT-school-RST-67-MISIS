@@ -63,7 +63,7 @@
 }
 
 .legacy.legacy-dashboard .stage-bars {
-  grid-template-columns: repeat(13, minmax(28px, 1fr));
+  grid-template-columns: repeat(var(--stage-count, 14), minmax(28px, 1fr));
   grid-template-rows: 240px 32px;
   column-gap: var(--space-1_5x);
   height: auto;
@@ -289,6 +289,11 @@
   overflow: hidden;
 }
 
+.legacy.legacy-dashboard .dashboard-universities-table tbody tr:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
 .legacy.legacy-dashboard .dashboard-universities-fade {
   position: absolute;
   right: 0;
@@ -309,6 +314,12 @@
   color: var(--color-brand);
   font: var(--font-body-s-strong);
   text-decoration: none;
+}
+
+.legacy.legacy-dashboard .dashboard-universities-fade.is-empty {
+  position: static;
+  height: auto;
+  padding: var(--space-3x);
 }
 
 .legacy.legacy-dashboard .dashboard-universities-all:hover {
@@ -383,4 +394,18 @@
     justify-self: start;
     white-space: normal;
   }
+}
+
+.legacy.legacy-dashboard .dashboard-manager-filter {
+  width: auto;
+  max-width: 300px;
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+  padding: 0 var(--space-4x);
+  font: var(--font-body-s-strong);
+}
+
+.legacy.legacy-dashboard .dashboard-manager-filter svg {
+  color: inherit;
+  flex-shrink: 0;
 }

@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../lib/motion.js';
 import { useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { cn } from '../lib/cn.js';
@@ -17,7 +18,7 @@ export function Tabs({ label, tabs, value, onChange, className, animateIndicator
     if (!tab || !indicator) return undefined;
 
     const position = { x: tab.offsetLeft, width: tab.offsetWidth };
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = shouldReduceMotion();
 
     if (!indicatorReadyRef.current || reduceMotion) {
       gsap.set(indicator, { ...position, scaleX: 1 });

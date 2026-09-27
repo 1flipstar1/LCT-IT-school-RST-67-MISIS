@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { apiClient } from '../../api/client.js';
 import { useRouter } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
+import { useProfile } from '../profile/ProfileProvider.jsx';
 import { describeError } from '../../domain/errors.js';
 import { filterInteractionRows } from '../../domain/filters.js';
 import { createId, formatDate, formatRelativeDateTime } from '../../domain/format.js';
 import { downloadBlob, safeFileName } from '../../lib/download.js';
 import { localStore, sessionStore } from '../../lib/storage.js';
-import { usePersistentState, writePersistentState } from '../../lib/usePersistentState.js';
+import { usePersistentState } from '../../lib/usePersistentState.js';
 import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selectors.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
 import { useActions } from '../../store/useActions.js';
@@ -73,6 +74,7 @@ function useModelStatus(enabled) {
 }
 
 export function useAssistant({ settings, page }) {
+  const { update: updateProfile } = useProfile();
   const { user, can } = useSession();
   const store = useStoreState();
   const rows = useVisibleInteractionRows();
@@ -173,12 +175,12 @@ export function useAssistant({ settings, page }) {
     const { effect } = result;
     if (!effect) return;
     if (effect.type === 'navigate') {
-      if (effect.view) writePersistentState('interactions:view', effect.view);
+      if (effect.view) updateProfile({ interactionView: effect.view });
       navigate(effect.path);
     }
     if (effect.type === 'download') downloadReport(id, result.card);
     if (effect.type === 'commit') commitCard(id, result.card);
-  }, [navigate, downloadReport, commitCard]);
+  }, [navigate, downloadReport, commitCard, updateProfile]);
 
   const reply = useCallback((result, source) => {
     const id = createId('m');

@@ -1,11 +1,12 @@
+import { shouldReduceMotion } from '../../lib/motion.js';
 import { Popover } from '@atomaro/ui-kit';
 import { gsap } from 'gsap';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useRouter } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
-import { PERMISSION } from '../../domain/roles.js';
+import { createVisibilityFilter, ROLE, PERMISSION } from '../../domain/roles.js';
 import { BASE_WORKFLOW } from '../../data/workflows.js';
-import { formatDays, formatRelativeDateTime } from '../../domain/format.js';
+import { formatDate, formatDays, formatRelativeDateTime } from '../../domain/format.js';
 import { PHASES, SLA_STATE, getStageIndex, isFinalStage, needsAttention } from '../../domain/workflow.js';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { useCatalogIndex, useVisibleInteractionRows } from '../../store/selectors.js';
@@ -22,7 +23,7 @@ import {
 } from '../../ui/icons.js';
 import { NewInteractionDialog } from '../interactions/NewInteractionDialog.jsx';
 import { describeEvent } from '../interactions/components/EventFeed.jsx';
-import { countCardsByStage, LEGACY_CARDS, LEGACY_UNIVERSITIES, sortableDate } from './legacyData.js';
+import { SelectMenu } from '../../ui/SelectMenu.jsx';
 import { Hint } from '../../ui/Hint.jsx';
 import { Kpi, LegacyButton, LegacyScreen, PageHeader, UniversityCell } from './legacyUi.jsx';
 import './DashboardScreen.css';
@@ -31,19 +32,35 @@ import './DashboardScreen.css';
 const DONUT_CIRCUMFERENCE = 559.2;
 
 /**
- * Дашборд прежнего дизайна (ветка main): распределение заявок по 13 этапам, KPI, события
- * и первые заявки списком. Данные — демонстрационные, как в main.
+ * Статистика и последние заявки по доступным взаимодействиям выбранного менеджера.
  */
 export function DashboardScreen() {
   useDocumentTitle('Дашборд');
   const { navigate } = useRouter();
   const { user, can } = useSession();
   const { events } = useStoreState();
-  const { users } = useCatalogIndex();
-  const interactions = useVisibleInteractionRows().filter((row) => row.workflowId === BASE_WORKFLOW.id);
+  const { users, workflows } = useCatalogIndex();
+  const [managerId, setManagerId] = useState('all');
+  const allRows = useVisibleInteractionRows();
+  const isVisible = createVisibilityFilter(user, [...users.values()]);
+  const managers = [...users.values()]
+    .filter((manager) => manager.role === ROLE.manager && isVisible({
+      managerId: manager.id,
+      directionId: user.access?.directionIds?.[0],
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+  const interactions = allRows.filter((row) => row.workflowId === BASE_WORKFLOW.id
+    && (managerId === 'all' || row.managerId === managerId));
+  const workflow = workflows.get(BASE_WORKFLOW.id) ?? BASE_WORKFLOW;
+  const interactionLink = managerId === 'all' ? '/interactions' : `/interactions?manager=${encodeURIComponent(managerId)}`;
   const chartRef = useRef(null);
   const [creating, setCreating] = useState(false);
   const [hoveredStage, setHoveredStage] = useState(null);
+  const openInteraction = (event, row) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigate(`/interactions/${row.id}`);
+  };
   const currentMonth = new Date();
   const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
   const universitiesInProgress = new Set(
@@ -68,19 +85,23 @@ export function DashboardScreen() {
     .filter((event) => visibleRows.has(event.interactionId))
     .sort((a, b) => b.at.localeCompare(a.at));
 
-  const stats = countCardsByStage(LEGACY_CARDS);
-  const total = stats.reduce((sum, stage) => sum + stage.n, 0) || 1;
+  const stats = workflow.stages.map((stage, index) => ({
+    ...stage,
+    label: stage.name,
+    short: stage.name,
+    color: `color-mix(in srgb, var(--color-accent) ${25 + (index / Math.max(1, workflow.stages.length - 1)) * 75}%, var(--color-surface))`,
+    n: interactions.filter((row) => row.stageId === stage.id).length,
+  }));
+  const total = interactions.length;
+  const chartKey = stats.map((stage) => `${stage.id}:${stage.n}`).join(',');
   const maxN = Math.max(1, ...stats.map((stage) => stage.n));
   const activeStage = stats.find((stage) => stage.id === hoveredStage);
   const phaseRanges = PHASES.map((phase) => {
     const indexes = stats.map((stage, index) => (stage.phase === phase.id ? index : -1)).filter((index) => index !== -1);
     return indexes.length ? { ...phase, from: indexes[0], to: indexes.at(-1) } : null;
   }).filter(Boolean);
-  const dashboardUniversities = LEGACY_UNIVERSITIES.slice(0, 5).sort((a, b) =>
-    sortableDate(a.updatedAt).localeCompare(sortableDate(b.updatedAt)),
-  );
+  const dashboardUniversities = [...interactions].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5);
 
-  const sliceAngles = [];
   const donutSegments = [];
   let acc = 0;
   for (const stage of stats) {
@@ -88,35 +109,50 @@ export function DashboardScreen() {
     const from = (acc / total) * 360;
     acc += stage.n;
     const to = (acc / total) * 360;
-    sliceAngles.push(to);
     donutSegments.push({ stage, start: from / 360, ratio: stage.n / total });
   }
 
   useLayoutEffect(() => {
+    if (shouldReduceMotion()) {
+      const context = gsap.context(() => {
+        gsap.set('.donut', { '--donut-progress': 360 });
+        gsap.set('.stage-bar-fill', { scaleY: 1 });
+      }, chartRef);
+      return () => context.revert();
+    }
     const context = gsap.context(() => {
-      const fills = gsap.utils.toArray('.stage-bar-fill');
+      const fills = gsap.utils.toArray('.stage-bar-fill', chartRef.current);
       const timeline = gsap.timeline();
+      const duration = 0.9;
+      const barDuration = 0.55;
 
       gsap.set(fills, { scaleY: 0, transformOrigin: 'bottom' });
       gsap.set('.donut', { '--donut-progress': 0 });
 
-      sliceAngles.forEach((angle) => {
-        timeline.to('.donut', { '--donut-progress': angle, duration: 0.18, ease: 'power2.out' });
-      });
-
-      timeline.to(fills, { scaleY: 1, duration: 0.55, stagger: 0.055, ease: 'power3.out' }, 0.12);
+      timeline.to('.donut', { '--donut-progress': 360, duration, ease: 'none' }, 0);
+      timeline.to(fills, {
+        scaleY: 1,
+        duration: barDuration,
+        stagger: fills.length > 1 ? (duration - barDuration) / (fills.length - 1) : 0,
+        ease: 'power3.out',
+      }, 0);
     }, chartRef);
 
     return () => context.revert();
-    // Данные статичные — анимация проигрывается один раз при открытии экрана.
-  }, []);
+    // Повторяем анимацию при изменении распределения.
+  }, [chartKey]);
 
   return (
     <LegacyScreen className="legacy-dashboard">
       <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`}>
-        <LegacyButton icon={<FilterIcon size={16} fill="currentColor" />}>
-          Все менеджеры
-        </LegacyButton>
+        <SelectMenu
+          className="dashboard-manager-filter"
+          label="Статистика по менеджеру"
+          icon={FilterIcon}
+          value={managerId}
+          options={[{ value: 'all', label: 'Все менеджеры' }, ...managers.map((manager) => ({ value: manager.id, label: manager.name }))]}
+          onChange={(value) => { setManagerId(value ?? 'all'); setHoveredStage(null); }}
+        />
         {can(PERMISSION.importCatalogs) && (
           <LegacyButton onClick={() => navigate('/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
             Импортировать
@@ -165,7 +201,7 @@ export function DashboardScreen() {
               </div>
             </div>
           </div>
-          <div className="stage-bars">
+          <div className="stage-bars" style={{ '--stage-count': stats.length }}>
             {stats.map((stage, index) => (
               <div
                 className={`stage-bar${hoveredStage && hoveredStage !== stage.id ? ' is-dimmed' : ''}`}
@@ -241,7 +277,7 @@ export function DashboardScreen() {
                 </Link>
               )) : <p className="dash-feed-empty">Все этапы идут в срок</p>}
             </div>
-            <Link className="dash-feed-more" to="/interactions?attention=1">
+            <Link className="dash-feed-more" to={`${interactionLink}${managerId === 'all' ? '?' : '&'}attention=1`}>
               Все срочные взаимодействия <ArrowRightIcon size={16} fill="currentColor" />
             </Link>
           </section>
@@ -265,7 +301,7 @@ export function DashboardScreen() {
                 </Link>
               )) : <p className="dash-feed-empty">Действий пока нет</p>}
             </div>
-            <Link className="dash-feed-more" to="/interactions">
+            <Link className="dash-feed-more" to={interactionLink}>
               Все взаимодействия <ArrowRightIcon size={16} fill="currentColor" />
             </Link>
           </section>
@@ -291,25 +327,37 @@ export function DashboardScreen() {
             </thead>
             <tbody>
               {dashboardUniversities.map((university) => (
-                <tr key={university.name}>
+                <tr
+                  key={university.id}
+                  role="link"
+                  tabIndex={0}
+                  aria-label={`Открыть заявку ${university.university.name}`}
+                  onClick={(event) => openInteraction(event, university)}
+                  onKeyDown={(event) => {
+                    if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                      openInteraction(event, university);
+                    }
+                  }}
+                >
                   <td>
-                    <UniversityCell name={university.name} />
+                    <Link to={`/interactions/${university.id}`}><UniversityCell name={university.university.name} /></Link>
                   </td>
                   <td>
-                    <b>{university.product}</b>
-                    <span className="subtext">{university.direction}</span>
+                    <b>{university.product.name}</b>
+                    <span className="subtext">{university.direction.name}</span>
                   </td>
                   <td>
-                    <span className="status-tag purple">{university.status}</span>
+                    <span className="status-tag purple">{university.stage.name}</span>
                   </td>
-                  <td>{university.manager}</td>
-                  <td className="muted">{university.updatedAt}</td>
+                  <td>{university.manager?.name ?? 'Не назначен'}</td>
+                  <td className="muted">{formatDate(university.updatedAt)}</td>
                 </tr>
               ))}
+              {!dashboardUniversities.length && <tr><td colSpan={5}>Нет заявок для выбранного менеджера</td></tr>}
             </tbody>
           </table>
-          <div className="dashboard-universities-fade">
-            <Link className="dashboard-universities-all" to="/interactions">
+          <div className={`dashboard-universities-fade${dashboardUniversities.length ? '' : ' is-empty'}`}>
+            <Link className="dashboard-universities-all" to={interactionLink}>
               Все заявки <ArrowRightIcon size={16} fill="currentColor" />
             </Link>
           </div>

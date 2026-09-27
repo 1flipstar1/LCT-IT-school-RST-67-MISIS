@@ -1,3 +1,4 @@
+import { useProfile } from '../profile/ProfileProvider.jsx';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
@@ -36,13 +37,14 @@ const SORTS = {
 function useFiltersFromQuery(setFilters) {
   const { query, pathname, navigate } = useRouter();
   const attention = query.get('attention');
+  const manager = query.get('manager');
   const stage = query.get('stage');
 
   useEffect(() => {
-    if (!attention && !stage) return;
-    setFilters({ ...EMPTY_FILTERS, onlyAttention: attention === '1', stageIds: stage ? [stage] : [] });
+    if (!attention && !stage && !manager) return;
+    setFilters({ ...EMPTY_FILTERS, onlyAttention: attention === '1', stageIds: stage ? [stage] : [], managerIds: manager ? [manager] : [] });
     navigate(pathname);
-  }, [attention, stage, pathname, navigate, setFilters]);
+  }, [attention, stage, manager, pathname, navigate, setFilters]);
 }
 
 export function InteractionsPage() {
@@ -50,8 +52,11 @@ export function InteractionsPage() {
   const { workflows } = useStoreState();
   const rows = useVisibleInteractionRows();
   const [filters, setFilters] = useFilters('interactions');
-  const [view, setView] = usePersistentState('interactions:view', 'table');
-  const [sort, setSort] = usePersistentState('interactions:sort', 'urgency');
+  const { preferences, update } = useProfile();
+  const view = preferences.interactionView;
+  const sort = preferences.interactionSort;
+  const setView = (interactionView) => update({ interactionView });
+  const setSort = (interactionSort) => update({ interactionSort });
   const [workflowId, setWorkflowId] = usePersistentState('interactions:workflow', workflows[0].id);
   const [creating, setCreating] = useState(false);
 

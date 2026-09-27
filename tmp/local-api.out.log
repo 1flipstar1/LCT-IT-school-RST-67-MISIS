@@ -1,0 +1,188 @@
+INFO:     127.0.0.1:27641 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:27641 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1451 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1452 - "POST /api/v1/auth/demo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1452 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/index-m5befgJ0.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/SessionProvider-DvbVav4n.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/Field-pX-GvQnC.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/index-DWJh_SJ_.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/icons-C1ugVUb-.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59182 - "GET /assets/noop-LkSjiNx-.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/SessionProvider-Br6OjjYc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59182 - "GET /assets/workflow-CXIrBBhR.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/Field-BeR5QTT4.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/store-BNxDFKS8.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/DialogTitle-cNnamnQ6.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59182 - "GET /assets/RostelecomBasis-Regular-BucBFK4o.otf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/logo-elWI0j3L.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6999 - "GET /assets/RostelecomBasis-Bold-D2EOi4Fv.otf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59182 - "GET /assets/RostelecomBasis-Medium-BaiBjA0u.otf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /assets/index-m5befgJ0.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/icons-C1ugVUb-.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /assets/Field-pX-GvQnC.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/SessionProvider-DvbVav4n.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /assets/index-DWJh_SJ_.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/noop-LkSjiNx-.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/SessionProvider-Br6OjjYc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /assets/workflow-CXIrBBhR.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/Field-BeR5QTT4.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /assets/store-BNxDFKS8.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/DialogTitle-cNnamnQ6.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/RostelecomBasis-Regular-BucBFK4o.otf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:31711 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:31711 - "GET /assets/logo-elWI0j3L.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /assets/RostelecomBasis-Medium-BaiBjA0u.otf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31711 - "GET /assets/RostelecomBasis-Bold-D2EOi4Fv.otf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7285 - "POST /api/v1/auth/demo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7285 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7285 - "GET /assets/DashboardScreen-BFTRQahz.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2898 - "GET /assets/Hint-RGbBvNGj.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1789 - "GET /assets/Hint-dRO1csx6.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "GET /assets/EventFeed-CuKMpRav.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1789 - "GET /assets/EventFeed-DjpYUIvf.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "GET /assets/InputDate-BaXXv4qE.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1789 - "GET /assets/Dialog-MmlxtPnr.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2898 - "GET /assets/InputDate-Bb3sPBrM.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "GET /assets/DashboardScreen-C1aDt8Jb.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1789 - "GET /assets/NewInteractionDialog-Ziu5CDns.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "GET /assets/Dialog-Cbv0__F8.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/InteractionsPage-BG_4gppx.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/PageHeader-9Z1SQqJ_.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/DataTable-VYxjn-zx.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/PageHeader-DNffO-JG.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/EmptyState-BzLpUoGB.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/MultiSelectFilter-BhjLc6R-.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/useFilters-Crmiek0X.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/FileDropzone-DxlomtmG.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/TransitionDialog-WIgCEu1z.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/InteractionsPage-_OdKkwbP.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/DataTable-BoeXZZ3N.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/EmptyState-e8PHuAoT.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/useFilters-Dey2CinY.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/MultiSelectFilter-cfku72Qf.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3805 - "GET /assets/TransitionDialog-DMtHnehh.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28696 - "GET /assets/FileDropzone-DtOpBnj4.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:17066 - "GET /assets/AnalyticsPage-CiPlI5AC.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:23890 - "GET /assets/catalog-D-cXTrAZ.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29227 - "GET /assets/catalog-wwu_rYZ3.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37803 - "GET /assets/AnalyticsPage-DhNh2GcZ.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32911 - "GET /assets/ReportsPage-C4aWI7Xl.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43169 - "GET /assets/ReportsPage-k1ruQc0R.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "PUT /api/v1/me/onboarding HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:11950 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "POST /api/v1/auth/demo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "PUT /api/v1/me/onboarding HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "POST /api/v1/auth/demo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:11950 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "GET /assets/HelpPage-s2ScHnUE.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29508 - "GET /assets/Tabs-B9oyGLQH.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29508 - "GET /assets/Tabs-7BOxcEoY.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11950 - "GET /assets/HelpPage-D7ELqhoT.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3318 - "GET /help/login.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10866 - "GET /help/search.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33312 - "GET /api/v1/assistant/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29736 - "GET /api/v1/assistant/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33783 - "GET /assets/CatalogsPage-CIRcXCnQ.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:12151 - "GET /assets/importTemplate-ChI5gabt.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:25039 - "GET /assets/CatalogsPage-BLHOZS2q.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46449 - "GET /help/errors.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42320 - "GET /api/v1/assistant/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET /assets/index-LsCiwBJF.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET /api/v1/assistant/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET /assets/DashboardScreen-BwYQ6GM5.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43585 - "GET /assets/EventFeed-D9CkhESq.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43585 - "GET /assets/DashboardScreen-DHADhaJo.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET /assets/InputDate-xbVUMKmM.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5703 - "GET /assets/NewInteractionDialog-ZjqorCRp.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:24982 - "GET /assets/ReportsPage-Dn2HqxOl.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:20100 - "GET /assets/useFilters-kJ_n4zYM.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43039 - "GET /assets/catalog-BtbHGJGa.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43039 - "GET /assets/AnalyticsPage-Disb8y-h.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:28880 - "GET /api/v1/assistant/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32592 - "GET /assets/ImportPage-2DYiO5An.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32592 - "GET /assets/ImportPage-1WdgDlh0.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32592 - "GET /assets/importTemplate-Du3fyxxF.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32592 - "GET /assets/FileDropzone-PtbgqeOJ.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32592 - "GET /api/v1/imports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53830 - "GET /assets/InteractionPage-BONC5D56.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56575 - "GET /assets/InteractionPage-DS50F7Mr.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34937 - "GET /assets/TransitionDialog-CX-Ok9yF.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37371 - "GET /assets/HelpPage-BnRO4DD2.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /assets/index-Ck9AL6Mu.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /assets/HelpPage-Wfwh4wV8.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "POST /api/v1/auth/demo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /assets/DashboardScreen-BTu2-F0r.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47364 - "GET /assets/EventFeed-B6S5isks.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52096 - "GET /assets/InputDate-DHs4pZav.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47364 - "GET /assets/interactionOpening-Bd8xZWCh.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52096 - "GET /assets/DashboardScreen-DWuiRjyL.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /assets/interactionOpening-DVRa161x.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:29097 - "GET /assets/NewInteractionDialog-DoUXD8us.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47526 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:47526 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31683 - "POST /api/v1/auth/demo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31683 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31683 - "PUT /api/v1/me/onboarding HTTP/1.1" 200 OK
+INFO:     127.0.0.1:31683 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:31683 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:23450 - "GET /assets/InteractionsPage-DmrX-4lk.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:23450 - "GET /assets/useFilters-Bk9fl2ye.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:23450 - "GET /assets/TransitionDialog-BDVx7s4j.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:23450 - "GET /assets/FileDropzone-C0NKQHbk.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51704 - "GET /assets/InteractionPage-oYcjUJjf.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32270 - "GET /assets/InteractionPage-BONC5D56.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46030 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46030 - "GET /assets/InteractionPage-oYcjUJjf.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38692 - "GET /assets/EventFeed-B6S5isks.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38692 - "GET /assets/InteractionPage-BONC5D56.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46030 - "GET /assets/interactionOpening-Bd8xZWCh.css HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46030 - "GET /assets/TransitionDialog-BDVx7s4j.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38692 - "GET /assets/FileDropzone-C0NKQHbk.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46030 - "GET /assets/interactionOpening-DVRa161x.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:19840 - "GET /assets/DashboardScreen-BTu2-F0r.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46857 - "GET /assets/NewInteractionDialog-DoUXD8us.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:18640 - "GET /assets/DashboardScreen-DWuiRjyL.css HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:28749 - "GET /assets/InputDate-DHs4pZav.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:28749 - "GET /assets/InteractionsPage-DmrX-4lk.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:18640 - "GET /assets/useFilters-Bk9fl2ye.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:28749 - "GET /assets/catalog-DvrnNlbH.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:18640 - "GET /assets/AnalyticsPage-CHVBe1j-.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:18640 - "GET /assets/ReportsPage-B2aQvqyy.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:44369 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44369 - "GET /assets/index-P9SlUtS6.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2398 - "GET /assets/avatarImages-BnYlJFIf.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2398 - "GET /assets/index-BZVHDfA1.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44369 - "GET /assets/workflow-Dcx6c0Pn.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2398 - "GET /api/v1/state HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2398 - "GET /assets/ReportsPage-IxRT2Y11.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:26205 - "GET /assets/InputDate-mPLI8zWB.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44369 - "GET /assets/useFilters-DkHM47ui.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46918 - "GET /assets/catalog-DyUR68VF.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:26205 - "GET /assets/ProfilePage-Dl2ox2MF.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46918 - "GET /assets/ProfilePage-BETItPM7.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43894 - "GET /assets/InteractionsPage-geAOocsI.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54961 - "GET /assets/TransitionDialog-CPdSWQc4.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5658 - "GET /assets/FileDropzone-DPZ8O4ZR.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8127 - "GET /assets/NewInteractionDialog-C3HEJ16r.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54961 - "GET /assets/CatalogsPage-DaU7Q-3t.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8127 - "GET /assets/importTemplate-Cu5o_nBc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5658 - "GET /assets/Tabs-Bp-dC4fD.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5468 - "GET /assets/AnalyticsPage-Be34jxYW.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5468 - "GET /assets/DashboardScreen-DFi8zdjL.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5468 - "GET /assets/DashboardScreen-CF7t5I5V.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5468 - "GET /assets/EventFeed-Dcl25sT3.js HTTP/1.1" 200 OK

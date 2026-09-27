@@ -15,3 +15,6 @@ export function avatarImageAt(index) {
   const safeIndex = Number.isInteger(index) && index >= 0 ? index : 0;
   return AVATAR_IMAGES[safeIndex % AVATAR_IMAGES.length];
 }
+
+export const AVATAR_OPTIONS = Object.keys(modules).sort().map((path) => ({ id: path.split('/').pop(), src: modules[path] }));
+export const avatarImageFor = (id) => AVATAR_OPTIONS.find((option) => option.id === id)?.src;

@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../lib/motion.js';
 import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import AtomaroToastModule from '@atomaro/ui-kit/components/Notifications/ToastNotification/ToastNotification';
 import { gsap } from 'gsap';
@@ -19,7 +20,7 @@ function ToastItem({ toast, remove }) {
     if (closing.current) return;
     closing.current = true;
     const node = wrapper.current;
-    if (!node || reducedMotion.current) {
+    if (!node || shouldReduceMotion()) {
       remove(toast.id);
       return;
     }
@@ -38,7 +39,7 @@ function ToastItem({ toast, remove }) {
 
   useLayoutEffect(() => {
     const node = wrapper.current;
-    reducedMotion.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    reducedMotion.current = shouldReduceMotion();
     if (!reducedMotion.current) {
       gsap.fromTo(node, { y: 28, scale: 0.94, opacity: 0 }, {
         y: 0,

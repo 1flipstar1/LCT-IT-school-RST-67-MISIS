@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../../lib/motion.js';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { gsap } from 'gsap';
@@ -79,7 +80,7 @@ function useGsapDashboardEditing({
     const nodes = [...grid.querySelectorAll('[data-widget-id]')];
     const contents = nodes.map((node) => node.querySelector('[data-widget-content]'));
     const placeholder = grid.querySelector('[data-drop-placeholder]');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = shouldReduceMotion();
     const draggables = [];
 
     if (!reduceMotion) {

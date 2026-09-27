@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../lib/motion.js';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useSession } from '../../auth/SessionProvider.jsx';
@@ -29,7 +30,7 @@ import { speak, speechOutputSupported, stopSpeaking, useSpeechRecognition } from
 import { useAssistant } from './useAssistant.js';
 import styles from './Assistant.module.css';
 
-const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = () => shouldReduceMotion();
 const scrollToEnd = (behavior = 'instant') => window.scrollTo({ top: document.documentElement.scrollHeight, behavior });
 
 /**

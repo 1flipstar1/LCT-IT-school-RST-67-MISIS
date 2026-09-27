@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../lib/motion.js';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
@@ -17,7 +18,7 @@ export const startOnboarding = () => window.dispatchEvent(new Event(START_TOUR_E
 const PADDING = 8;
 const CARD_WIDTH = 360;
 const GAP = 16;
-const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = () => shouldReduceMotion();
 
 /** Ждём элемент шага после перехода на страницу: страницы грузятся лениво. */
 function waitForTarget(target, timeout = 2500) {

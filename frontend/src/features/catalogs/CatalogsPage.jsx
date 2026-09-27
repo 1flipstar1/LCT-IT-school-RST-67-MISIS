@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../../lib/motion.js';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useSession } from '../../auth/SessionProvider.jsx';
@@ -28,7 +29,7 @@ export function CatalogsPage() {
 
   useLayoutEffect(() => {
     const rows = Array.from(tableBodyRef.current?.rows ?? []);
-    if (!rows.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    if (!rows.length || shouldReduceMotion()) return undefined;
 
     const context = gsap.context(() => {
       gsap.killTweensOf(rows);

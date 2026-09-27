@@ -10,6 +10,7 @@ import { ASSISTANT_PATH } from '../features/assistant/launch.js';
 const page = (loader, name) => lazy(() => loader().then((module) => ({ default: module[name] })));
 
 export const ROUTES = [
+  { path: '/profile', component: page(() => import('../features/profile/ProfilePage.jsx'), 'ProfilePage') },
   { path: '/', component: page(() => import('../features/legacy/DashboardScreen.jsx'), 'DashboardScreen') },
   { path: '/interactions', component: page(() => import('../features/interactions/InteractionsPage.jsx'), 'InteractionsPage') },
   { path: '/interactions/:id', component: page(() => import('../features/interactions/InteractionPage.jsx'), 'InteractionPage') },

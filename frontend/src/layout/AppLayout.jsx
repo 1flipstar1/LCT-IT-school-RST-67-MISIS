@@ -1,3 +1,4 @@
+import { shouldReduceMotion } from '../lib/motion.js';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useRouter } from '../app/router.jsx';
@@ -32,7 +33,7 @@ export function AppLayout({ children }) {
     const cameFromChat = previousPathRef.current === ASSISTANT_PATH && !chat;
     previousPathRef.current = pathname;
     if (chat) gsap.set(contentRef.current, { clearProps: 'all' });
-    if (!cameFromChat || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!cameFromChat || shouldReduceMotion()) return;
     gsap.fromTo(
       contentRef.current,
       { autoAlpha: 0, y: 16, filter: 'blur(12px)' },
