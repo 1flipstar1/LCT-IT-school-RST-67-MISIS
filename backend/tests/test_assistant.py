@@ -9,7 +9,7 @@ import httpx
 from fastapi.testclient import TestClient
 
 from app.services import assistant
-from app.services.assistant_knowledge import allowed_pages, knowledge, retrieve
+from app.services.assistant_knowledge import allowed_pages, knowledge, navigation_target, retrieve
 
 
 REAL_ASYNC_CLIENT = httpx.AsyncClient
@@ -55,7 +55,7 @@ def test_chat_uses_local_model_catalogs_and_tools(client: TestClient, manager_he
         "change_stage", "open_interaction", "interaction_details",
     }
     system = sent["messages"][0]["content"]
-    assert "дословно из запроса" in system
+    assert "Аргументы бери из запроса" in system
     assert "Подписание документов" not in system
     assert "Казанский федеральный университет (КФУ)" not in system
     # Имена сотрудников в модель не передаются: их распознаёт браузер по справочнику.
@@ -156,6 +156,8 @@ def test_knowledge_covers_help_and_respects_roles() -> None:
     assert "users" not in allowed_pages("manager")
     assert "users" in allowed_pages("lead")
     assert "users" in allowed_pages("admin")
+    assert navigation_target("Открой пользователей")["id"] == "users"
+    assert navigation_target("Открой настройки профиля")["id"] == "profile"
     manager_docs, manager_denial = retrieve("Как сменить роль сотрудника?", "manager")
     assert manager_denial["id"] == "access-roles"
     assert all(article["id"] != "access-roles" for article in manager_docs)
@@ -177,6 +179,12 @@ def test_manager_cannot_get_admin_instructions_or_open_admin_page(
     assert response.status_code == 200
     assert response.json()["type"] == "message"
     assert "недоступен" in response.json()["message"]
+    assert requests == []
+
+    response = client.post("/api/v1/assistant/chat", json={"message": "Открой неизвестный раздел"}, headers=manager_headers)
+    assert response.status_code == 200
+    assert response.json()["type"] == "message"
+    assert "недоступен" in response.json()["message"]
     assert "users" not in requests[0]["tools"][0]["function"]["parameters"]["properties"]["page"]["enum"]
 
 
@@ -188,6 +196,19 @@ def test_role_grounded_prompt_uses_relevant_help_article(client: TestClient, adm
     assert "Роль пользователя: Администратор" in prompt
     assert "Как сменить роль сотрудника" in prompt
     assert "Свою роль изменить нельзя" in prompt
+
+
+def test_lead_can_navigate_to_team_without_model(client: TestClient, monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": ""}))
+    token = client.post("/api/v1/auth/demo", json={"role": "lead"}).json()["accessToken"]
+    response = client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "Открой пользователей"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["action"] == {"name": "open_page", "arguments": {"page": "users"}}
+    assert requests == []
 
 
 def test_deleting_employee_is_not_claimed_as_a_feature(client: TestClient, admin_headers: dict[str, str], monkeypatch) -> None:

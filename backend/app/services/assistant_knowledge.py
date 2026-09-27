@@ -50,13 +50,14 @@ def retrieve(question: str, role: str, limit: int = 2) -> tuple[list[dict], dict
     return [article for score, article in allowed if score >= minimum][:limit], restricted
 
 
-def role_context(role: str) -> str:
+def role_context(role: str, *, include_pages: bool = False) -> str:
     data = knowledge()
     info = data["roles"].get(role, data["roles"]["manager"])
     grants = set(info["permissions"])
     pages = ", ".join(page["label"] for page in data["pages"]
                       if not page["permission"] or page["permission"] in grants)
-    return f"Роль пользователя: {info['label']}. {info['description']} Доступные разделы: {pages}."
+    return (f"Роль пользователя: {info['label']}. {info['description']}"
+            + (f" Доступные разделы: {pages}." if include_pages else ""))
 
 
 def allowed_pages(role: str) -> list[str]:
@@ -66,12 +67,25 @@ def allowed_pages(role: str) -> list[str]:
             if not page["permission"] or page["permission"] in grants]
 
 
-def article_context(articles: list[dict]) -> str:
+def navigation_target(message: str) -> dict | None:
+    text = message.lower().replace("ё", "е").strip()
+    if not re.match(r"^(открой|откройте|перейди|перейдите|зайди|зайдите)\b", text):
+        return None
+    tokens = re.findall(r"[a-zа-я0-9]+", text)
+    for page in knowledge()["pages"]:
+        for phrase in page["stems"]:
+            parts = re.findall(r"[a-zа-я0-9]+", phrase.lower().replace("ё", "е"))
+            if parts and all(any(token.startswith(part) for token in tokens) for part in parts):
+                return page
+    return None
+
+
+def article_context(articles: list[dict], *, detailed: bool = False) -> str:
     chunks = []
     for article in articles:
-        steps = " ".join(step.replace("**", "")[:240] for step in article["steps"][:5])
-        tips = " ".join(tip[:180] for tip in article["tips"][:1])
-        chunks.append(f"{article['title']}: {article['summary']} {steps} {tips}"[:1250])
+        steps = " ".join(step.replace("**", "")[:170] for step in article["steps"][:5 if detailed else 4])
+        tips = " ".join(tip[:140] for tip in article["tips"][:1]) if detailed else ""
+        chunks.append(f"{article['title']}: {article['summary']} {steps} {tips}"[:1000 if detailed else 650])
     return "\n".join(chunks)
 
 
@@ -80,5 +94,5 @@ def access_denial(article: dict, role: str) -> str:
     permitted = [info["label"].lower() for name, info in data["roles"].items()
                  if article["permission"] in info["permissions"] and name != role]
     owners = " и ".join(permitted)
-    return (f"В вашей роли эта функция недоступна. «{article['title']}» могут выполнять {owners}. "
+    return (f"В вашей роли эта функция недоступна. Доступ к «{article['title']}» есть у {owners}. "
             "Попросите коллегу с нужными правами или администратора помочь.")

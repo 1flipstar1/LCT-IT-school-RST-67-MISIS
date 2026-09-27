@@ -16,7 +16,7 @@ import httpx
 from app.core.config import settings
 from app.core.errors import APIError
 from app.schemas.assistant import ActionName, AssistantAction, AssistantStatus, ChatRequest, ChatResponse
-from app.services.assistant_knowledge import access_denial, allowed_pages, article_context, retrieve, role_context
+from app.services.assistant_knowledge import access_denial, allowed_pages, article_context, navigation_target, retrieve, role_context
 
 
 PAGE_NAMES = {
@@ -52,7 +52,7 @@ TRANSITION_RULES = (
 )
 
 DETAIL_RULES = {
-    "short": "Ответь одним-двумя короткими предложениями или кратким списком.",
+    "short": "Ответь максимум тремя предложениями и закончи мысль. Без длинного списка.",
     "detailed": "Отвечай подробно: по шагам, с пояснением, где находится каждая кнопка.",
 }
 
@@ -171,7 +171,7 @@ def _tools_for(message: str, role: str = "manager") -> list[dict]:
     """Send only relevant schemas so a small CPU model can answer before the browser times out."""
     text = message.lower().replace("ё", "е")
     if any(word in text for word in ("открой", "перейди", "зайди")):
-        names = ("open_page", "open_interaction")
+        names = ("open_page", "open_interaction") if ("карточ" in text or "вуз" in text or re.search(r"\b[А-ЯЁ]{2,}\b", message)) else ("open_page",)
     elif any(word in text for word in ("отчет", "pdf", "excel", "xlsx", "xls", "выгруз", "скача")):
         if any(word in text for word in ("повтор", "последн", "заново")):
             return [TOOL_BY_NAME["repeat_last_report"]]
@@ -256,33 +256,32 @@ def _system_prompt(state: dict, payload: ChatRequest, role: str, articles: list[
     question = payload.message.lower()
     explanation = payload.mode == "guide" or _is_explanation(question)
     needs_stages = explanation and any(word in question for word in ("этап", "процесс", "переход", "внедрен", "обучен"))
-    needs_transitions = explanation and any(word in question for word in ("смен", "переход", "пропус", "верну", "назад", "перевед"))
+    needs_transitions = explanation and (
+        ("этап" in question and any(word in question for word in ("смен", "переход", "пропус", "верну", "назад", "перевед")))
+        or any(word in question for word in ("пропус", "назад", "переход между"))
+    )
     if payload.mode == "agent":
         role_instruction = (
-            "Ты помощник CRM «ИТ Школа Ростелекома». На просьбу выполнить действие вызови один инструмент. "
-            "На вопрос «как сделать» объясни словами. Аргументы инструмента бери дословно из запроса; не выдумывай условия."
+            "Ты помощник CRM «ИТ Школа Ростелекома». Для действия вызови один инструмент; "
+            "для вопроса дай словесный ответ. Аргументы бери из запроса."
         )
     else:
         role_instruction = (
-            "Ты — текстовый помощник системы «ИТ Школа Ростелекома». Ты не выполняешь действия: "
-            "объясняй по шагам, где в интерфейсе это сделать."
+            "Ты помощник CRM «ИТ Школа Ростелекома». Объясняй, как выполнить действие в интерфейсе."
         )
     return (
         f"{role_instruction}\n"
-        "Только CRM: вузы, этапы, отчёты, данные, роли. На посторонний вопрос вежливо откажи. "
-        "Пиши по-русски живым языком: сначала ответ по существу, затем шаги, если спрашивают «как». "
-        "Не копируй статью списком без пояснения. Не выдумывай функции, кнопки, факты и цифры. "
-        "Учитывай права текущего пользователя; чужие права не предлагай как доступные ему. "
-        "Помощник сам умеет открывать разделы, искать доступные взаимодействия, показывать сводки, "
-        "статистику и контакты, формировать отчёты и после подтверждения менять этап или добавлять комментарий. "
-        "Настройку CRM и учётных записей он только объясняет; сам их не меняет. "
-        "Если сведений нет, честно скажи об этом и уточни вопрос. "
+        "Отвечай по-русски своими словами, прямо и по делу. Описывай только функции из справки и доступные роли. "
+        "Не придумывай кнопки и факты; при отсутствии сведений спроси уточнение. "
         f"{DETAIL_RULES[payload.detail]}\n"
         f"Сегодня {date.today().isoformat()}; раздел: {PAGE_NAMES[payload.page]}.\n"
-        f"{role_context(role)}\n"
-        + (f"Справка CRM:\n{article_context(articles)}\n" if articles else "")
+        f"{role_context(role, include_pages=not articles and explanation)}\n"
+        + (f"Справка CRM:\n{article_context(articles, detailed=payload.detail == 'detailed')}\n" if articles else "")
+        + ("Помощник умеет открывать разделы, искать взаимодействия, показывать сводки, контакты и статистику, "
+           "создавать отчёты, предлагать смену этапа и комментарии. Настройки CRM и сотрудников он только объясняет.\n"
+           if not articles else "")
         + (f"Правила переходов: {TRANSITION_RULES}\n" if needs_transitions else "")
-        + (f"Работа с отчётами: {REPORT_GUIDE}\n" if explanation and ("отчёт" in question or "отчет" in question) else "")
+        + (f"Работа с отчётами: {REPORT_GUIDE}\n" if not articles and explanation and ("отчёт" in question or "отчет" in question) else "")
         + (f"Актуальные этапы:\n{_workflow_context(state)}" if needs_stages else "")
     )
 
@@ -324,6 +323,11 @@ async def chat(payload: ChatRequest, state: dict, role: str = "manager") -> Chat
     question = payload.message.lower().replace("ё", "е")
     if re.search(r"удал[а-я]*\s+(?:\w+\s+){0,2}(?:сотрудник|пользовател|менеджер|человек)", question):
         return ChatResponse(message="Удаление сотрудников в CRM не предусмотрено. Руководитель может заблокировать менеджера своей команды, администратор — управлять доступом всех сотрудников.")
+    page = navigation_target(payload.message)
+    if page:
+        if page["id"] not in allowed_pages(role):
+            return ChatResponse(message=f"Раздел «{page['label']}» недоступен для вашей роли.")
+        return ChatResponse(type="action", action=AssistantAction(name="open_page", arguments={"page": page["id"]}))
     articles, restricted = retrieve(payload.message, role)
     if restricted:
         return ChatResponse(message=access_denial(restricted, role))
