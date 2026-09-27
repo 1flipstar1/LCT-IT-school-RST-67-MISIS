@@ -188,3 +188,18 @@ def test_preferences_follow_the_employee_and_stay_private(client: TestClient) ->
 
     for broken in ({**preferences, "startPage": "/users"}, {**preferences, "toastDuration": 1}, {**preferences, "theme": "dark"}):
         assert client.put("/api/v1/me/preferences", json=broken, headers=manager).status_code == 422
+
+
+def test_save_with_stale_preferences_is_not_rejected(client: TestClient) -> None:
+    """Настройки меняются отдельным запросом; снимок в браузере может отставать — это не правка сотрудников."""
+
+    manager = _headers(client, "manager")
+    snapshot = client.get("/api/v1/state", headers=manager).json()
+    client.put("/api/v1/me/preferences", json={"uiScale": 120}, headers=manager)
+    stale = client.get("/api/v1/state", headers=manager).json()
+    for user in snapshot["state"]["users"]:
+        user.pop("preferences", None)
+    saved = client.put("/api/v1/state", json={"state": snapshot["state"], "expectedRevision": stale["revision"]}, headers=manager)
+    assert saved.status_code == 200, saved.text
+    me = next(user for user in saved.json()["state"]["users"] if user["id"] == "usr-1")
+    assert me["preferences"]["uiScale"] == 120, "сервер оставил свои настройки, а не пустые из браузера"

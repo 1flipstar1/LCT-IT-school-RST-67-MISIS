@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useInsertionEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useInsertionEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { localStore } from '../../lib/storage.js';
 import { useActions } from '../../store/useActions.js';
@@ -38,7 +38,12 @@ function UserPreferences({ userId, server, children }) {
   // Масштаб интерфейса: tokens.css по умолчанию задаёт 110%, профиль его переопределяет.
   useInsertionEffect(() => {
     document.documentElement.style.setProperty('--ui-scale', String(preferences.uiScale / 100));
-    // При другом масштабе вёрстке достаётся другая ширина — режим раскладки мог смениться.
+  }, [preferences.uiScale]);
+
+  // При другом масштабе вёрстке достаётся другая ширина — режим раскладки мог смениться.
+  // Отдельным layout-эффектом: смена режима обновляет подписчиков, а из insertion-эффекта
+  // React запрещает вызывать обновления.
+  useLayoutEffect(() => {
     syncLayoutMode();
   }, [preferences.uiScale]);
 

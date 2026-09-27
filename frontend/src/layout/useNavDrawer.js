@@ -11,10 +11,12 @@ const SWIPE_CLOSE_SHARE = 0.3;
 const PHASE = { closed: 'closed', open: 'open', closing: 'closing' };
 
 /**
- * Выезжающее меню на телефоне и планшете. Покой задаёт CSS (класс .open), движение — GSAP:
- * меню выезжает с упругим замедлением, пункты появляются лесенкой, затемнение проявляется.
- * Закрыть можно пунктом меню, тапом по затемнению, Esc или свайпом влево (Draggable).
- * На компьютере меню закреплено — хук сам сбрасывает состояние при смене режима.
+ * Выезжающее меню на телефоне и планшете.
+ *
+ * Состояния покоя («закрыто» / «открыто», класс .open) задаёт CSS, а GSAP только анимирует переход
+ * между ними и в конце снимает свои инлайновые стили. Поэтому закрытие идёт в три фазы:
+ * open → closing (анимация, класс ещё стоит) → closed (класс снят, CSS прячет меню за краем).
+ * Закрыть можно пунктом меню, тапом по затемнению, Esc или свайпом влево.
  */
 export function useNavDrawer({ panelRef, scrimRef, triggerRef }) {
   const mode = useLayoutMode();
@@ -22,10 +24,19 @@ export function useNavDrawer({ panelRef, scrimRef, triggerRef }) {
   const [phase, setPhase] = useState(PHASE.closed);
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
+  const closingRef = useRef(null);
 
-  const open = useCallback(() => setPhase(PHASE.open), []);
+  // Меню снова открыли, пока оно уезжало: останавливаем закрытие, иначе его onComplete
+  // захлопнул бы только что открытое меню. Инлайновый сдвиг сбрасываем — появление начнётся с края.
+  const open = useCallback(() => {
+    closingRef.current?.kill();
+    closingRef.current = null;
+    gsap.set([panelRef.current, scrimRef.current].filter(Boolean), { clearProps: 'transform,opacity,visibility' });
+    setPhase(PHASE.open);
+  }, [panelRef, scrimRef]);
 
   const finishClose = useCallback(() => {
+    closingRef.current = null;
     gsap.set([panelRef.current, scrimRef.current].filter(Boolean), { clearProps: 'all' });
     setPhase(PHASE.closed);
     triggerRef.current?.focus({ preventScroll: true });
@@ -39,7 +50,7 @@ export function useNavDrawer({ panelRef, scrimRef, triggerRef }) {
     }
     setPhase(PHASE.closing);
     const panel = panelRef.current;
-    gsap.timeline({ onComplete: finishClose })
+    closingRef.current = gsap.timeline({ onComplete: finishClose })
       .to(panel, { x: -panel.offsetWidth, xPercent: 0, duration: 0.3, ease: 'power2.in' }, 0)
       .to(scrimRef.current, { autoAlpha: 0, duration: 0.25, ease: 'power1.in' }, 0);
   }, [finishClose, panelRef, scrimRef]);

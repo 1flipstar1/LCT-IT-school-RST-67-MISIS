@@ -21,6 +21,7 @@ export function StoreProvider({ children }) {
   const pendingStateRef = useRef(null);
   const saveTimerRef = useRef(null);
   const savingRef = useRef(false);
+  const inFlightRef = useRef(null);
   const mountedRef = useRef(false);
   const hydrationIdRef = useRef(0);
   const syncGenerationRef = useRef(0);
@@ -31,8 +32,19 @@ export function StoreProvider({ children }) {
     stateRef.current = state;
   }, [state]);
 
+  /**
+   * Отправить на сервер накопленные изменения. Промис завершается, когда они действительно
+   * сохранены (или сохранение не удалось): действия, которые потом идут отдельным запросом
+   * (настройки профиля, курс новичка, импорт), вызывают `await flush()` и должны быть уверены,
+   * что их запрос не обгонит смену этапа, сделанную секундой раньше.
+   */
   const flushPendingState = useCallback(async () => {
-    if (savingRef.current || !pendingStateRef.current) return;
+    // Сохранение уже в пути — дожидаемся его и досохраняем то, что успело накопиться за это время.
+    if (savingRef.current) {
+      await inFlightRef.current;
+      return flushPendingState();
+    }
+    if (!pendingStateRef.current) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = null;
 
@@ -47,6 +59,8 @@ export function StoreProvider({ children }) {
       dirty: true,
     });
 
+    let finishSaving;
+    inFlightRef.current = new Promise((resolve) => { finishSaving = resolve; });
     try {
       const saved = await persistState(snapshot, revisionRef.current);
       if (syncGeneration !== syncGenerationRef.current) return;
@@ -71,6 +85,7 @@ export function StoreProvider({ children }) {
       });
     } finally {
       savingRef.current = false;
+      finishSaving();
       if (mountedRef.current && pendingStateRef.current) {
         saveTimerRef.current = setTimeout(flushPendingState, failed ? RETRY_DELAY_MS : SAVE_DEBOUNCE_MS);
       }

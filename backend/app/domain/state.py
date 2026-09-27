@@ -254,6 +254,15 @@ def _hide_private_user_fields(state: dict[str, Any], own_id: str) -> dict[str, A
     return state
 
 
+def _without_server_owned_fields(users: Any) -> Any:
+    if not isinstance(users, list):
+        return users
+    return [
+        {key: value for key, value in item.items() if key not in SERVER_OWNED_USER_FIELDS} if isinstance(item, dict) else item
+        for item in users
+    ]
+
+
 def _restore_server_owned_user_fields(current: dict[str, Any], proposed: dict[str, Any]) -> dict[str, Any]:
     current_users = {item.get("id"): item for item in current.get("users", []) if isinstance(item, dict)}
     for item in proposed.get("users", []):
@@ -330,12 +339,17 @@ def merge_state_for_principal(
         return _restore_server_owned_user_fields(current, copy.deepcopy(proposed))
     user = find_principal_user(current, principal)
     projected_current = project_state_for_principal(current, principal)
-    protected = {"users", "version"}
+    protected = {"version"}
     if principal.role == "manager":
         protected.update({"directions", "programs", "products", "workflows", "metrics", "inbox", "integrations"})
     for key in protected:
         if proposed.get(key) != projected_current.get(key):
             _reject(key)
+    # Сотрудников через общее сохранение менять нельзя. Настройки и привязку Telegram сервер
+    # меняет отдельно (/me/...), и браузер может прислать их чуть устаревшими — это не попытка
+    # правки, поэтому такие поля в сравнение не входят.
+    if _without_server_owned_fields(proposed.get("users")) != _without_server_owned_fields(projected_current.get("users")):
+        _reject("users")
     visible_ids = visible_interaction_ids(current, user)
     current_interactions = {item["id"]: item for item in current["interactions"]}
     proposed_interactions: list[dict[str, Any]] = []

@@ -1,7 +1,10 @@
 /**
- * Финал курса: две хлопушки из нижних углов засыпают экран конфетти, а в небе один за другим
- * взрываются фейерверки. Рисуется на отдельном холсте поверх всего и удаляет его, когда последняя
- * частица погасла, — поэтому салют догорает, даже если пользователь уже закрыл тур.
+ * Салют в конце курса: конфетти из двух нижних углов и несколько фейерверков.
+ *
+ * Рисуется на своём canvas поверх страницы (а не в слое тура), поэтому продолжает догорать после
+ * закрытия тура; холст удаляется, когда погасла последняя частица. Физика — простая покадровая:
+ * скорость, гравитация, сопротивление воздуха и затухание, всё умножается на delta, чтобы на
+ * мониторах 60 и 120 Гц салют длился одинаково.
  */
 
 import { shouldReduceMotion } from '../../lib/motion.js';
@@ -9,7 +12,19 @@ import { shouldReduceMotion } from '../../lib/motion.js';
 const TOKENS = ['--color-brand', '--color-accent', '--color-brand-hover', '--color-warning-text', '--color-brand-soft', '--color-warning-soft'];
 const FRAME = 1000 / 60;
 const MAX_DURATION = 9000;
+/**
+ * Физика в пикселях за один кадр 60 Гц. Сопротивление воздуха — доля скорости, которая остаётся
+ * после кадра; при пропуске кадров её возводят в степень числа кадров (0.985² за два кадра),
+ * иначе на медленном устройстве частицы тормозили бы слабее.
+ */
 const GRAVITY = { confetti: 0.22, spark: 0.06 };
+const DRAG = { confetti: 0.985, spark: 0.96 };
+/** Конфетти падает не быстрее этого: бумажка парит, а не летит камнем. */
+const CONFETTI_MAX_FALL_SPEED = 4.5;
+/** Покачивание конфетти из стороны в сторону: скорость фазы и размах. */
+const WOBBLE = { speed: 0.12, amplitude: 1.2 };
+/** За кадр анимации считаем не больше трёх: после фоновой вкладки салют не «прыгает». */
+const MAX_FRAMES_PER_TICK = 3;
 /** Где по ширине экрана взрываются ракеты: вразнобой, чтобы салют заполнял всё небо. */
 const BURST_X = [0.22, 0.72, 0.4, 0.86, 0.14, 0.58];
 
@@ -81,33 +96,42 @@ function explode(particles, colors, { x, y }) {
   }
 }
 
-function step(particles, colors, ratio) {
+/**
+ * Сдвинуть все частицы на frames кадров 60 Гц. Идём с конца массива: так можно удалять
+ * погасшие частицы прямо в цикле, а искры от взорвавшейся ракеты добавляются в конец и
+ * начнут двигаться со следующего кадра.
+ */
+function step(particles, colors, frames) {
   for (let index = particles.length - 1; index >= 0; index -= 1) {
     const particle = particles[index];
     if (particle.kind === 'confetti') {
-      particle.vx *= 0.985 ** ratio;
-      particle.vy = Math.min(particle.vy * 0.985 ** ratio + GRAVITY.confetti * ratio, 4.5);
-      particle.wobble += 0.12 * ratio;
-      particle.x += (particle.vx + Math.cos(particle.wobble) * 1.2) * ratio;
-      particle.y += particle.vy * ratio;
-      particle.rotation += particle.spin * ratio;
+      const drag = DRAG.confetti ** frames;
+      particle.vx *= drag;
+      particle.vy = Math.min(particle.vy * drag + GRAVITY.confetti * frames, CONFETTI_MAX_FALL_SPEED);
+      particle.wobble += WOBBLE.speed * frames;
+      particle.x += (particle.vx + Math.cos(particle.wobble) * WOBBLE.amplitude) * frames;
+      particle.y += particle.vy * frames;
+      particle.rotation += particle.spin * frames;
     } else if (particle.kind === 'rocket') {
-      particle.vy += GRAVITY.spark * ratio;
-      particle.x += particle.vx * ratio;
-      particle.y += particle.vy * ratio;
+      particle.vy += GRAVITY.spark * frames;
+      particle.x += particle.vx * frames;
+      particle.y += particle.vy * frames;
+      // Взрыв — в верхней точке полёта или на заданной высоте, что наступит раньше.
       if (particle.vy >= 0 || particle.y <= particle.targetY) {
         explode(particles, colors, particle);
         particle.life = 0;
       }
     } else {
+      // Прошлая позиция нужна, чтобы нарисовать искру чёрточкой-следом, а не точкой.
       particle.px = particle.x;
       particle.py = particle.y;
-      particle.vx *= 0.96 ** ratio;
-      particle.vy = particle.vy * 0.96 ** ratio + GRAVITY.spark * ratio;
-      particle.x += particle.vx * ratio;
-      particle.y += particle.vy * ratio;
+      const drag = DRAG.spark ** frames;
+      particle.vx *= drag;
+      particle.vy = particle.vy * drag + GRAVITY.spark * frames;
+      particle.x += particle.vx * frames;
+      particle.y += particle.vy * frames;
     }
-    particle.life -= particle.decay * ratio;
+    particle.life -= particle.decay * frames;
     const fellOut = particle.y > window.innerHeight + 40 && particle.vy > 0;
     if (particle.life <= 0 || fellOut) particles.splice(index, 1);
   }
@@ -153,12 +177,13 @@ export function celebrate() {
   const context = canvas.getContext('2d');
   const colors = palette();
   const particles = [];
-  const ratio = window.devicePixelRatio || 1;
+  // Холст в физических пикселях экрана, рисуем в CSS-пикселях — на Retina салют не будет мыльным.
+  const pixelRatio = window.devicePixelRatio || 1;
   const width = window.innerWidth;
   const height = window.innerHeight;
-  canvas.width = width * ratio;
-  canvas.height = height * ratio;
-  context.scale(ratio, ratio);
+  canvas.width = width * pixelRatio;
+  canvas.height = height * pixelRatio;
+  context.scale(pixelRatio, pixelRatio);
 
   const scale = Math.max(0.7, Math.min(1.3, height / 800));
   const schedule = [
@@ -168,23 +193,22 @@ export function celebrate() {
       run: () => rocket(particles, colors, { x: width * BURST_X[index], targetY: height * random(0.1, 0.22), height }),
     })),
     { at: 1900, run: () => { popper(particles, colors, { x: 0, y: height, direction: 1, scale: scale * 0.85 }); popper(particles, colors, { x: width, y: height, direction: -1, scale: scale * 0.85 }); } },
-  ];
+  ].sort((a, b) => a.at - b.at);
 
   const started = performance.now();
   let previous = started;
   const frame = (now) => {
     const elapsed = now - started;
-    const delta = Math.min(3, (now - previous) / FRAME);
+    const frames = Math.min(MAX_FRAMES_PER_TICK, (now - previous) / FRAME);
     previous = now;
     while (schedule.length && schedule[0].at <= elapsed) schedule.shift().run();
 
-    step(particles, colors, delta);
+    step(particles, colors, frames);
     context.clearRect(0, 0, width, height);
     draw(context, particles);
 
     if ((schedule.length || particles.length) && elapsed < MAX_DURATION) requestAnimationFrame(frame);
     else canvas.remove();
   };
-  schedule.sort((a, b) => a.at - b.at);
   requestAnimationFrame(frame);
 }

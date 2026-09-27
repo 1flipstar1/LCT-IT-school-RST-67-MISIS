@@ -40,8 +40,11 @@ function measure() {
 export function syncLayoutMode({ animate = true } = {}) {
   const next = measure();
   if (next === current) return;
-  const targets = animate && current && !shouldReduceMotion() ? document.querySelectorAll(FLIP_SELECTOR) : [];
+  const targets = animate && current && !shouldReduceMotion() ? [...document.querySelectorAll(FLIP_SELECTOR)] : [];
+  // Снимок берём с учётом ещё идущей анимации и только потом её останавливаем:
+  // так при быстром изменении окна новый переход начнётся ровно с того места, где элементы сейчас.
   const state = targets.length ? Flip.getState(targets) : null;
+  if (state) Flip.killFlipsOf(targets);
 
   current = next;
   document.documentElement.dataset.layout = next;

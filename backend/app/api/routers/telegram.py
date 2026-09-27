@@ -20,6 +20,7 @@ class TelegramStatus(APIModel):
     bot_username: str | None = None
     connected: bool
     username: str | None = None
+    chat_name: str | None = None
     linked_at: str | None = None
 
 

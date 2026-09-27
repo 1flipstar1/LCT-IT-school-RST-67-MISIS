@@ -30,6 +30,7 @@ def bot(monkeypatch) -> FakeTelegram:
     monkeypatch.setattr(telegram, "get_client", lambda: fake)
     monkeypatch.setattr(settings, "telegram_notify_delay_seconds", 0)
     telegram._bot_username.clear()
+    telegram._username_failed_at.clear()
     monkeypatch.setattr(settings, "telegram_bot_token", "test-token")
     return fake
 
@@ -139,3 +140,28 @@ def test_admin_gets_every_transition_but_not_own(client: TestClient, bot: FakeTe
     client.put("/api/v1/state", json={"state": state, "expectedRevision": snapshot["revision"]}, headers=manager)
     telegram.notifier.wait()
     assert [chat for chat, text in bot.sent if "Переход" in text and chat == 6001], "администратор получает переходы всех менеджеров"
+
+
+def test_chat_without_username_keeps_the_name_separately(client: TestClient, bot: FakeTelegram) -> None:
+    lead = _headers(client, "lead")
+    code = client.post("/api/v1/me/telegram/link", headers=lead).json()["url"].split("start=")[1]
+    with SessionLocal() as db:
+        telegram.handle_update(db, {"message": {"chat": {"id": 7001, "type": "private"}, "from": {"first_name": "Алексей", "last_name": "Козлов"}, "text": f"/start {code}"}})
+    status = client.get("/api/v1/me/telegram", headers=lead).json()
+    assert status["username"] is None and status["chatName"] == "Алексей Козлов"
+
+
+def test_failed_getme_is_not_repeated_on_every_status_request(monkeypatch) -> None:
+    calls = []
+
+    class Offline(FakeTelegram):
+        def get_me(self) -> dict:
+            calls.append(1)
+            raise telegram.TelegramError("нет связи")
+
+    monkeypatch.setattr(telegram, "get_client", lambda: Offline())
+    monkeypatch.setattr(settings, "telegram_bot_token", "offline-token")
+    telegram._bot_username.clear()
+    telegram._username_failed_at.clear()
+    assert telegram.bot_username() is None and telegram.bot_username() is None
+    assert len(calls) == 1, "повторный запрос ждёт минуту, а не таймаутов подключения"

@@ -82,7 +82,6 @@ export function ProfilePage() {
       <PageHeader title="Настройки профиля" hint="Личные настройки интерфейса: видны только вам и действуют на любом компьютере, где вы входите в CRM." />
 
       <div className={styles.layout}>
-        {/* Уведомления в Telegram — первыми: руководителю это самое полезное, что можно включить. */}
         {(role === 'lead' || role === 'admin') && <TelegramSettings />}
 
         <Card>

@@ -24,6 +24,7 @@ from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from typing import Any
 from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
 
 import httpx
 from sqlalchemy.orm import Session
@@ -42,6 +43,11 @@ LINK_TTL = timedelta(minutes=15)
 POLL_TIMEOUT_SECONDS = 25
 MAX_COMMENT_LENGTH = 500
 NOTIFIED_EVENT_TYPES = {"transition", "completed"}
+# Даты в сообщениях — по Москве: события хранятся в UTC, и около полуночи день иначе «съезжает».
+DISPLAY_TZ = ZoneInfo("Europe/Moscow")
+# Если Telegram не ответил на getMe, не спрашиваем снова минуту — иначе каждый запрос
+# статуса из браузера ждал бы таймаутов подключения.
+USERNAME_RETRY_SECONDS = 60
 
 
 class TelegramError(Exception):
@@ -130,21 +136,26 @@ def get_client() -> TelegramClient | None:
 
 
 _bot_username: dict[str, str] = {}
+_username_failed_at: dict[str, float] = {}
 
 
 def bot_username() -> str | None:
-    """Имя бота для ссылки t.me — узнаём у Telegram один раз."""
+    """Имя бота для ссылки t.me. Узнаём у Telegram один раз; неудачу помним минуту."""
 
     client = get_client()
     token = settings.telegram_bot_token
     if client is None or token is None:
         return None
-    if token not in _bot_username:
-        try:
-            _bot_username[token] = client.get_me()["username"]
-        except (TelegramError, KeyError) as exc:
-            logger.warning("Telegram getMe failed: %s", exc)
-            return None
+    if token in _bot_username:
+        return _bot_username[token]
+    if time.monotonic() - _username_failed_at.get(token, float("-inf")) < USERNAME_RETRY_SECONDS:
+        return None
+    try:
+        _bot_username[token] = client.get_me()["username"]
+    except (TelegramError, KeyError) as exc:
+        _username_failed_at[token] = time.monotonic()
+        logger.warning("Telegram getMe failed: %s", exc)
+        return None
     return _bot_username[token]
 
 
@@ -159,6 +170,8 @@ class StageNotification:
     chat_id: int
     text: str
     url: str | None
+    # Когда можно отправлять: время сохранения + пауза на «Отменить» (по time.monotonic()).
+    due_at: float
 
 
 def _by_id(state: dict[str, Any], key: str) -> dict[str, dict[str, Any]]:
@@ -213,7 +226,7 @@ def _progress_bar(position: int, total: int) -> str:
 
 
 def _date(value: datetime) -> str:
-    return value.strftime("%d.%m.%Y")
+    return value.astimezone(DISPLAY_TZ).strftime("%d.%m.%Y")
 
 
 def _days(count: int) -> str:
@@ -265,11 +278,13 @@ def format_stage_message(state: dict[str, Any], event: dict[str, Any], interacti
             lines.append(f"🗓 В работе {_days(max(1, (at - _parse(started)).days))}: с {_date(_parse(started))} по {_date(at)}")
     else:
         lines.append(f"📍 «{escape(from_stage.get('name', '—'))}» → <b>«{escape(to_stage.get('name', '—'))}»</b>")
-        if kind == "skip":
-            skipped = [stage["name"] for stage in stages[stages.index(from_stage) + 1 : stages.index(to_stage)]] if from_stage in stages and to_stage in stages else []
-            if skipped:
-                lines.append(f"⏭ Пропущен: «{escape(', '.join(skipped))}»")
-        position = stages.index(to_stage) + 1 if to_stage in stages else None
+        positions = {stage["id"]: index for index, stage in enumerate(stages)}
+        source = positions.get(event.get("fromStageId"))
+        target = positions.get(event.get("toStageId"))
+        if kind == "skip" and source is not None and target is not None:
+            skipped = [stage["name"] for stage in stages[source + 1 : target]]
+            lines.append(f"⏭ Пропущен: «{escape(', '.join(skipped))}»")
+        position = target + 1 if target is not None else None
         if position:
             phase = PHASES.get(to_stage.get("phase"))
             lines.append(f"📊 Этап {position} из {len(stages)}  {_progress_bar(position, len(stages))}")
@@ -327,7 +342,11 @@ def stage_notifications(before: dict[str, Any], after: dict[str, Any]) -> list[S
             continue
         text = format_stage_message(after, event, interaction)
         url = _interaction_url(interaction["id"])
-        result.extend(StageNotification(event_id=event["id"], chat_id=chat_id, text=text, url=url) for chat_id in chats)
+        due_at = time.monotonic() + settings.telegram_notify_delay_seconds
+        result.extend(
+            StageNotification(event_id=event["id"], chat_id=chat_id, text=text, url=url, due_at=due_at)
+            for chat_id in chats
+        )
     return result
 
 
@@ -365,8 +384,12 @@ class StageNotifier:
         wait(pending, timeout=timeout)
 
     def _deliver(self, notification: StageNotification) -> None:
-        if settings.telegram_notify_delay_seconds > 0:
-            time.sleep(settings.telegram_notify_delay_seconds)
+        # Ждём не «паузу целиком», а до due_at: если потоки были заняты, уведомления
+        # не должны задерживаться ещё на 15 секунд каждое.
+        remaining = notification.due_at - time.monotonic()
+        if remaining > 0:
+            time.sleep(remaining)
+        # Пока шла пауза, менеджер мог нажать «Отменить» — тогда события в состоянии уже нет.
         if not _event_still_exists(notification.event_id):
             return
         client = get_client()
@@ -423,6 +446,7 @@ def status_for(user: dict[str, Any]) -> dict[str, Any]:
         "bot_username": bot_username(),
         "connected": bool(telegram.get("chatId")),
         "username": telegram.get("username"),
+        "chat_name": telegram.get("name"),
         "linked_at": telegram.get("linkedAt"),
     }
 
@@ -474,7 +498,9 @@ def bind_chat(db: Session, code: str, chat: dict[str, Any], sender: dict[str, An
                 item.pop("telegram")
         owner["telegram"] = {
             "chatId": chat["id"],
-            "username": sender.get("username") or sender.get("first_name"),
+            # username есть не у всех — тогда показываем имя из профиля Telegram.
+            "username": sender.get("username"),
+            "name": " ".join(part for part in (sender.get("first_name"), sender.get("last_name")) if part) or None,
             "linkedAt": _iso(now),
         }
         return copy.deepcopy(owner)
@@ -539,7 +565,7 @@ def overview(db: Session) -> dict[str, Any]:
     return {
         "configured": get_client() is not None,
         "bot_username": bot_username(),
-        "polling": bool(poller and poller.is_alive()),
+        "polling": bool(poller and poller.healthy),
         "recipients": len(recipients),
         "connected": connected,
     }
@@ -648,6 +674,15 @@ class TelegramPoller(threading.Thread):
         super().__init__(name="telegram-poller", daemon=True)
         self._client = client
         self._stopped = threading.Event()
+        self._last_success: float | None = None
+
+    @property
+    def healthy(self) -> bool:
+        """Поток жив и недавно получил ответ от Telegram (а не просто крутится с ошибками)."""
+
+        if not self.is_alive() or self._last_success is None:
+            return False
+        return time.monotonic() - self._last_success < (POLL_TIMEOUT_SECONDS + settings.telegram_timeout_seconds) * 2
 
     def stop(self) -> None:
         self._stopped.set()
@@ -664,11 +699,14 @@ class TelegramPoller(threading.Thread):
                     ready = True
                     logger.info("Telegram bot is ready")
                 updates = self._client.get_updates(offset)
+                self._last_success = time.monotonic()
             except TelegramError as exc:
                 logger.warning("Telegram polling failed: %s", exc)
                 self._stopped.wait(5)
                 continue
             for update in updates:
+                # Сдвигаем offset до обработки: сообщение, на котором бот упал, не будет
+                # приходить снова бесконечно (лучше потерять один ответ, чем зациклиться).
                 offset = update["update_id"] + 1
                 try:
                     with SessionLocal() as db:

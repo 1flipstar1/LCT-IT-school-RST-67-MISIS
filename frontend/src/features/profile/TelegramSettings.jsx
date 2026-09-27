@@ -35,22 +35,32 @@ export function TelegramSettings() {
     load().catch(() => setStatus({ unreachable: true }));
   }, [load]);
 
-  // Пока ссылка действует, ждём, когда бот получит «Старт».
+  // Пока ссылка действует, ждём, когда бот получит «Старт». Следующий запрос — только после
+  // ответа на предыдущий (setTimeout, а не setInterval), чтобы медленная сеть не копила запросы.
   useEffect(() => {
     if (!link) return undefined;
-    const timer = setInterval(async () => {
+    let cancelled = false;
+    let timer;
+    const check = async () => {
       if (Date.parse(link.expiresAt) < Date.now()) {
         setLink(null);
         return;
       }
       const next = await apiClient.getTelegramStatus().catch(() => null);
+      if (cancelled) return;
       if (next?.connected) {
         setStatus(next);
         setLink(null);
         toast.success('Telegram подключён — теперь вы не пропустите ни одного перехода');
+        return;
       }
-    }, LINK_POLL_MS);
-    return () => clearInterval(timer);
+      timer = setTimeout(check, LINK_POLL_MS);
+    };
+    timer = setTimeout(check, LINK_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [link, toast]);
 
   const run = async (action) => {
@@ -84,7 +94,7 @@ export function TelegramSettings() {
         <div className={styles.connectedText}>
           <h2 className={styles.connectedTitle}>Уведомления в Telegram подключены</h2>
           <p>
-            Чат {status.username ? <b>@{status.username}</b> : 'в Telegram'} с {formatDate(status.linkedAt)}.
+            Чат <b>{status.username ? `@${status.username}` : status.chatName ?? 'в Telegram'}</b> с {formatDate(status.linkedAt)}.
             Бот пишет, когда {WHO[status.scope] ?? 'менеджер'} переводит заявку. Команда /stop в чате тоже отключит уведомления.
           </p>
         </div>
