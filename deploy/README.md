@@ -1,7 +1,7 @@
 # Развёртывание на 158.160.222.79
 
 `compose.yml` запускает Caddy, FastAPI с собранным React, PostgreSQL,
-Keycloak и Ollama. Снаружи открыт только порт 80. Данные, вложения и модель
+Keycloak и Ollama. Снаружи открыты порты 80 и 443. Данные, вложения, сертификаты и модель
 хранятся в постоянных Docker volumes.
 Демо-вход открыт для любого посетителя адреса, включая роль администратора.
 
@@ -32,11 +32,15 @@ SSH-ключу и запускает тот же `deploy.sh` после push в 
 которого добавлена в `~admin67/.ssh/authorized_keys`. Ключ сервера закреплён
 в `deploy/known_hosts`.
 
-До появления домена сайт работает по HTTP. Логины и данные через HTTP
-передаются без шифрования, поэтому для реальной работы с персональными
-данными сначала нужен домен и HTTPS. При переезде следует сменить
-`PUBLIC_URL`, включить HTTPS в Caddy и обновить hostname, redirect URI и
-`sslRequired` в существующем realm Keycloak; повторный импорт realm не
-меняет уже созданную базу.
+Домен `rtk-itschool.ru` должен иметь A-запись `158.160.222.79`; входящие
+TCP 80 и 443 должны быть доступны из интернета. Caddy автоматически получает
+и продлевает сертификат, сохраняя его в volume `caddy_data`.
+
+До появления DNS сайт работает по HTTP на IP. При переходе на домен нужно
+сменить `PUBLIC_URL`, `CORS_ORIGINS`, `PUBLIC_APP_URL` в `deploy/.env`, обновить
+hostname Keycloak, а в существующем realm — `sslRequired`, `rootUrl`,
+`redirectUris`, `webOrigins` и `post.logout.redirect.uris` клиента
+`rtk-it-school-web`. Затем пересобрать API командой `bash deploy/deploy.sh`.
+Повторный импорт realm не меняет уже созданную базу.
 
 Не запускайте `docker compose down -v`: это удалит базы, вложения и модель.

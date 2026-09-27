@@ -1,4 +1,13 @@
-:80 {
+rtk-itschool.ru {
+    handle /auth/* {
+        reverse_proxy keycloak:8080
+    }
+    handle {
+        reverse_proxy api:8000
+    }
+}
+
+http://158.160.222.79 {
     handle /auth/* {
         reverse_proxy keycloak:8080
     }
