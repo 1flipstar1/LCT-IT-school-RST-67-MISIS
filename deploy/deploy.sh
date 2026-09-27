@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 if [[ ! -f deploy/.env ]]; then
   python3 deploy/init.py "http://158.160.222.79"
 fi
+python3 deploy/render_caddy.py
 
 docker compose --env-file deploy/.env -f deploy/compose.yml up -d --build --remove-orphans
 

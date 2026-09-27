@@ -36,11 +36,12 @@ SSH-ключу и запускает тот же `deploy.sh` после push в 
 TCP 80 и 443 должны быть доступны из интернета. Caddy автоматически получает
 и продлевает сертификат, сохраняя его в volume `caddy_data`.
 
-До появления DNS сайт работает по HTTP на IP. При переходе на домен нужно
-сменить `PUBLIC_URL`, `CORS_ORIGINS`, `PUBLIC_APP_URL` в `deploy/.env`, обновить
-hostname Keycloak, а в существующем realm — `sslRequired`, `rootUrl`,
-`redirectUris`, `webOrigins` и `post.logout.redirect.uris` клиента
-`rtk-it-school-web`. Затем пересобрать API командой `bash deploy/deploy.sh`.
+До появления DNS сайт работает по HTTP на IP. Когда A-запись начнёт указывать
+на сервер, запустите на сервере `python3 deploy/activate-domain.py`.
+Скрипт сохраняет резервные копии конфигурации, меняет публичный адрес в
+`deploy/.env` и существующем realm Keycloak, пересобирает API и проверяет
+OIDC issuer. Перед переключением он запускает HTTPS, дожидается действительного
+сертификата и восстанавливает прежний прокси, если сертификат не выдан.
 Повторный импорт realm не меняет уже созданную базу.
 
 Не запускайте `docker compose down -v`: это удалит базы, вложения и модель.
