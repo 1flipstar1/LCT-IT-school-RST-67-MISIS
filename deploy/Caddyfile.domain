@@ -8,5 +8,10 @@ rtk-itschool.ru {
 }
 
 http://158.160.222.79 {
-    redir https://rtk-itschool.ru{uri} permanent
+    handle /auth/* {
+        reverse_proxy keycloak:8080
+    }
+    handle {
+        reverse_proxy api:8000
+    }
 }
