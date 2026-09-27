@@ -19,6 +19,7 @@ const BENEFITS = [
 
 export function LoginPage() {
   useDocumentTitle('Вход');
+  const keycloakAvailable = Boolean(globalThis.crypto?.subtle);
   const { login, loginWithKeycloak, keycloakError } = useSession();
   const [ssoUnavailable, setSsoUnavailable] = useState(false);
   const [loginError, setLoginError] = useState(null);
@@ -72,11 +73,17 @@ export function LoginPage() {
         <div className={styles.card}>
           <img src={logoUrl} alt="Ростелеком" className={styles.cardLogo} />
           <h1 className={styles.title}>Вход в систему</h1>
-          <p className={styles.subtitle}>Используйте корпоративную учётную запись Ростелекома.</p>
+          <p className={styles.subtitle}>
+            {keycloakAvailable
+              ? 'Используйте корпоративную учётную запись Ростелекома.'
+              : 'Выберите демо-роль для входа. Корпоративный вход появится после подключения защищённого адреса.'}
+          </p>
 
-          <Button variant="primary" size="l" fullWidth onClick={handleSso}>
-            Войти через Keycloak
-          </Button>
+          {keycloakAvailable && (
+            <Button variant="primary" size="l" fullWidth onClick={handleSso}>
+              Войти через Keycloak
+            </Button>
+          )}
 
           {ssoUnavailable && (
             <InlineAlert tone="info" title="Это демо-стенд">
@@ -84,9 +91,11 @@ export function LoginPage() {
             </InlineAlert>
           )}
 
-          <div className={styles.divider}>
-            <span>Демо-доступ</span>
-          </div>
+          {keycloakAvailable && (
+            <div className={styles.divider}>
+              <span>Демо-доступ</span>
+            </div>
+          )}
 
           {(loginError || keycloakError) && <ErrorAlert error={loginError || keycloakError} />}
 

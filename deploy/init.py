@@ -50,7 +50,7 @@ def main() -> None:
         "APP_ENV": "production",
         "CORS_ORIGINS": public_url,
         "JWT_SECRET": token(),
-        "DEMO_AUTH_ENABLED": "false",
+        "DEMO_AUTH_ENABLED": "true",
         "ASSISTANT_ENABLED": "true",
         "OLLAMA_MODEL": "qwen3:4b-instruct",
         "ASSISTANT_TIMEOUT_SECONDS": "120",
