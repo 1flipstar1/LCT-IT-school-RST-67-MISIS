@@ -140,7 +140,7 @@ export function CatalogsPage() {
       />
 
       <Card padding="none">
-        <div className={styles.head}>
+        <div className={styles.head} data-tour="catalogs-head">
           <Tabs
             label="Справочники"
             value={tab}

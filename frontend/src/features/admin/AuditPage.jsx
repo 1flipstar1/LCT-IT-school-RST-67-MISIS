@@ -88,7 +88,7 @@ export function AuditPage() {
       <PageHeader
         title="Журнал действий" hint="Кто, что и когда менял. Журнал нельзя редактировать — он нужен для разбора спорных ситуаций и проверок по 152-ФЗ и приказу ФСТЭК № 117."
       />
-      <div className={styles.filters}>
+      <div className={styles.filters} data-tour="audit-filters">
         <SearchField className={styles.search} value={query} onChange={setQuery} placeholder="Действие или объект" />
         <MultiSelectFilter label="Сотрудники" options={[...index.users.values()].map((user) => ({ value: user.id, label: user.name }))} value={userIds} onChange={setUserIds} />
       </div>

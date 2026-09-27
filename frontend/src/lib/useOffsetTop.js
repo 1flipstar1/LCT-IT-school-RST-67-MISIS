@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { toLayoutPx } from './zoom.js';
 
 /**
  * Расстояние от верха страницы до элемента — чтобы растянуть его до низа окна: calc(100dvh - offset).
@@ -13,7 +14,8 @@ export function useOffsetTop() {
     const element = ref.current;
     if (!element) return undefined;
 
-    const measure = () => setOffsetTop(Math.round(element.getBoundingClientRect().top + window.scrollY));
+    // Результат идёт в CSS (calc с --viewport-height), поэтому переводим в пиксели макета.
+    const measure = () => setOffsetTop(Math.round(toLayoutPx(element.getBoundingClientRect().top + window.scrollY, element)));
     measure();
 
     const observer = new ResizeObserver(measure);

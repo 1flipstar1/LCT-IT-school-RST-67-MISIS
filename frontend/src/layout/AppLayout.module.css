@@ -1,5 +1,5 @@
 .shell {
-  min-height: 100vh;
+  min-height: var(--viewport-height);
 }
 
 .skipLink {
@@ -72,42 +72,53 @@
   }
 }
 
-@media (max-width: 960px) {
-  .main {
-    margin-left: 0;
-  }
+/* ---------- Телефон и планшет: меню выезжает поверх, сверху — шапка с кнопкой меню ----------
+ * Режим задаёт lib/layoutMode.js по ширине окна с учётом масштаба интерфейса — не медиазапрос.
+ */
+:global(html:not([data-layout='desktop'])) .main {
+  margin-left: 0;
+}
 
-  .mobileBar {
-    position: sticky;
-    top: 0;
-    z-index: var(--z-sticky);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2x);
-    height: 56px;
-    padding: 0 var(--space-2x);
-    border-bottom: 1px solid var(--color-border);
-    background: var(--color-surface);
-  }
+:global(html:not([data-layout='desktop'])) .mobileBar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  height: 56px;
+  padding: 0 var(--space-2x);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
 
-  .mobileLogo {
-    height: 22px;
-  }
+.mobileLogo {
+  height: 22px;
+}
 
-  .scrim {
-    position: fixed;
-    inset: 0;
-    z-index: calc(var(--z-sidebar) - 1);
-    display: block;
-    background: var(--color-overlay);
-  }
+/* Затемнение под меню: появляется и гаснет через GSAP (AppLayout.jsx). */
+:global(html:not([data-layout='desktop'])) .scrim {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-sidebar) - 1);
+  display: block;
+  background: var(--color-overlay);
+}
 
-  .content {
-    padding: var(--space-5x) var(--space-4x) var(--content-padding-bottom);
-  }
+:global(html:not([data-layout='desktop'])) .searchBar {
+  top: 56px;
+  padding: var(--space-3x) var(--space-4x) 0;
+}
 
-  .searchBar {
-    top: 56px;
-    padding: var(--space-3x) var(--space-4x) 0;
-  }
+:global(html[data-layout='tablet']) .content {
+  padding: var(--space-6x) var(--space-6x) var(--content-padding-bottom);
+}
+
+:global(html[data-layout='mobile']) .content {
+  padding: var(--space-5x) var(--space-4x) var(--content-padding-bottom);
+}
+
+/* Меню открыто: страница под ним не прокручивается. */
+:global(html[data-nav-open]) {
+  overflow: hidden;
 }

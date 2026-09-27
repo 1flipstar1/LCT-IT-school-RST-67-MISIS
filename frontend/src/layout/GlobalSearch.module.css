@@ -11,7 +11,7 @@
 .field input:focus-visible { outline: 0; box-shadow: none; }
 .field input::placeholder { color: var(--color-text-tertiary); }
 .field kbd { padding: var(--space-1x) var(--space-2x); border: 1px solid var(--color-border); border-radius: var(--radius-s); color: var(--color-text-tertiary); font: var(--font-caption); }
-.results { position: absolute; z-index: 1; top: calc(100% + var(--space-2x)); left: 0; right: 0; max-height: min(65vh, 520px); overflow-y: auto; padding: var(--space-2x); border: 1px solid var(--color-border); border-radius: var(--radius-l); background: var(--color-surface); box-shadow: var(--shadow-l); }
+.results { position: absolute; z-index: 1; top: calc(100% + var(--space-2x)); left: 0; right: 0; max-height: min(calc(var(--viewport-height) * 0.65), 520px); overflow-y: auto; padding: var(--space-2x); border: 1px solid var(--color-border); border-radius: var(--radius-l); background: var(--color-surface); box-shadow: var(--shadow-l); }
 .result { display: flex; align-items: center; width: 100%; gap: var(--space-3x); padding: var(--space-3x); border: 0; border-radius: var(--radius-m); background: transparent; color: var(--color-text); text-align: left; cursor: pointer; }
 .result:hover, .result:focus-visible { background: var(--color-brand-softer); outline: none; }
 .result span:nth-child(1), .result span:nth-child(2) { min-width: 0; }

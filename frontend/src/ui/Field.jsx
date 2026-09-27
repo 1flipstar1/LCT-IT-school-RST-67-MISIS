@@ -120,9 +120,9 @@ export function SelectField({ label, hint, error, required, className, options, 
   );
 }
 
-export function SearchField({ value, onChange, placeholder = 'Поиск', label = 'Поиск', className }) {
+export function SearchField({ value, onChange, placeholder = 'Поиск', label = 'Поиск', className, ...rest }) {
   return (
-    <label className={cn(styles.search, className)}>
+    <label className={cn(styles.search, className)} {...rest}>
       <SearchIcon size={18} fill="currentColor" aria-hidden="true" />
       <span className="visually-hidden">{label}</span>
       <input type="search" value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />

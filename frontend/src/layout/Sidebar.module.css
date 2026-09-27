@@ -235,26 +235,27 @@
 }
 
 /* На десктопе навигация — отдельная «плавающая» карточка, как в прежнем дизайне. */
-@media (min-width: 961px) {
-  .sidebar {
-    inset: var(--space-3x) auto var(--space-3x) var(--space-3x);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-s);
-  }
+/* Компьютер: меню закреплено и «парит» с отступом от краёв окна. */
+:global(html[data-layout='desktop']) .sidebar {
+  inset: var(--space-3x) auto var(--space-3x) var(--space-3x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-s);
 }
 
-@media (max-width: 960px) {
-  .sidebar {
-    width: min(300px, 86vw);
-    transform: translateX(-100%);
-    transition: transform var(--duration-base) var(--easing);
-    box-shadow: var(--shadow-l);
-  }
+/* Телефон и планшет: меню — выезжающая панель. Покой задаёт CSS (закрыто / .open),
+   движение между ними — GSAP в AppLayout.jsx, поэтому CSS-transition здесь нет. */
+:global(html:not([data-layout='desktop'])) .sidebar {
+  width: min(300px, calc(var(--viewport-width) * 0.86));
+  transform: translateX(-100%);
+  visibility: hidden;
+  box-shadow: var(--shadow-l);
+  touch-action: pan-y;
+}
 
-  .open {
-    transform: none;
-  }
+:global(html:not([data-layout='desktop'])) .open {
+  transform: none;
+  visibility: visible;
 }
 
 .profileLink { display: flex; align-items: center; flex: 1; min-width: 0; gap: var(--space-2x); color: var(--color-text); border-radius: var(--radius-m); }

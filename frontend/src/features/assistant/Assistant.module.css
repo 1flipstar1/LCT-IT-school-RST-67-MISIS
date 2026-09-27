@@ -10,7 +10,7 @@
   flex-direction: column;
   width: 100%;
   max-width: 880px;
-  min-height: calc(100dvh - var(--space-8x));
+  min-height: calc(var(--viewport-height) - var(--space-8x));
   margin: 0 auto;
 }
 
@@ -431,12 +431,12 @@
 }
 
 @media (max-width: 1100px) {
-  .page { min-height: calc(100dvh - var(--space-6x)); }
+  .page { min-height: calc(var(--viewport-height) - var(--space-6x)); }
 }
 
 @media (max-width: 960px) {
   .topbar { top: 56px; }
-  .page { min-height: calc(100dvh - 56px - var(--space-5x)); }
+  .page { min-height: calc(var(--viewport-height) - 56px - var(--space-5x)); }
   .welcomeTitle { font: var(--font-h1); }
   .userRow .messageBody { max-width: 90%; }
 }

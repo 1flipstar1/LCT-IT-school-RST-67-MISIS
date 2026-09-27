@@ -84,11 +84,12 @@ export function AnalyticsPage() {
                 </span>
               </ButtonLink>
             )}
-            <Button icon={DownloadIcon} onClick={exportPdf} disabled={exporting}>
+            <Button data-tour="analytics-export" icon={DownloadIcon} onClick={exportPdf} disabled={exporting}>
               {exporting ? 'Формируем PDF…' : 'Скачать PDF'}
             </Button>
             {!editing && (
               <IconButton
+                data-tour="analytics-customize"
                 icon={SettingsIcon}
                 label="Настроить панель"
                 aria-pressed={false}

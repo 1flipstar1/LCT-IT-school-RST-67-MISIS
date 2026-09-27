@@ -17,11 +17,13 @@ import { AddIcon, ErrorIcon, LinkIcon, SuccessIcon, SyncIcon } from '../../ui/ic
 import { PageHeader } from '../../ui/PageHeader.jsx';
 import { Tabs } from '../../ui/Tabs.jsx';
 import { useToast } from '../../ui/Toast.jsx';
+import { TelegramBotCard } from './TelegramBotCard.jsx';
 import styles from './IntegrationsPage.module.css';
 
 const SOURCE_LABEL = { lms: 'LMS', site: 'Сайт' };
 
 export function IntegrationsPage() {
+  const { role } = useSession();
   const { integrations, inbox } = useStoreState();
   const [tab, setTab] = useState('new');
   const newItems = inbox.filter((item) => item.status === 'new');
@@ -33,13 +35,14 @@ export function IntegrationsPage() {
         title="Интеграции" hint="LMS и сайт ИТ Школы передают данные по API в формате JSON. Новые записи разберите: добавьте к существующему взаимодействию или создайте новое."
       />
 
-      <section className={styles.sources} aria-label="Источники данных">
+      <section className={styles.sources} aria-label="Источники данных" data-tour="integration-sources">
         {integrations.sources.map((source) => (
           <SourceCard key={source.id} source={source} />
         ))}
+        <TelegramBotCard canConnect={role === ROLE.lead || role === ROLE.admin} />
       </section>
 
-      <Card className={styles.inbox}>
+      <Card className={styles.inbox} data-tour="integration-inbox">
         <CardHeader title="Входящие записи" hint="Данные из LMS и с сайта ИТ Школы, которые ещё не привязаны к работе с вузом. Добавьте запись к существующему взаимодействию или создайте новое." description="Всё, что пришло из внешних систем и ещё не привязано к работе с вузом." />
         <Tabs
           label="Входящие записи"

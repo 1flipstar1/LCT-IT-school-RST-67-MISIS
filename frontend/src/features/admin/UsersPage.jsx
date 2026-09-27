@@ -176,7 +176,7 @@ export function UsersPage() {
         hint={isAdmin
           ? 'Кто работает в системе и что ему доступно. Роль определяет, что человек может делать, видимость — какие вузы он видит.'
           : 'Менеджеры вашей команды: заведите нового сотрудника, выдайте временный пароль или заблокируйте доступ.'}
-        actions={<Button variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>Добавить сотрудника</Button>}
+        actions={<Button data-tour="users-add" variant="primary" icon={AddIcon} onClick={() => setCreating(true)}>Добавить сотрудника</Button>}
       />
 
       {status && (status.keycloak ? (
@@ -194,7 +194,7 @@ export function UsersPage() {
         </InlineAlert>
       ))}
 
-      <Card padding="none">
+      <Card padding="none" data-tour="users-table">
         <CardHeader
           title="Сотрудники"
           hint="Роль, какие вузы видит сотрудник и активна ли учётная запись."

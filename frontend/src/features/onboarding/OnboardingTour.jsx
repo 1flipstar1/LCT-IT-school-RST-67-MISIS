@@ -4,12 +4,14 @@ import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { useRouter } from '../../app/router.jsx';
 import { useSession } from '../../auth/SessionProvider.jsx';
+import { useVisibleInteractionRows } from '../../store/selectors.js';
 import { useActions } from '../../store/useActions.js';
 import { Button } from '../../ui/Button.jsx';
 import { useToast } from '../../ui/Toast.jsx';
 import { playCue } from './cues.js';
 import { stepsFor } from './tourSteps.js';
 import styles from './OnboardingTour.module.css';
+import { zoomOf } from '../../lib/zoom.js';
 
 export const START_TOUR_EVENT = 'onboarding:start';
 /** Запустить курс заново — например, из справки. */
@@ -18,7 +20,39 @@ export const startOnboarding = () => window.dispatchEvent(new Event(START_TOUR_E
 const PADDING = 8;
 const CARD_WIDTH = 360;
 const GAP = 16;
+/** Сколько ждать, пока раскроется меню (см. анимацию аккордеона в Sidebar). */
+const EXPAND_DELAY = 350;
+/** Сколько длится выезд меню на телефоне (layout/useNavDrawer.js). */
+const DRAWER_DELAY = 550;
 const reducedMotion = () => shouldReduceMotion();
+const pause = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+
+/**
+ * На телефоне и планшете меню спрятано за краем экрана: для шагов про пункты меню открываем его,
+ * для остальных — закрываем, чтобы оно не заслоняло подсвеченный элемент.
+ */
+async function revealNavigation(node) {
+  if (document.documentElement.dataset.layout === 'desktop') return;
+  const nav = document.getElementById('app-navigation');
+  const button = document.querySelector('[aria-controls="app-navigation"]');
+  const expanded = button?.getAttribute('aria-expanded') === 'true';
+  const inside = Boolean(node && nav?.contains(node));
+  if (inside && !expanded) {
+    button?.click();
+    await pause(reducedMotion() ? 0 : DRAWER_DELAY);
+  } else if (!inside && expanded) {
+    document.querySelector('[data-nav-scrim]')?.click();
+    await pause(reducedMotion() ? 0 : DRAWER_DELAY);
+  }
+}
+
+/** Шагу нужно раскрытое меню — нажимаем на свёрнутый переключатель и ждём конца анимации. */
+async function expand(target) {
+  const toggle = target && document.querySelector(`[data-tour="${target}"][aria-expanded="false"]`);
+  if (!toggle) return;
+  toggle.click();
+  await pause(reducedMotion() ? 0 : EXPAND_DELAY);
+}
 
 /** Ждём элемент шага после перехода на страницу: страницы грузятся лениво. */
 function waitForTarget(target, timeout = 2500) {
@@ -47,7 +81,8 @@ function holeFor(node) {
 
 /** Где поставить карточку шага: со стороны placement, а если не помещается — где есть место. */
 function cardPosition(hole, placement, cardHeight) {
-  const width = Math.min(CARD_WIDTH, window.innerWidth - GAP * 2);
+  // Карточка растёт вместе с масштабом интерфейса: её текст увеличен тем же zoom (см. .content).
+  const width = Math.min(CARD_WIDTH * zoomOf(document.getElementById('root')), window.innerWidth - GAP * 2);
   if (hole.w === 0) return { left: (window.innerWidth - width) / 2, top: Math.max(GAP, (window.innerHeight - cardHeight) / 2), width };
   const fits = {
     right: hole.x + hole.w + GAP + width < window.innerWidth,
@@ -74,6 +109,9 @@ export function OnboardingTour() {
   const { pathname, navigate } = useRouter();
   const actions = useActions();
   const toast = useToast();
+  const rows = useVisibleInteractionRows();
+  const rowsRef = useRef(rows);
+  rowsRef.current = rows;
   const steps = useMemo(() => stepsFor(can), [can]);
 
   const [active, setActive] = useState(false);
@@ -143,10 +181,15 @@ export function OnboardingTour() {
   useLayoutEffect(() => {
     if (!active || !step) return undefined;
     let cancelled = false;
-    if (step.route && step.route !== pathname) navigate(step.route);
+    const route = typeof step.route === 'function' ? step.route({ rows: rowsRef.current }) : step.route;
+    if (route && route !== pathname) navigate(route);
 
     (async () => {
+      await expand(step.expand);
+      if (cancelled) return;
       const node = await waitForTarget(step.target);
+      if (cancelled) return;
+      await revealNavigation(node);
       if (cancelled) return;
       node?.scrollIntoView({ block: 'center', behavior: 'instant' });
       targetRef.current = node;
@@ -165,7 +208,7 @@ export function OnboardingTour() {
       if (!reducedMotion()) {
         gsap.delayedCall(duration, () => {
           if (cancelled || !cueLayerRef.current) return;
-          cueRef.current = playCue(step.cue, { layer: cueLayerRef.current, rect: node ? hole : null, card, ring: ringRef.current, classes: styles });
+          cueRef.current = playCue(step.cue, { layer: cueLayerRef.current, target: node, rect: node ? hole : null, card, ring: ringRef.current, classes: styles });
         });
       }
     })();
@@ -231,12 +274,13 @@ export function OnboardingTour() {
 
       <section ref={cardRef} className={styles.card}>
         <div data-tour-content className={styles.content}>
-          <div className={styles.progress} aria-label={`Шаг ${index + 1} из ${steps.length}`}>
-            {steps.map((item, dotIndex) => (
-              <span key={item.id} className={dotIndex <= index ? styles.dotDone : styles.dotTodo} />
-            ))}
+          <div className={styles.status}>
+            <span>{step.section}</span>
+            <span aria-hidden="true">{index + 1} / {steps.length}</span>
           </div>
-          <p className={styles.counter}>Курс новичка · {index + 1} из {steps.length}</p>
+          <div className={styles.progress} role="progressbar" aria-label="Курс новичка" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={index + 1} aria-valuetext={`Шаг ${index + 1} из ${steps.length}`}>
+            <span className={styles.progressFill} style={{ width: `${((index + 1) / steps.length) * 100}%` }} />
+          </div>
           <h2 id="tour-title" className={styles.title}>{step.id === 'welcome' && user?.name ? `Добро пожаловать, ${user.name.split(' ')[0]}!` : step.title}</h2>
           <p id="tour-text" className={styles.text}>{step.text}</p>
           <div className={styles.actions}>

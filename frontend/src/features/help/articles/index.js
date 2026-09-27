@@ -1,6 +1,7 @@
 import { ADMIN_ARTICLES } from './admin.js';
 import { ASSISTANT_ARTICLES } from './assistant.js';
 import { DATA_ARTICLES } from './data.js';
+import { PROFILE_ARTICLES } from './profile.js';
 import { WORK_ARTICLES } from './work.js';
 
 /**
@@ -15,6 +16,7 @@ import { WORK_ARTICLES } from './work.js';
  */
 export const HELP_CATEGORIES = [
   { id: 'start', title: 'Начало работы', description: 'Вход, роли, интерфейс и курс новичка' },
+  { id: 'profile', title: 'Настройки и уведомления', description: 'Профиль, масштаб, анимации, Telegram' },
   { id: 'dashboard', title: 'Дашборд', description: 'Главная страница и срочные этапы' },
   { id: 'interactions', title: 'Взаимодействия', description: 'Список, фильтры, доска этапов' },
   { id: 'cards', title: 'Карточка взаимодействия', description: 'Этапы, комментарии, файлы, изменения' },
@@ -31,7 +33,7 @@ export const HELP_CATEGORIES = [
   { id: 'troubleshooting', title: 'Если что-то не так', description: 'Коды ошибок и частые проблемы' },
 ];
 
-export const HELP_ARTICLES = [...WORK_ARTICLES, ...DATA_ARTICLES, ...ASSISTANT_ARTICLES, ...ADMIN_ARTICLES];
+export const HELP_ARTICLES = [...WORK_ARTICLES, ...PROFILE_ARTICLES, ...DATA_ARTICLES, ...ASSISTANT_ARTICLES, ...ADMIN_ARTICLES];
 
 const byId = new Map(HELP_ARTICLES.map((article) => [article.id, article]));
 export const articleById = (id) => byId.get(id) ?? null;

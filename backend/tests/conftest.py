@@ -14,6 +14,8 @@ os.environ["APP_ENV"] = "test"
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DATABASE.as_posix()}"
 os.environ["JWT_SECRET"] = "test-secret-that-is-not-used-outside-tests"
 os.environ["ATTACHMENT_STORAGE_PATH"] = str(TEST_ATTACHMENTS)
+# Тесты не должны ходить к настоящему боту из backend/.env.local — в test_telegram.py свой поддельный клиент.
+os.environ["TELEGRAM_BOT_TOKEN"] = ""
 
 from app.main import app  # noqa: E402
 from app.core.database import engine  # noqa: E402

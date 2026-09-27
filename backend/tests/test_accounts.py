@@ -170,3 +170,21 @@ def test_onboarding_is_remembered_on_the_server(client: TestClient) -> None:
     reset = client.put("/api/v1/me/onboarding", json={"status": "reset"}, headers=manager)
     assert "onboarding" not in next(user for user in reset.json()["state"]["users"] if user["id"] == "usr-1")
     assert client.put("/api/v1/me/onboarding", json={"status": "later"}, headers=manager).status_code == 422
+
+
+def test_preferences_follow_the_employee_and_stay_private(client: TestClient) -> None:
+    manager = _headers(client, "manager")
+    preferences = {
+        "avatar": "avatar-3", "uiScale": 120, "reduceMotion": True, "showBadges": False, "showHints": False, "shortcuts": False,
+        "startPage": "/analytics", "interactionView": "table", "interactionSort": "updated", "toastDuration": 10000,
+    }
+    saved = client.put("/api/v1/me/preferences", json=preferences, headers=manager)
+    assert saved.status_code == 200, saved.text
+    me = next(user for user in saved.json()["state"]["users"] if user["id"] == "usr-1")
+    assert me["preferences"] == preferences
+
+    admin_view = client.get("/api/v1/state", headers=_headers(client, "admin")).json()["state"]["users"]
+    assert "preferences" not in next(user for user in admin_view if user["id"] == "usr-1"), "чужие настройки не видны"
+
+    for broken in ({**preferences, "startPage": "/users"}, {**preferences, "toastDuration": 1}, {**preferences, "theme": "dark"}):
+        assert client.put("/api/v1/me/preferences", json=broken, headers=manager).status_code == 422

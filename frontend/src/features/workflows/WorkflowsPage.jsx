@@ -108,7 +108,7 @@ export function WorkflowsPage() {
           />
         )}
 
-        <ol className={styles.stages}>
+        <ol className={styles.stages} data-tour="workflow-stages">
           {draft.stages.map((stage, index) => {
             const usage = usageByStage.get(stage.id) ?? 0;
             return (
@@ -161,7 +161,7 @@ export function WorkflowsPage() {
           </InlineAlert>
         )}
 
-        <footer className={styles.footer}>
+        <footer className={styles.footer} data-tour="workflow-save">
           <span className={styles.dirty}>{isDirty ? 'Есть несохранённые изменения' : 'Все изменения сохранены'}</span>
           <Button onClick={discard} disabled={!isDirty}>
             {isNew ? 'Удалить черновик' : 'Отменить изменения'}

@@ -39,7 +39,7 @@ export function FilterBar({
   const inPanel = variant === 'panel';
 
   const search = show.search !== false && (
-    <SearchField className={styles.search} value={filters.query} onChange={(query) => set({ query })} placeholder={searchPlaceholder} />
+    <SearchField data-tour="filters-search" className={styles.search} value={filters.query} onChange={(query) => set({ query })} placeholder={searchPlaceholder} />
   );
   const fields = <FilterFields filters={filters} set={set} show={show} stages={stages} fieldClassName={inPanel ? styles.panelField : undefined} />;
 
@@ -94,10 +94,10 @@ function FilterPanelBar({ search, fields, activeCount, onReset, resultLabel, act
   return (
     <div className={styles.panelBar}>
       {search}
-      <Button icon={FilterIcon} onClick={() => setOpen(true)}>
+      <span data-tour="filters-button"><Button icon={FilterIcon} onClick={() => setOpen(true)}>
         Фильтры
         {activeCount > 0 && <span className={styles.badge}>{activeCount}</span>}
-      </Button>
+      </Button></span>
       {actions && <div className={styles.actions}>{actions}</div>}
 
       <SidePanel

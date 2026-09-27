@@ -23,7 +23,8 @@ class Settings(BaseSettings):
     """Runtime settings with safe local-development defaults."""
 
     model_config = SettingsConfigDict(
-        env_file=BACKEND_DIR / ".env",
+        # .env.local (не в git) — для секретов конкретной машины, например токена Telegram-бота; перекрывает .env.
+        env_file=(BACKEND_DIR / ".env", BACKEND_DIR / ".env.local"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -86,6 +87,20 @@ class Settings(BaseSettings):
     # Системный промпт с инструментами занимает ~5 тыс. токенов; окно Ollama по умолчанию (4096) мало.
     assistant_context_tokens: int = 8192
 
+    # Telegram-бот уведомляет руководителя, когда его менеджер переводит заявку на другой этап.
+    # Токен выдаёт @BotFather; без него бот выключен, а CRM работает как обычно.
+    telegram_bot_token: str | None = None
+    telegram_api_url: str = "https://api.telegram.org"
+    # Long polling не требует публичного адреса. В нескольких экземплярах API включайте его только в одном.
+    telegram_polling_enabled: bool = True
+    # Пауза перед отправкой: если менеджер нажмёт «Отменить», уведомление не уйдёт.
+    telegram_notify_delay_seconds: float = 15.0
+    telegram_timeout_seconds: int = 10
+    # Прокси до api.telegram.org, если прямой доступ из сети сервера нестабилен: http://host:port или socks5://host:port.
+    telegram_proxy_url: str | None = None
+    # Адрес CRM для кнопки «Открыть карточку» в сообщении, например https://crm.example.ru.
+    public_app_url: str | None = None
+
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_database_url(cls, value: object) -> object:
@@ -113,6 +128,9 @@ class Settings(BaseSettings):
         "lms_api_token",
         "website_api_url",
         "website_api_token",
+        "telegram_bot_token",
+        "telegram_proxy_url",
+        "public_app_url",
         mode="before",
     )
     @classmethod

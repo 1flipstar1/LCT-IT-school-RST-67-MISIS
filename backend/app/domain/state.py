@@ -240,16 +240,47 @@ def authorize_state_replacement(current: dict[str, Any], proposed: dict[str, Any
             _reject("universities")
 
 
+# Fields of a user card that only the server writes (through /me endpoints and the Telegram bot).
+# Browsers never receive the Telegram binding and see only their own preferences; on save the
+# server copies these fields back from its own state, so a client snapshot can neither forge nor lose them.
+SERVER_OWNED_USER_FIELDS = ("preferences", "telegram")
+
+
+def _hide_private_user_fields(state: dict[str, Any], own_id: str) -> dict[str, Any]:
+    for item in state["users"]:
+        item.pop("telegram", None)
+        if item.get("id") != own_id:
+            item.pop("preferences", None)
+    return state
+
+
+def _restore_server_owned_user_fields(current: dict[str, Any], proposed: dict[str, Any]) -> dict[str, Any]:
+    current_users = {item.get("id"): item for item in current.get("users", []) if isinstance(item, dict)}
+    for item in proposed.get("users", []):
+        if not isinstance(item, dict):
+            continue
+        existing = current_users.get(item.get("id"), {})
+        for field in SERVER_OWNED_USER_FIELDS:
+            if field in existing:
+                item[field] = copy.deepcopy(existing[field])
+            else:
+                item.pop(field, None)
+    return proposed
+
+
 def project_state_for_principal(state: dict[str, Any], principal: Principal | None) -> dict[str, Any]:
     """Return only the records visible to a non-admin user.
 
     Catalog names remain available for creating a new interaction, while
     university contacts and operational records are restricted to the user's
-    data scope.
+    data scope. Other employees' personal settings are never exposed.
     """
 
-    if principal is None or principal.role == "admin":
+    if principal is None:
+        # Anonymous access exists only in local development, where server jobs also read the full state.
         return copy.deepcopy(state)
+    if principal.role == "admin":
+        return _hide_private_user_fields(copy.deepcopy(state), find_principal_user(state, principal)["id"])
     user = find_principal_user(state, principal)
     visible_ids = visible_interaction_ids(state, user)
     interactions = [item for item in state["interactions"] if item["id"] in visible_ids]
@@ -285,7 +316,7 @@ def project_state_for_principal(state: dict[str, Any], principal: Principal | No
         projected["integrations"] = {"sources": [], "log": []}
     else:
         projected["audit"] = [copy.deepcopy(item) for item in state["audit"] if item.get("userId") in related_user_ids]
-    return projected
+    return _hide_private_user_fields(projected, user["id"])
 
 
 def merge_state_for_principal(
@@ -296,7 +327,7 @@ def merge_state_for_principal(
     """Merge a scoped browser snapshot back into the canonical aggregate."""
 
     if principal.role == "admin":
-        return copy.deepcopy(proposed)
+        return _restore_server_owned_user_fields(current, copy.deepcopy(proposed))
     user = find_principal_user(current, principal)
     projected_current = project_state_for_principal(current, principal)
     protected = {"users", "version"}

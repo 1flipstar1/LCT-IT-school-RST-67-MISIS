@@ -67,16 +67,18 @@ function InteractionView({ row }) {
         }
         actions={
           !row.completedAt && (
-            <Button variant="primary" icon={WorkflowIcon} onClick={() => setTransitionOpen(true)}>
-              Сменить этап
-            </Button>
+            <span data-tour="card-change-stage">
+              <Button variant="primary" icon={WorkflowIcon} onClick={() => setTransitionOpen(true)}>
+                Сменить этап
+              </Button>
+            </span>
           )
         }
       />
 
       <div className={styles.layout}>
         <div className={styles.main}>
-          <Card className={styles.current}>
+          <Card className={styles.current} data-tour="card-stage">
             <p className={styles.eyebrow}>
               {row.completedAt ? 'Взаимодействие завершено' : `Текущий этап · ${progress.step} из ${progress.total}`}
             </p>
@@ -108,7 +110,7 @@ function InteractionView({ row }) {
             </dl>
           </Card>
 
-          <Card>
+          <Card data-tour="card-history">
             <Tabs
               label="Разделы взаимодействия"
               value={tab}
@@ -131,7 +133,7 @@ function InteractionView({ row }) {
         </div>
 
         <aside className={styles.aside}>
-          <Card className={styles.characteristics}>
+          <Card className={styles.characteristics} data-tour="card-params">
             <CardHeader
               title="Характеристики заявки"
               hint="Основные параметры заявки: вуз, ИТ-направление, учебная программа, ИТ-продукт и выбранный процесс работы."
@@ -175,7 +177,7 @@ function InteractionView({ row }) {
             </dl>
           </Card>
 
-          <Card>
+          <Card data-tour="card-people">
             <CardHeader
               title="Ответственные"
               hint="Кто ведёт работу с вузом со стороны ИТ Школы и кто контактное лицо со стороны вуза."
@@ -217,7 +219,7 @@ function InteractionView({ row }) {
             </div>
           </Card>
 
-          <Card>
+          <Card data-tour="card-path">
             <CardHeader title="Путь взаимодействия" hint="Все этапы работы с вузом по порядку: пройденные отмечены, текущий выделен." description={row.workflow.name} />
             <StageStepper row={row} events={events} />
           </Card>

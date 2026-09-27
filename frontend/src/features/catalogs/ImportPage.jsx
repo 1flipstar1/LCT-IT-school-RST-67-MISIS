@@ -158,7 +158,7 @@ export function ImportPage() {
         actions={<Button icon={DownloadIcon} onClick={downloadImportTemplate}>Скачать шаблон</Button>}
       />
 
-      <ol className={styles.steps} aria-label="Шаги импорта">
+      <ol className={styles.steps} aria-label="Шаги импорта" data-tour="import-steps">
         {STEPS.map((label, index) => (
           <li key={label} className={cn(styles.step, index === step && styles.stepCurrent, index < step && styles.stepDone)} aria-current={index === step ? 'step' : undefined}>
             <span className={styles.stepMarker}>{index < step ? <CheckIcon size={16} fill="currentColor" /> : index + 1}</span>
@@ -167,7 +167,7 @@ export function ImportPage() {
         ))}
       </ol>
 
-      <Card className={styles.panel}>
+      <Card className={styles.panel} data-tour="import-panel">
         {step === 0 && (
           <div className={styles.stack}>
             <FileDropzone files={[]} multiple={false} accept=".xlsx,.csv" onChange={handleFile} title="Перетащите файл XLSX или CSV" hint="Первая строка — заголовки колонок · до 25 МБ · CSV через «;» или «,»" />

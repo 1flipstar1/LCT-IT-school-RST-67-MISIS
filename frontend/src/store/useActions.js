@@ -380,6 +380,12 @@ export function useActions() {
         applyServerSnapshot(await apiClient.updateOnboarding(status));
       },
 
+      /** Личные настройки интерфейса: сервер хранит их в карточке сотрудника, поэтому они переезжают на любой компьютер. */
+      async updatePreferences(preferences) {
+        await flush();
+        applyServerSnapshot(await apiClient.updatePreferences(preferences));
+      },
+
       async rollbackImport(importId, { force = false } = {}) {
         requirePermission(PERMISSION.importCatalogs);
         await flush();

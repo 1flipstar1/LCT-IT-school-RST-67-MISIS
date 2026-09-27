@@ -289,6 +289,15 @@
   overflow: hidden;
 }
 
+.legacy.legacy-dashboard .dashboard-universities-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.legacy.legacy-dashboard .dashboard-universities-scroll table {
+  min-width: 720px;
+}
+
 .legacy.legacy-dashboard .dashboard-universities-table tbody tr:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: -2px;
@@ -396,16 +405,88 @@
   }
 }
 
+.legacy.legacy-dashboard .page-actions {
+  min-width: 0;
+}
+
+.legacy.legacy-dashboard .dash-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3x);
+}
+
 .legacy.legacy-dashboard .dashboard-manager-filter {
   width: auto;
-  max-width: 300px;
-  color: var(--color-brand);
-  border-color: var(--color-brand);
-  padding: 0 var(--space-4x);
+  min-width: 188px;
+  max-width: 260px;
+  height: var(--control-height-m);
+  padding: 0 var(--space-3x);
+  border-color: var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  color: var(--color-text);
   font: var(--font-body-s-strong);
+  box-shadow: none;
+}
+
+.legacy.legacy-dashboard .dashboard-manager-filter:hover,
+.legacy.legacy-dashboard .dashboard-manager-filter[data-popup-open] {
+  border-color: var(--color-brand);
+  background: var(--color-brand-softer);
 }
 
 .legacy.legacy-dashboard .dashboard-manager-filter svg {
-  color: inherit;
   flex-shrink: 0;
+  color: var(--color-brand);
+}
+
+.legacy.legacy-dashboard .dash-header-actions .button {
+  height: var(--control-height-m);
+  padding: 0 var(--space-4x);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: var(--font-body-s-strong);
+  box-shadow: none;
+}
+
+.legacy.legacy-dashboard .dash-header-actions .button:hover {
+  border-color: var(--color-brand);
+  background: var(--color-brand-softer);
+  color: var(--color-brand);
+}
+
+.legacy.legacy-dashboard .dash-header-actions .button:focus-visible {
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.legacy.legacy-dashboard .dash-header-actions .button.primary {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+
+.legacy.legacy-dashboard .dash-header-actions .button.primary:hover {
+  border-color: var(--color-brand-hover);
+  background: var(--color-brand-hover);
+  color: var(--color-text-on-brand);
+}
+
+@media (max-width: 760px) {
+  .legacy.legacy-dashboard .dash-header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .legacy.legacy-dashboard .dash-header-actions > * {
+    flex: 1 1 auto;
+  }
+
+  .legacy.legacy-dashboard .dashboard-manager-filter {
+    max-width: none;
+  }
 }

@@ -38,7 +38,7 @@ font:inherit
 cursor:pointer;border:0;background:none;color:inherit
 }
 .legacy .app-shell {
-display:flex;min-height:100vh
+display:flex;min-height:var(--viewport-height)
 }
 .legacy .sidebar {
 width:256px;background:var(--nav);color:#e7eaf1;display:flex;flex-direction:column;flex-shrink:0;padding:24px 14px
@@ -1001,10 +1001,10 @@ outline:0
 }
 /* Fixed sidebar and account controls */
 .legacy .sidebar {
-position:fixed;inset:0 auto 0 0;height:100vh;overflow:hidden;z-index:4
+position:fixed;inset:0 auto 0 0;height:var(--viewport-height);overflow:hidden;z-index:4
 }
 .legacy .main {
-margin-left:256px;min-height:100vh
+margin-left:256px;min-height:var(--viewport-height)
 }
 .legacy .sidebar-bottom {
 flex-shrink:0
@@ -1052,7 +1052,7 @@ min-width:64px
 }
 @media(max-width:760px) {
 .legacy .sidebar {
-height:100vh;overflow:hidden
+height:var(--viewport-height);overflow:hidden
 }
 .legacy .main {
 margin-left:0
@@ -1869,6 +1869,7 @@ display:block;width:100%;height:100%
 display:block
 }
 .legacy .stage-bar-popover-content {
+  zoom: var(--ui-scale);
 display:grid;gap:4px;max-width:240px
 }
 .legacy .stage-bar-popover-content b {

@@ -1,0 +1,261 @@
+/* ---------- Баннер «Подключите Telegram»: сплошной фирменный фиолетовый, без градиента ---------- */
+/* Превью переносится под текст, когда самому баннеру не хватает ширины (а не окну). */
+.banner {
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8x);
+  padding: var(--space-8x);
+  border-radius: var(--radius-xl);
+  background: var(--color-brand);
+  color: var(--color-surface);
+  box-shadow: var(--shadow-m);
+}
+
+.pitch {
+  flex: 1 1 380px;
+  display: grid;
+  gap: var(--space-4x);
+  justify-items: start;
+}
+
+.eyebrow {
+  padding: var(--space-1x) var(--space-3x);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-surface) 18%, transparent);
+  font: var(--font-caption-strong);
+  letter-spacing: 0.02em;
+}
+
+.title {
+  max-width: 520px;
+  font: var(--font-h2);
+}
+
+.lead {
+  max-width: 560px;
+  font: var(--font-body-m);
+  opacity: 0.92;
+}
+
+.benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2x) var(--space-5x);
+  font: var(--font-body-s-strong);
+}
+
+.benefits li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1_5x);
+}
+
+.benefits svg {
+  flex-shrink: 0;
+  padding: var(--space-0_5x);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-brand);
+}
+
+.steps {
+  display: grid;
+  gap: var(--space-2x);
+  padding-left: var(--space-5x);
+  font: var(--font-body-m);
+  list-style: decimal;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4x);
+  margin-top: var(--space-2x);
+}
+
+/* Белая кнопка на фиолетовом фоне: те же переменные Атомаро, что у главной кнопки. */
+.cta.cta {
+  --button-primary-accent-bg-color-default: var(--color-surface);
+  --button-primary-accent-bg-color-hover: var(--color-brand-soft);
+  --button-primary-accent-bg-color-active: var(--color-brand-soft);
+  --button-primary-accent-label-color-default: var(--color-brand);
+  --button-primary-accent-label-color-hover: var(--color-brand-active);
+  --button-primary-accent-label-color-active: var(--color-brand-active);
+  --button-primary-accent-icon-color-default: var(--color-brand);
+  --button-primary-accent-icon-color-hover: var(--color-brand-active);
+  --button-primary-accent-icon-color-active: var(--color-brand-active);
+  background: var(--button-primary-accent-bg-color-default);
+  color: var(--color-brand);
+  box-shadow: var(--shadow-s);
+}
+
+.cta.cta:hover {
+  background: var(--color-brand-soft);
+}
+
+.note,
+.waiting {
+  font: var(--font-caption);
+  opacity: 0.85;
+}
+
+.secondary {
+  padding: var(--space-2x) var(--space-1x);
+  border: none;
+  background: none;
+  color: var(--color-surface);
+  font: var(--font-body-s-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
+}
+
+.cta:focus-visible,
+.secondary:focus-visible {
+  outline: 2px solid var(--color-surface);
+  outline-offset: 2px;
+}
+
+/* ---------- Пример сообщения ---------- */
+.preview {
+  flex: 0 1 300px;
+  margin-left: auto;
+  display: grid;
+  gap: var(--space-3x);
+  padding: var(--space-4x);
+  border-radius: var(--radius-l);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-l);
+  transform: rotate(1.5deg);
+}
+
+.previewHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.previewHead span:last-child {
+  display: grid;
+  font: var(--font-body-s-strong);
+}
+
+.previewHead small {
+  color: var(--color-text-tertiary);
+  font: var(--font-caption);
+}
+
+.previewAvatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+  color: var(--color-surface);
+}
+
+.bubble {
+  display: grid;
+  gap: var(--space-1x);
+  padding: var(--space-3x);
+  border-radius: var(--radius-l) var(--radius-l) var(--radius-l) var(--space-1x);
+  background: var(--color-brand-softer);
+  font: var(--font-caption);
+  color: var(--color-text-secondary);
+}
+
+.bubble b {
+  color: var(--color-text);
+}
+
+.bubble > b:first-child {
+  font: var(--font-body-s-strong);
+}
+
+/* ---------- Уже подключено: компактная строка ---------- */
+.connected {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4x);
+}
+
+.connectedIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.connectedText {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1x);
+  min-width: 0;
+}
+
+.connectedText p {
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.connectedTitle {
+  font: var(--font-h4);
+}
+
+.connectedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2x);
+}
+
+/* Превью — украшение: когда баннер узкий, оно только вытягивает его в высоту. */
+@container (max-width: 760px) {
+  .preview {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .banner {
+    gap: var(--space-6x);
+    padding: var(--space-6x);
+  }
+
+  .preview {
+    transform: none;
+  }
+
+  .connected {
+    flex-wrap: wrap;
+  }
+}

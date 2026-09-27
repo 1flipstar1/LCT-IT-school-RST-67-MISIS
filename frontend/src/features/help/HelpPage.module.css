@@ -15,7 +15,7 @@
   top: calc(52px + var(--space-6x));
   display: grid;
   gap: var(--space-3x);
-  max-height: calc(100vh - 52px - var(--space-12x));
+  max-height: calc(var(--viewport-height) - 52px - var(--space-12x));
   overflow-y: auto;
   padding-right: var(--space-1x);
 }

@@ -7,6 +7,7 @@ import { Flip } from 'gsap/Flip';
 import { Button } from '../../../ui/Button.jsx';
 import { AddIcon, RefreshIcon } from '../../../ui/icons.js';
 import { SidePanel } from '../../../ui/SidePanel.jsx';
+import { toLayoutPx, zoomOf } from '../../../lib/zoom.js';
 import { WidgetContext } from '../../../ui/widgetContext.js';
 import { ReportPin } from '../ReportPin.jsx';
 import { WIDGET_CATEGORY } from '../widgets/common.js';
@@ -36,14 +37,16 @@ const sizeSpan = (size, columns) => {
 function closestGridIndex(nodes, dragged, grid) {
   const draggedRect = dragged.getBoundingClientRect();
   const gridRect = grid.getBoundingClientRect();
+  // offset* — в пикселях макета, rect — в экранных: при масштабе интерфейса приводим к экранным.
+  const zoom = zoomOf(grid);
   let result = Number(dragged.dataset.widgetIndex);
   let distance = Number.POSITIVE_INFINITY;
   nodes.forEach((node) => {
     const slot = {
-      left: gridRect.left + node.offsetLeft,
-      top: gridRect.top + node.offsetTop,
-      width: node.offsetWidth,
-      height: node.offsetHeight,
+      left: gridRect.left + node.offsetLeft * zoom,
+      top: gridRect.top + node.offsetTop * zoom,
+      width: node.offsetWidth * zoom,
+      height: node.offsetHeight * zoom,
     };
     const nextDistance = centerDistance(draggedRect, slot);
     if (nextDistance < distance) {
@@ -148,8 +151,8 @@ function useGsapDashboardEditing({
           callbacksRef.current.onPreviewMove(id, index);
           this.update(false, true);
           const visualAfter = node.getBoundingClientRect();
-          this.x += visualBefore.left - visualAfter.left;
-          this.y += visualBefore.top - visualAfter.top;
+          this.x += toLayoutPx(visualBefore.left - visualAfter.left, node);
+          this.y += toLayoutPx(visualBefore.top - visualAfter.top, node);
           gsap.set(node, { x: this.x, y: this.y });
           previewAnimation?.kill();
           previewAnimation = Flip.from(state, {
@@ -220,7 +223,7 @@ function useGsapDashboardEditing({
             const span = sizeSpan(size, columns.length);
             return columns.slice(0, span).reduce((sum, width) => sum + width, 0) + gap * Math.max(0, span - 1);
           });
-          startWidth = node.getBoundingClientRect().width;
+          startWidth = toLayoutPx(node.getBoundingClientRect().width, node);
           previewIndex = startIndex;
           appliedPreviewIndex = startIndex;
           node.classList.add(styles.widgetResizing);
@@ -231,6 +234,7 @@ function useGsapDashboardEditing({
         onDrag() {
           const minWidth = Math.min(...allowedWidths);
           const maxWidth = Math.max(...allowedWidths);
+          // Draggable сам учитывает CSS zoom: this.x уже в пикселях макета.
           const width = clamp(startWidth + this.x, minWidth, maxWidth);
           const delta = width - startWidth;
           const range = Math.max(1, maxWidth - minWidth);

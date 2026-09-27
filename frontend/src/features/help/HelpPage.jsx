@@ -48,7 +48,7 @@ export function HelpPage() {
       <PageHeader
         title="Справка"
         hint="База знаний по всем разделам: пошаговые инструкции со скриншотами. Не нашли ответ — спросите ИИ-помощника."
-        actions={<Button icon={MagicIcon} onClick={startOnboarding}>Пройти курс новичка</Button>}
+        actions={<Button data-tour="help-restart" icon={MagicIcon} onClick={startOnboarding}>Пройти курс новичка</Button>}
       />
 
       <Tabs
@@ -65,7 +65,7 @@ export function HelpPage() {
 
       {section === 'kb' && (
         <div className={styles.layout}>
-          <aside className={styles.sidebar} aria-label="Разделы базы знаний">
+          <aside className={styles.sidebar} aria-label="Разделы базы знаний" data-tour="help-knowledge">
             <SearchField value={search} onChange={setSearch} placeholder="Поиск по справке" label="Поиск по справке" className={styles.search} />
             <nav className={styles.categories}>
               {HELP_CATEGORIES.map((item) => {

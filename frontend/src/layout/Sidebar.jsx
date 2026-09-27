@@ -53,7 +53,7 @@ function NavigationGroup({ group, pathname, badges, onNavigate }) {
   );
 }
 
-export function Sidebar({ open, onNavigate }) {
+export function Sidebar({ open, onNavigate, panelRef }) {
   const { pathname } = useRouter();
   const { user, role, can, logout } = useSession();
   const { users } = useStoreState();
@@ -98,7 +98,7 @@ export function Sidebar({ open, onNavigate }) {
   }, [settingsOpen, preferences.reduceMotion]);
 
   return (
-    <aside className={cn(styles.sidebar, open && styles.open)} aria-label="Основная навигация" data-print-hidden>
+    <aside id="app-navigation" ref={panelRef} className={cn(styles.sidebar, open && styles.open)} aria-label="Основная навигация" data-print-hidden data-layout-flip>
       <Link to="/" className={styles.brand} onClick={onNavigate}>
         <img src={logoUrl} alt="Ростелеком. ИТ Школа — на главную" className={styles.logo} />
       </Link>
@@ -108,7 +108,7 @@ export function Sidebar({ open, onNavigate }) {
           .filter((group) => group.id !== 'admin')
           .map((group) => <NavigationGroup key={group.id} group={group} pathname={pathname} badges={badges} onNavigate={onNavigate} />)}
 
-        {adminGroup && <section className={styles.accordion}>
+        {adminGroup && <section className={styles.accordion} data-tour="nav-settings-group">
           <button
             type="button"
             data-tour="nav-settings"
@@ -137,7 +137,7 @@ export function Sidebar({ open, onNavigate }) {
                 const Icon = item.icon;
                 return (
                   <li key={item.to}>
-                    <Link to={item.to} className={cn(styles.item, active && styles.active)} aria-current={active ? 'page' : undefined} onClick={onNavigate}>
+                    <Link to={item.to} data-tour={`nav:${item.to}`} className={cn(styles.item, active && styles.active)} aria-current={active ? 'page' : undefined} onClick={onNavigate}>
                       <Icon size={20} fill="currentColor" />
                       <span className={styles.itemLabel}>{item.label}</span>
                       {count > 0 && (
@@ -168,7 +168,7 @@ export function Sidebar({ open, onNavigate }) {
           </span>
           <ArrowRightIcon size={16} fill="currentColor" className={styles.helpArrow} />
         </Link>
-        <div className={styles.user}>
+        <div className={styles.user} data-tour="profile">
           <Link to="/profile" className={styles.profileLink} onClick={onNavigate} aria-label="Настройки профиля">
           <Avatar name={user.name} src={avatarSrc} variant="brand" />
           <div className={styles.userText}>

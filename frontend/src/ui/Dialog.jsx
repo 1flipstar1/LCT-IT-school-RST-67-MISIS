@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { cn } from '../lib/cn.js';
 import { CloseIcon } from './icons.js';
@@ -6,14 +7,32 @@ import styles from './Dialog.module.css';
 /**
  * Модальное окно на Base UI: фокус-ловушка, закрытие по Esc и клику по фону, aria-разметка.
  * На телефоне превращается в нижний лист на всю ширину.
+ *
+ * Фокус после закрытия возвращается туда, откуда окно открыли. Если того элемента уже нет
+ * (карточка переехала в другую колонку доски, кнопка «Сменить этап» пропала у завершённого
+ * взаимодействия), Base UI отдал бы фокус последнему живому элементу из своей истории — часто
+ * это строка поиска, и она открывала бы выпадающий список. Поэтому запасной вариант — сама страница.
  */
 export function Dialog({ open, onOpenChange, title, description, children, footer, size = 'm' }) {
+  const openerRef = useRef(null);
+  const wasOpenRef = useRef(false);
+  // Запоминаем источник в момент открытия, до того как Base UI переведёт фокус внутрь окна.
+  if (open && !wasOpenRef.current) openerRef.current = document.activeElement;
+  wasOpenRef.current = open;
+
+  const returnFocus = () => {
+    const opener = openerRef.current;
+    const target = opener?.isConnected && opener !== document.body ? opener : document.getElementById('main');
+    target?.focus({ preventScroll: true });
+    return false;
+  };
+
   return (
     <BaseDialog.Root open={open} onOpenChange={onOpenChange}>
       <BaseDialog.Portal>
         <BaseDialog.Backdrop className={styles.backdrop} />
         <BaseDialog.Viewport className={styles.viewport}>
-          <BaseDialog.Popup className={cn(styles.popup, styles[size])}>
+          <BaseDialog.Popup className={cn(styles.popup, styles[size])} finalFocus={returnFocus}>
             <header className={styles.header}>
               <div className={styles.titles}>
                 <BaseDialog.Title className={styles.title}>{title}</BaseDialog.Title>

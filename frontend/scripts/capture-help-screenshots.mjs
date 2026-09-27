@@ -2,13 +2,13 @@
 /**
  * Скриншоты для базы знаний (public/help/*.png).
  *
- * Запуск: поднять стенд (frontend :5173, API :8000), затем
+ * Запуск: поднять стенд (API :8000 отдаёт и собранный фронтенд — backend/run-local.sh), затем
  *   node scripts/capture-help-screenshots.mjs
- * Переменные: BASE_URL (по умолчанию http://localhost:5173), CHROME — путь к Google Chrome.
+ * Переменные: BASE_URL (по умолчанию http://localhost:8000), CHROME — путь к Google Chrome.
  *
  * Скрипт только открывает экраны и диалоги, ничего не сохраняя. Вход — через демо-авторизацию API
  * (роль администратора, чтобы были видны все разделы). Курс новичка на время съёмки помечается
- * пройденным, а в конце отметка возвращается как была.
+ * пройденным, настройки профиля (вид списка) меняются под кадр — в конце всё возвращается как было.
  * Нужен Node 22+ (встроенный WebSocket) и Google Chrome.
  */
 import { spawn } from 'node:child_process';
@@ -17,7 +17,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const BASE_URL = process.env.BASE_URL ?? 'http://localhost:5173';
+const BASE_URL = process.env.BASE_URL ?? 'http://localhost:8000';
 const CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'help');
 const PORT = 9400 + Math.floor(Math.random() * 400);
@@ -84,6 +84,19 @@ const shot = async (name) => {
   writeFileSync(join(OUT, name), Buffer.from(result.data, 'base64'));
   console.log(`✓ ${name}`);
 };
+/** Крупный кадр одного блока: когда страница целиком помещается в экран, общий кадр не покажет деталь. */
+const shotBlock = async (name, headingText) => {
+  await scrollToHeading(headingText);
+  const rect = await evaluate(`(() => {
+    const heading = [...document.querySelectorAll('#main h2, #main h3')].find((item) => item.textContent.includes(${JSON.stringify(headingText)}));
+    const block = heading?.closest('section, [class*=card], [class*=Card]') ?? heading;
+    const box = block.getBoundingClientRect();
+    return { x: Math.max(0, box.left - 16), y: Math.max(0, box.top - 16), width: Math.min(box.width + 32, innerWidth), height: Math.min(box.height + 32, innerHeight) };
+  })()`);
+  const { result } = await send('Page.captureScreenshot', { format: 'png', clip: { ...rect, scale: 1.5 } });
+  writeFileSync(join(OUT, name), Buffer.from(result.data, 'base64'));
+  console.log(`✓ ${name} (блок «${headingText}»)`);
+};
 /** Нажать кнопку или ссылку по началу текста (или aria-label). */
 const click = async (text, scope = 'body') => {
   const found = await evaluate(`(() => {
@@ -94,6 +107,23 @@ const click = async (text, scope = 'body') => {
   })()`);
   if (!found) console.warn(`  ! не найдено: «${text}»`);
   await sleep(700);
+};
+/** Дождаться заголовка блока (данные могут подгружаться с сервера) и прокрутить к нему. */
+const scrollToHeading = async (text, timeout = 6000) => {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    const found = await evaluate(`(() => {
+      const node = [...document.querySelectorAll('#main h2, #main h3')].find((item) => item.textContent.includes(${JSON.stringify(text)}));
+      node?.closest('section, [class*=card], [class*=Card]')?.scrollIntoView({ block: 'start' }) ?? node?.scrollIntoView({ block: 'start' });
+      return Boolean(node);
+    })()`);
+    if (found) {
+      await sleep(600);
+      return;
+    }
+    await sleep(300);
+  }
+  console.warn(`  ! не найден блок «${text}»`);
 };
 const scrollTo = async (selector) => {
   await evaluate(`document.querySelector(${JSON.stringify(selector)})?.scrollIntoView({ block: 'center' })`);
@@ -119,6 +149,7 @@ const api = (path, init = {}) => evaluate(`(async () => {
 
 // ---------- Съёмка ----------
 let restoreOnboarding = null;
+let originalPreferences = null;
 try {
   await open('/', 2500);
   await evaluate('sessionStorage.clear(); localStorage.clear(); location.reload()');
@@ -130,7 +161,6 @@ try {
     const auth = await fetch('/api/v1/auth/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'admin' }) }).then((r) => r.json());
     sessionStorage.setItem('crm.session', JSON.stringify({ role: auth.user.role, user: auth.user, accessToken: auth.accessToken, tokenType: 'Bearer', expiresAt: Date.now() + auth.expiresIn * 1000 }));
     localStorage.setItem('reports:widgets', JSON.stringify(['kpi-universities', 'kpi-applications', 'chart-applications', 'chart-ranking']));
-    localStorage.setItem('interactions:view', JSON.stringify('table'));
   })()`);
   const state = await api('/state');
   const me = state.state.users.find((user) => user.role === 'admin');
@@ -139,6 +169,10 @@ try {
     await api('/me/onboarding', { method: 'PUT', body: JSON.stringify({ status: 'completed' }) });
   }
   const interactionId = state.state.interactions.find((item) => !item.completedAt)?.id ?? state.state.interactions[0].id;
+  // Настройки профиля живут на сервере: для кадров меняем вид списка, в конце возвращаем исходные.
+  originalPreferences = me.preferences ?? {};
+  const setPreferences = (patch) => api('/me/preferences', { method: 'PUT', body: JSON.stringify({ ...originalPreferences, ...patch }) });
+  await setPreferences({ interactionView: 'table' });
   // Смена только хеша не перезагружает страницу — а сессию приложение читает при загрузке.
   await evaluate('location.reload()');
   await sleep(3000);
@@ -176,10 +210,18 @@ try {
   await open('/interactions');
   await click('Новое взаимодействие');
   await shot('new-interaction.png');
-  await evaluate(`localStorage.setItem('interactions:view', JSON.stringify('board'))`);
+  await setPreferences({ interactionView: 'board' });
   await open('/interactions', 2500);
   await shot('board.png');
-  await evaluate(`localStorage.setItem('interactions:view', JSON.stringify('table'))`);
+
+  // Телефон: меню выезжает по кнопке ☰.
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  await open('/interactions', 2200);
+  await click('Открыть меню');
+  await sleep(900);
+  await shot('mobile.png');
+  await send('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false });
+  await setPreferences({ interactionView: 'table' });
 
   await open(`/interactions/${interactionId}`);
   await shot('interaction.png');
@@ -188,6 +230,17 @@ try {
   await open(`/interactions/${interactionId}`);
   await click('Изменить', '#main');
   await shot('edit-interaction.png');
+
+  // Настройки профиля и Telegram.
+  await open('/profile', 2200);
+  await shot('profile.png');
+  await scrollToHeading('Внешний вид');
+  await shot('profile-appearance.png');
+  await open('/profile', 2200);
+  // Ещё не подключено — показываем второй шаг с кнопкой «Открыть Telegram»; уже подключено — строку состояния.
+  await click('Подключить Telegram');
+  await sleep(900);
+  await shot('telegram.png');
 
   await open('/analytics', 2500);
   await shot('analytics.png');
@@ -201,8 +254,7 @@ try {
   await shot('reports.png');
   await scrollTo('[data-tour="report-step-3"]');
   await shot('reports-charts.png');
-  await evaluate(`[...document.querySelectorAll('#main h2, #main h3')].find((node) => node.textContent.includes('История отчётов'))?.scrollIntoView({ block: 'start' })`);
-  await sleep(500);
+  await scrollToHeading('История отчётов');
   await shot('report-history.png');
 
   await open('/catalogs');
@@ -214,9 +266,7 @@ try {
   await click('Проверить данные');
   await shot('import-check.png');
   await open('/import');
-  await evaluate(`[...document.querySelectorAll('#main h2, #main h3')].find((node) => node.textContent.includes('История импортов'))?.scrollIntoView({ block: 'center' })`);
-  await sleep(500);
-  await shot('import-history.png');
+  await shotBlock('import-history.png', 'История импортов');
 
   await open('/workflows');
   await shot('workflows.png');
@@ -249,6 +299,7 @@ try {
   await shot('assistant-settings.png');
 } finally {
   if (restoreOnboarding) await api('/me/onboarding', { method: 'PUT', body: JSON.stringify({ status: restoreOnboarding }) }).catch(() => {});
+  if (originalPreferences) await api('/me/preferences', { method: 'PUT', body: JSON.stringify(originalPreferences) }).catch(() => {});
   socket.close();
   chrome.kill();
   await sleep(300);

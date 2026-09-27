@@ -13,6 +13,7 @@
 
 /* Плавающая карточка у правого края — зеркально левой навигации. */
 .panel {
+  zoom: var(--ui-scale);
   position: fixed;
   top: var(--space-3x);
   right: var(--space-3x);
@@ -20,7 +21,7 @@
   z-index: var(--z-overlay);
   display: flex;
   flex-direction: column;
-  width: min(400px, calc(100vw - var(--space-6x)));
+  width: min(400px, calc(var(--viewport-width) - var(--space-6x)));
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-l);
@@ -91,7 +92,7 @@
 @media (max-width: 760px) {
   .panel {
     inset: 0;
-    width: 100vw;
+    width: var(--viewport-width);
     border-radius: 0;
   }
 

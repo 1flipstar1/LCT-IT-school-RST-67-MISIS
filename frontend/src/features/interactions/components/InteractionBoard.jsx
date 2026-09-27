@@ -44,7 +44,7 @@ export function InteractionBoard({ workflow, rows }) {
 
   return (
     <>
-      <div ref={boardRef} className={styles.board} style={{ '--board-top': `${boardTop}px` }}>
+      <div ref={boardRef} data-tour="interactions-list" className={styles.board} style={{ '--board-top': `${boardTop}px` }}>
         {PHASES.map((phase) => {
           const stages = workflow.stages.filter((stage) => stage.phase === phase.id);
           if (stages.length === 0) return null;

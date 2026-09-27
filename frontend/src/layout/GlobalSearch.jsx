@@ -6,8 +6,10 @@ import { useSession } from '../auth/SessionProvider.jsx';
 import { articlesFor } from '../features/help/articles/index.js';
 import { openAssistant, takeReturnOrigin } from '../features/assistant/launch.js';
 import { NAVIGATION } from './navigation.js';
+import { useProfile } from '../features/profile/ProfileProvider.jsx';
 import { MagicIcon, SearchIcon } from '../ui/icons.js';
 import styles from './GlobalSearch.module.css';
+import { toLayoutPx } from '../lib/zoom.js';
 
 const BLOCKS = [
   { title: 'Требуют внимания', path: '/' },
@@ -65,9 +67,9 @@ export function GlobalSearch() {
     if (!origin || !fieldRef.current || shouldReduceMotion()) return;
     const target = fieldRef.current.getBoundingClientRect();
     gsap.from(fieldRef.current, {
-      x: origin.left - target.left,
-      y: origin.top - target.top,
-      width: origin.width,
+      x: toLayoutPx(origin.left - target.left, fieldRef.current),
+      y: toLayoutPx(origin.top - target.top, fieldRef.current),
+      width: toLayoutPx(origin.width, fieldRef.current),
       boxShadow: 'none',
       duration: 0.65,
       ease: 'power3.inOut',
@@ -99,8 +101,14 @@ export function GlobalSearch() {
     } else reveal(label);
   }, [path]);
 
+  // Обработчик вешается один раз, а настройку читает на каждое нажатие — переключатель действует сразу.
+  const { preferences } = useProfile();
+  const shortcutsRef = useRef(preferences.shortcuts);
+  shortcutsRef.current = preferences.shortcuts;
+
   useEffect(() => {
     const onKey = (event) => {
+      if (!shortcutsRef.current && (event.ctrlKey || event.metaKey) && ['KeyK', 'Slash'].includes(event.code)) return;
       if ((event.ctrlKey || event.metaKey) && event.code === 'KeyK') { event.preventDefault(); setOpen(true); inputRef.current?.focus(); }
       if ((event.ctrlKey || event.metaKey) && event.code === 'Slash') { event.preventDefault(); openAssistant({ from: fieldRef.current }); }
       if (event.key === 'Escape') setOpen(false);
@@ -133,8 +141,8 @@ export function GlobalSearch() {
         <SearchIcon size={20} fill="currentColor" />
         <span className={styles.aiMark}>Ai</span>
       </span>
-      <input ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={() => setOpen(true)} placeholder="Найдите раздел или спросите ИИ-помощника" aria-label="Поиск по программе и базе знаний" aria-expanded={open} aria-controls="global-search-results" onKeyDown={(event) => { if (event.key === 'Enter' && query.trim()) { event.preventDefault(); select({ type: 'AI' }); } }} />
-      <kbd>Ctrl K</kbd>
+      <input ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onPointerDown={() => setOpen(true)} placeholder="Найдите раздел или спросите ИИ-помощника" aria-label="Поиск по программе и базе знаний" aria-expanded={open} aria-controls="global-search-results" onKeyDown={(event) => { if (event.key === 'ArrowDown') setOpen(true); if (event.key === 'Enter' && query.trim()) { event.preventDefault(); select({ type: 'AI' }); } }} />
+      {preferences.shortcuts && <kbd data-tour="search-hotkey">Ctrl K</kbd>}
       <button type="button" data-tour="open-chat" className={styles.chatButton} onClick={() => select({ type: 'AI' })} title="Открыть чат с ИИ-помощником · Ctrl + /">
         <MagicIcon size={18} fill="currentColor" aria-hidden="true" />
         <span>Открыть чат</span>

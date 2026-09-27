@@ -30,6 +30,23 @@ from app.schemas.state import StateSnapshotResponse
 logger = logging.getLogger(__name__)
 SINGLETON_ID = 1
 MutationResult = TypeVar("MutationResult")
+StateListener = Callable[[dict[str, Any], dict[str, Any]], None]
+_state_listeners: list[StateListener] = []
+
+
+def add_state_listener(listener: StateListener) -> None:
+    """Подписка на сохранённые изменения состояния (прежняя и новая версии), например для уведомлений."""
+
+    if listener not in _state_listeners:
+        _state_listeners.append(listener)
+
+
+def _notify_listeners(before: dict[str, Any], after: dict[str, Any]) -> None:
+    for listener in _state_listeners:
+        try:
+            listener(before, after)
+        except Exception:  # noqa: BLE001 — сбой подписчика не должен отменять уже сохранённое состояние.
+            logger.exception("State listener %s failed", listener)
 
 
 def empty_state() -> dict[str, Any]:
@@ -175,6 +192,8 @@ def replace_state(
         )
 
     db.commit()
+    if not is_demo_reset:
+        _notify_listeners(current_state, next_state)
     # ``expire_on_commit=False`` keeps request objects usable, so explicitly
     # invalidate the singleton after the SQL expression increments revision.
     db.expire_all()

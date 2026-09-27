@@ -93,13 +93,13 @@ export function InteractionsPage() {
         actions={
           <>
             {view === 'table' ? (
-              <SelectField
+              <span data-tour="sort"><SelectField
                 className={styles.sort}
                 aria-label="Сортировка"
                 value={sort}
                 onChange={(event) => setSort(event.target.value)}
                 options={Object.entries(SORTS).map(([value, { label }]) => ({ value, label }))}
-              />
+              /></span>
             ) : (
               workflows.length > 1 && (
                 <SelectField
@@ -120,7 +120,7 @@ export function InteractionsPage() {
       <div className={styles.listGap} />
 
       {view === 'table' ? (
-        <Card padding="none">
+        <Card padding="none" data-tour="interactions-list">
           <InteractionTable rows={filtered} onReset={() => setFilters(EMPTY_FILTERS)} hiddenColumns={can(PERMISSION.viewAllInteractions) ? [] : ['manager']} />
         </Card>
       ) : (

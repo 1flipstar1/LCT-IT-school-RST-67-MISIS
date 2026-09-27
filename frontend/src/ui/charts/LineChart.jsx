@@ -3,6 +3,7 @@ import { formatNumber } from '../../domain/format.js';
 import { useElementWidth } from '../../lib/useElementWidth.js';
 import styles from './charts.module.css';
 import { niceTicks } from './scale.js';
+import { toLayoutPx } from '../../lib/zoom.js';
 
 const MARGIN = { top: 16, right: 16, bottom: 32, left: 48 };
 
@@ -27,7 +28,7 @@ export function LineChart({ points, ariaLabel, valueLabel, height = 260 }) {
 
   const handlePointerMove = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
-    const ratio = (event.clientX - bounds.left - MARGIN.left) / plotWidth;
+    const ratio = (toLayoutPx(event.clientX - bounds.left, event.currentTarget) - MARGIN.left) / plotWidth;
     setActiveIndex(Math.min(points.length - 1, Math.max(0, Math.round(ratio * (points.length - 1)))));
   };
 

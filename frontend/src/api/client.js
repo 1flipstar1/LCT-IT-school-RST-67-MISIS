@@ -112,6 +112,12 @@ export function createApiClient({
     downloadAttachment: (attachmentId, options = {}) =>
       request(`/attachments/${encodeURIComponent(attachmentId)}`, { ...options, responseType: 'blob' }),
     updateOnboarding: (status, options = {}) => request('/me/onboarding', { ...options, method: 'PUT', body: { status } }),
+    updatePreferences: (preferences, options = {}) => request('/me/preferences', { ...options, method: 'PUT', body: preferences }),
+    getTelegramStatus: (options = {}) => request('/me/telegram', options),
+    createTelegramLink: (options = {}) => request('/me/telegram/link', { ...options, method: 'POST' }),
+    sendTelegramTest: (options = {}) => request('/me/telegram/test', { ...options, method: 'POST' }),
+    disconnectTelegram: (options = {}) => request('/me/telegram', { ...options, method: 'DELETE' }),
+    getTelegramOverview: (options = {}) => request('/telegram/status', options),
     getAccountsStatus: (options = {}) => request('/accounts/status', options),
     createAccount: (payload, options = {}) => request('/accounts', { ...options, method: 'POST', body: payload, timeoutMs: 20_000 }),
     setAccountRole: (userId, role, options = {}) =>

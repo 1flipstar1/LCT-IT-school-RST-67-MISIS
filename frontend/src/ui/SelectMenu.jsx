@@ -40,7 +40,8 @@ export function SelectMenu({
         <ChevronDownIcon size={16} fill="currentColor" aria-hidden="true" />
       </Select.Trigger>
       <Select.Portal>
-        <Select.Positioner className={popupStyles.positioner} sideOffset={6} align="start">
+        {/* Список открывается под полем: режим «выбранный пункт поверх поля» сбивается при масштабе интерфейса (CSS zoom). */}
+        <Select.Positioner className={popupStyles.positioner} sideOffset={6} align="start" alignItemWithTrigger={false}>
           <Select.Popup className={popupStyles.popup} finalFocus={(closeType) => closeType === 'keyboard'}>
             <Select.List className={styles.list}>
               {options.map((option) => (

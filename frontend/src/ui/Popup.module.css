@@ -5,8 +5,9 @@
 }
 
 .popup {
+  zoom: var(--ui-scale);
   min-width: 220px;
-  max-width: min(360px, calc(100vw - var(--space-8x)));
+  max-width: min(360px, calc(var(--viewport-width) - var(--space-8x)));
   padding: var(--space-1x);
   background: var(--color-surface);
   border: 1px solid var(--color-border);

@@ -18,8 +18,10 @@
   padding: var(--space-4x);
 }
 
+/* Узкая карточка: когда заголовку остаётся меньше 200px, действия переносятся под него. */
 .header {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4x);
@@ -32,6 +34,7 @@
 
 .titles {
   display: grid;
+  flex: 1 1 200px;
   gap: var(--space-1x);
   min-width: 0;
 }

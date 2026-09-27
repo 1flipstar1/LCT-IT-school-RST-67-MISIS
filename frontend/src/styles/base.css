@@ -47,6 +47,12 @@ html {
   background: var(--color-brand-hover);
 }
 
+/* Масштаб интерфейса: см. --ui-scale в tokens.css. Порталы (окна, меню, подсказки) живут вне #root
+   и увеличивают своё содержимое сами — так библиотеки позиционирования видят честные координаты. */
+#root {
+  zoom: var(--ui-scale);
+}
+
 body {
   margin: 0;
   font: var(--font-body-s);

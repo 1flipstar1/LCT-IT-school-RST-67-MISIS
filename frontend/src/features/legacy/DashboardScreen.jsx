@@ -145,22 +145,24 @@ export function DashboardScreen() {
   return (
     <LegacyScreen className="legacy-dashboard">
       <PageHeader title={`Добрый день, ${user.name.split(' ')[0]}`}>
-        <SelectMenu
-          className="dashboard-manager-filter"
-          label="Статистика по менеджеру"
-          icon={FilterIcon}
-          value={managerId}
-          options={[{ value: 'all', label: 'Все менеджеры' }, ...managers.map((manager) => ({ value: manager.id, label: manager.name }))]}
-          onChange={(value) => { setManagerId(value ?? 'all'); setHoveredStage(null); }}
-        />
-        {can(PERMISSION.importCatalogs) && (
-          <LegacyButton onClick={() => navigate('/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
-            Импортировать
+        <span className="dash-header-actions" data-tour="dashboard-actions">
+          <SelectMenu
+            className="dashboard-manager-filter"
+            label="Статистика по менеджеру"
+            icon={FilterIcon}
+            value={managerId}
+            options={[{ value: 'all', label: 'Все менеджеры' }, ...managers.map((manager) => ({ value: manager.id, label: manager.name }))]}
+            onChange={(value) => { setManagerId(value ?? 'all'); setHoveredStage(null); }}
+          />
+          {can(PERMISSION.importCatalogs) && (
+            <LegacyButton onClick={() => navigate('/import')} icon={<UploadIcon size={16} fill="currentColor" />}>
+              Импортировать
+            </LegacyButton>
+          )}
+          <LegacyButton primary onClick={() => setCreating(true)} icon={<AddIcon size={16} fill="currentColor" />}>
+            Новое взаимодействие
           </LegacyButton>
-        )}
-        <LegacyButton primary onClick={() => setCreating(true)} icon={<AddIcon size={16} fill="currentColor" />}>
-          Новое взаимодействие
-        </LegacyButton>
+        </span>
       </PageHeader>
 
       <section ref={chartRef} className="panel stage-stats" data-tour="stage-stats">
@@ -247,7 +249,7 @@ export function DashboardScreen() {
 
       <div className="dash-bottom">
         <div className="dash-left">
-          <section className="kpi-grid">
+          <section className="kpi-grid" data-tour="kpi">
             <Kpi title="Вузов в работе" hint="Сколько вузов сейчас в работе: у каждого есть незавершённое взаимодействие." value={universitiesInProgress} icon={<UniversityIcon fill="currentColor" />} tone="indigo" />
             <Kpi title="Контрактов подписано за этот месяц" hint="Сколько договоров с вузами подписано в текущем месяце — по дате подписания лицензии." value={contractsSignedThisMonth} icon={<DocumentIcon fill="currentColor" />} tone="orange" />
             <Kpi title="Учебных программ актуализировано" hint="Сколько программ (вуз + направление) уже прошли этап актуализации учебной программы." value={updatedPrograms} icon={<EducationIcon fill="currentColor" />} tone="indigo" />
@@ -281,7 +283,7 @@ export function DashboardScreen() {
               Все срочные взаимодействия <ArrowRightIcon size={16} fill="currentColor" />
             </Link>
           </section>
-          <section className="panel dash-feed-panel dash-activity-panel" aria-labelledby="dash-activity-title">
+          <section className="panel dash-feed-panel dash-activity-panel" aria-labelledby="dash-activity-title" data-tour="activity">
             <div className="panel-head dash-feed-head">
               <div>
                 <Hint text="Что происходило во взаимодействиях: смена этапа, комментарии и файлы. Сначала самые свежие.">
@@ -308,13 +310,15 @@ export function DashboardScreen() {
         </div>
       </div>
 
-      <section className="panel table-panel dashboard-universities">
+      <section className="panel table-panel dashboard-universities" data-tour="dashboard-table">
         <div className="panel-head dashboard-universities-head">
           <Hint text="Последние заявки вузов: продукт и направление, текущий статус и ответственный менеджер.">
             <h2>Заявки</h2>
           </Hint>
         </div>
         <div className="dashboard-universities-table">
+          {/* Узкий экран: таблица прокручивается вбок внутри карточки, затемнение «Все заявки» остаётся на месте. */}
+          <div className="dashboard-universities-scroll">
           <table>
             <thead>
               <tr>
@@ -356,6 +360,7 @@ export function DashboardScreen() {
               {!dashboardUniversities.length && <tr><td colSpan={5}>Нет заявок для выбранного менеджера</td></tr>}
             </tbody>
           </table>
+          </div>
           <div className={`dashboard-universities-fade${dashboardUniversities.length ? '' : ' is-empty'}`}>
             <Link className="dashboard-universities-all" to={interactionLink}>
               Все заявки <ArrowRightIcon size={16} fill="currentColor" />

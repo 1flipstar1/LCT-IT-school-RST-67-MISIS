@@ -138,7 +138,7 @@ export function ReportsPage() {
 
           <ErrorAlert error={error} />
 
-          <div className={styles.submit}>
+          <div className={styles.submit} data-tour="report-submit">
             <Button
               variant="primary"
               size="l"
@@ -151,7 +151,7 @@ export function ReportsPage() {
           </div>
         </Card>
 
-        <Card padding="none" className={styles.preview}>
+        <Card padding="none" className={styles.preview} data-tour="report-preview">
           <CardHeader title="Предпросмотр" hint="Первые строки отчёта с выбранными колонками — так он будет выглядеть в файле." description={`${summary}. Показаны первые ${Math.min(PREVIEW_ROWS, rows.length)} из ${rows.length}.`} />
           {selectedColumns.length === 0 || rows.length === 0 ? (
             <EmptyState icon={ReportIcon} title="Нечего показать" description={selectedColumns.length === 0 ? 'Отметьте хотя бы одну колонку.' : 'Под фильтры не попало ни одного взаимодействия.'} />
@@ -176,7 +176,7 @@ export function ReportsPage() {
         />
       )}
 
-      <Card padding="none">
+      <Card padding="none" data-tour="report-history">
         <CardHeader title="История отчётов" hint="Отчёты, которые уже формировали. Любой можно собрать заново по актуальным данным." description="Отчёт можно сформировать заново — с теми же фильтрами и колонками, но по актуальным данным." />
         <DataTable
           caption="История отчётов"

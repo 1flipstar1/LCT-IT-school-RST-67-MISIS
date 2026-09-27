@@ -1,11 +1,152 @@
-.layout { display: grid; gap: var(--space-4x); max-width: 880px; }
-.identity { display: flex; align-items: center; gap: var(--space-4x); margin-bottom: var(--space-6x); overflow-wrap: anywhere; }
-.identity h2 { font: var(--font-h3); margin: 0; }
-.layout p { font: var(--font-body-s); color: var(--color-text-secondary); margin: var(--space-2x) 0 0; }
-.avatars { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: var(--space-3x); }
-.avatar { display: grid; justify-items: center; gap: var(--space-2x); padding: var(--space-3x); border: 2px solid var(--color-border); border-radius: var(--radius-l); background: var(--color-surface); color: var(--color-text-secondary); font: var(--font-caption); cursor: pointer; }
-.avatar img { width: 56px; height: 56px; border-radius: 50%; }
-.avatar:hover, .avatar[aria-pressed='true'] { border-color: var(--color-brand); background: var(--color-brand-softer); color: var(--color-brand); }
-.avatar:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
-.fields { display: grid; gap: var(--space-6x); }
-.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4x); }
+.layout {
+  display: grid;
+  gap: var(--space-4x);
+  max-width: 880px;
+}
+
+/* ---------- Профиль ---------- */
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4x);
+  margin-bottom: var(--space-6x);
+  overflow-wrap: anywhere;
+}
+
+.identityText p {
+  margin-top: var(--space-1x);
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.identityName {
+  font: var(--font-h3);
+}
+
+.avatars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3x);
+}
+
+.avatar {
+  padding: var(--space-1x);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: border-color var(--duration-base);
+}
+
+.avatar img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.avatar:hover {
+  border-color: var(--color-border-strong);
+}
+
+.avatar[aria-checked='true'] {
+  border-color: var(--color-brand);
+}
+
+.avatar:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ---------- Строки настроек ---------- */
+.settings {
+  display: grid;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6x);
+  padding: var(--space-4x) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.setting:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.setting:last-child {
+  padding-bottom: 0;
+}
+
+.settingText {
+  display: grid;
+  gap: var(--space-1x);
+  max-width: 480px;
+}
+
+.settingTitle {
+  font: var(--font-body-m-strong);
+}
+
+.settingDescription {
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
+.settingControl {
+  flex-shrink: 0;
+}
+
+.select {
+  width: 240px;
+}
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2x);
+}
+
+/* ---------- Подвал ---------- */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4x);
+}
+
+.status,
+.statusWarning {
+  max-width: 560px;
+  font: var(--font-body-s);
+}
+
+.status {
+  color: var(--color-text-secondary);
+}
+
+.statusWarning {
+  color: var(--color-warning-text);
+}
+
+@media (max-width: 720px) {
+  .setting {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3x);
+  }
+
+  .select {
+    width: 100%;
+  }
+
+  .inline {
+    justify-content: flex-start;
+  }
+}

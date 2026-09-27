@@ -22,10 +22,11 @@
 }
 
 .popup {
+  zoom: var(--ui-scale);
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: calc(100dvh - var(--space-12x));
+  max-height: calc(var(--viewport-height) - var(--space-12x));
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-l);
@@ -115,7 +116,7 @@
 
   .popup {
     max-width: none;
-    max-height: 92dvh;
+    max-height: calc(var(--viewport-height) * 0.92);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   }
 

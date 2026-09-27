@@ -3,15 +3,16 @@ import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRe
 import AtomaroToastModule from '@atomaro/ui-kit/components/Notifications/ToastNotification/ToastNotification';
 import { gsap } from 'gsap';
 import { interopDefault } from '../lib/interopDefault.js';
+import { useProfile } from '../features/profile/ProfileProvider.jsx';
 import styles from './Toast.module.css';
 
 const AtomaroToast = interopDefault(AtomaroToastModule);
 const ToastContext = createContext(null);
-const DURATION_MS = 6000;
+const DEFAULT_DURATION_MS = 6000;
 
 function noop() {}
 
-function ToastItem({ toast, remove }) {
+function ToastItem({ toast, remove, duration }) {
   const wrapper = useRef(null);
   const closing = useRef(false);
   const reducedMotion = useRef(false);
@@ -49,12 +50,12 @@ function ToastItem({ toast, remove }) {
         ease: 'back.out(1.35)',
       });
     }
-    const timer = setTimeout(dismiss, DURATION_MS);
+    const timer = setTimeout(dismiss, duration);
     return () => {
       clearTimeout(timer);
       gsap.killTweensOf(node);
     };
-  }, [dismiss]);
+  }, [dismiss, duration]);
 
   const undo = toast.undo ? [{
     label: 'Отменить',
@@ -88,6 +89,7 @@ function ToastItem({ toast, remove }) {
 
 /** Короткие уведомления с возможностью отменить последнее действие. */
 export function ToastProvider({ children }) {
+  const duration = useProfile()?.preferences.toastDuration ?? DEFAULT_DURATION_MS;
   const [toasts, setToasts] = useState([]);
   const remove = useCallback((id) => setToasts((current) => current.filter((toast) => toast.id !== id)), []);
   const show = useCallback(({ message, tone = 'success', undo, code }) => {
@@ -103,7 +105,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={api}>
       {children}
       <div className={styles.region} role="status" aria-live="polite">
-        {toasts.map((toast) => <ToastItem key={toast.id} toast={toast} remove={remove} />)}
+        {toasts.map((toast) => <ToastItem key={toast.id} toast={toast} remove={remove} duration={duration} />)}
       </div>
     </ToastContext.Provider>
   );

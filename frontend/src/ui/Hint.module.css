@@ -4,6 +4,7 @@
 }
 
 .text {
+  zoom: var(--ui-scale);
   display: block;
   max-width: 300px;
   font: var(--font-body-s);

@@ -29,6 +29,7 @@ import { DEFAULT_SETTINGS, withDefaults } from './settings.js';
 import { speak, speechOutputSupported, stopSpeaking, useSpeechRecognition } from './speech.js';
 import { useAssistant } from './useAssistant.js';
 import styles from './Assistant.module.css';
+import { toLayoutPx } from '../../lib/zoom.js';
 
 const reducedMotion = () => shouldReduceMotion();
 const scrollToEnd = (behavior = 'instant') => window.scrollTo({ top: document.documentElement.scrollHeight, behavior });
@@ -64,9 +65,9 @@ export function AssistantPage() {
       if (origin && frameRef.current) {
         const target = frameRef.current.getBoundingClientRect();
         gsap.from(frameRef.current, {
-          x: origin.left - target.left,
-          y: origin.top - target.top,
-          width: origin.width,
+          x: toLayoutPx(origin.left - target.left, frameRef.current),
+          y: toLayoutPx(origin.top - target.top, frameRef.current),
+          width: toLayoutPx(origin.width, frameRef.current),
           boxShadow: 'none',
           duration: 0.75,
           ease: 'power3.inOut',
