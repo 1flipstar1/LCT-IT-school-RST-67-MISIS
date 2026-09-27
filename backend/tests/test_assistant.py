@@ -37,7 +37,7 @@ def test_chat_uses_local_model_catalogs_and_tools(client: TestClient, manager_he
     response = client.post(
         "/api/v1/assistant/chat",
         json={
-            "message": "Как сменить этап?",
+            "message": "Переведи КФУ на следующий этап",
             "history": [{"role": "user", "content": "Привет"}, {"role": "assistant", "content": "Здравствуйте"}],
             "page": "interactions",
         },
@@ -88,6 +88,16 @@ def test_unknown_tool_is_ignored_and_guide_mode_sends_no_tools(client: TestClien
     assert response.json()["type"] == "message"
     assert "tools" not in requests[0]
     assert "подробно" in requests[0]["messages"][0]["content"]
+
+
+def test_explanation_uses_a_short_prompt_without_tools(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "Откройте этапы работы."}))
+    response = client.post("/api/v1/assistant/chat", json={"message": "Какие этапы работы с вузом?"}, headers=manager_headers)
+    assert response.status_code == 200
+    sent = requests[0]
+    assert "tools" not in sent
+    assert "Подписание документов" in sent["messages"][0]["content"]
+    assert len(sent["messages"][0]["content"]) < 3500
 
 
 def test_chat_requires_auth_and_limits_input(client: TestClient, manager_headers: dict[str, str]) -> None:

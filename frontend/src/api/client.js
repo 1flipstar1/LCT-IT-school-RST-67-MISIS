@@ -102,7 +102,7 @@ export function createApiClient({
       }),
     demoLogin: (role, options = {}) => request('/auth/demo', { ...options, method: 'POST', body: { role } }),
     chatWithAssistant: (payload, options = {}) =>
-      request('/assistant/chat', { ...options, method: 'POST', body: payload, timeoutMs: 90_000 }),
+      request('/assistant/chat', { ...options, method: 'POST', body: payload, timeoutMs: 150_000 }),
     getAssistantStatus: (options = {}) => request('/assistant/status', { ...options, timeoutMs: 5_000 }),
     uploadAttachment: (file, options = {}) => {
       const formData = new FormData();

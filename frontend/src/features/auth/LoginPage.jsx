@@ -74,29 +74,8 @@ export function LoginPage() {
           <img src={logoUrl} alt="Ростелеком" className={styles.cardLogo} />
           <h1 className={styles.title}>Вход в систему</h1>
           <p className={styles.subtitle}>
-            {keycloakAvailable
-              ? 'Используйте корпоративную учётную запись Ростелекома.'
-              : 'Выберите демо-роль для входа. Корпоративный вход появится после подключения защищённого адреса.'}
+            Выберите демо-роль для входа. Корпоративная учётная запись не требуется для тестового доступа.
           </p>
-
-          {keycloakAvailable && (
-            <Button variant="primary" size="l" fullWidth onClick={handleSso}>
-              Войти через Keycloak
-            </Button>
-          )}
-
-          {ssoUnavailable && (
-            <InlineAlert tone="info" title="Это демо-стенд">
-              Keycloak здесь не подключён. Выберите роль ниже — интерфейс покажет её права.
-            </InlineAlert>
-          )}
-
-          {keycloakAvailable && (
-            <div className={styles.divider}>
-              <span>Демо-доступ</span>
-            </div>
-          )}
-
           {(loginError || keycloakError) && <ErrorAlert error={loginError || keycloakError} />}
 
           <ul className={styles.roles} ref={rolesRef}>
@@ -124,6 +103,23 @@ export function LoginPage() {
               );
             })}
           </ul>
+
+          <div className={styles.divider}>
+            <span>Корпоративный вход</span>
+          </div>
+          <Button variant="outline" size="l" fullWidth onClick={handleSso} disabled={!keycloakAvailable}>
+            Войти через Keycloak
+          </Button>
+          {!keycloakAvailable && (
+            <InlineAlert tone="info" title="Доступен после подключения HTTPS">
+              Пока открывайте демо-доступ по роли выше.
+            </InlineAlert>
+          )}
+          {ssoUnavailable && (
+            <InlineAlert tone="info" title="Корпоративный вход не настроен">
+              Выберите демо-роль выше для входа.
+            </InlineAlert>
+          )}
         </div>
         <p className={styles.legal}>Обработка персональных данных — в соответствии с 152-ФЗ</p>
       </main>

@@ -9,9 +9,14 @@ python3 deploy/render_caddy.py
 
 docker compose --env-file deploy/.env -f deploy/compose.yml up -d --build --remove-orphans
 
-if ! docker compose --env-file deploy/.env -f deploy/compose.yml exec -T ollama ollama list | grep -q '^qwen3:4b-instruct'; then
+ollama_model="$(sed -n 's/^OLLAMA_MODEL=//p' deploy/.env | head -n 1)"
+if [[ -z "$ollama_model" ]]; then
+  echo "OLLAMA_MODEL is missing from deploy/.env" >&2
+  exit 1
+fi
+if ! docker compose --env-file deploy/.env -f deploy/compose.yml exec -T ollama ollama list | awk 'NR > 1 {print $1}' | grep -Fxq "$ollama_model"; then
   docker compose --env-file deploy/.env -f deploy/compose.yml run --rm --no-deps \
-    -e OLLAMA_HOST=http://ollama:11434 ollama pull qwen3:4b-instruct
+    -e OLLAMA_HOST=http://ollama:11434 ollama pull "$ollama_model"
 fi
 
 for attempt in $(seq 1 40); do

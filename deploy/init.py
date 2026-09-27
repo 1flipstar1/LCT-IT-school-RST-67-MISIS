@@ -52,8 +52,8 @@ def main() -> None:
         "JWT_SECRET": token(),
         "DEMO_AUTH_ENABLED": "true",
         "ASSISTANT_ENABLED": "true",
-        "OLLAMA_MODEL": "qwen3:4b-instruct",
-        "ASSISTANT_TIMEOUT_SECONDS": "120",
+        "OLLAMA_MODEL": "qwen3:1.7b",
+        "ASSISTANT_TIMEOUT_SECONDS": "140",
         "PUBLIC_APP_URL": public_url,
     }
     deploy_dir.joinpath("generated").mkdir(mode=0o700, exist_ok=True)
