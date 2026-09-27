@@ -137,6 +137,31 @@ TOOLS = [
 ]
 
 ACTION_NAMES = set(get_args(ActionName))
+TOOL_BY_NAME = {tool["function"]["name"]: tool for tool in TOOLS}
+
+
+def _tools_for(message: str) -> list[dict]:
+    """Send only relevant schemas so a small CPU model can answer before the browser times out."""
+    text = message.lower().replace("ё", "е")
+    if any(word in text for word in ("отчет", "pdf", "excel", "xlsx", "xls", "выгруз", "скача")):
+        names = ("create_report", "repeat_last_report")
+    elif any(word in text for word in ("комментар", "примечан")):
+        names = ("add_comment", "open_interaction")
+    elif any(word in text for word in ("этап", "перевед", "пропуст", "доработ")):
+        names = ("change_stage", "open_interaction", "interaction_details")
+    elif any(word in text for word in ("контакт", "телефон", "почт")):
+        names = ("university_contacts", "open_interaction")
+    elif any(word in text for word in ("статист", "сколько", "нагрузк", "просроч", "план на день")):
+        names = ("show_stats", "manager_workload", "daily_plan", "find_interactions")
+    elif any(word in text for word in ("как дела", "что с ", "статус вуза")):
+        names = ("interaction_details", "open_interaction")
+    elif any(word in text for word in ("открой", "перейди")):
+        names = ("open_page", "open_interaction")
+    elif any(word in text for word in ("найди", "покажи", "список", "взаимодейств")):
+        names = ("find_interactions", "open_interaction", "interaction_details")
+    else:
+        return TOOLS
+    return [TOOL_BY_NAME[name] for name in names]
 
 # Помощник работает только с CRM. Очевидно посторонние запросы отсекаются до модели: так маленькая
 # модель не решает примеры и не пишет код. Правила совпадают с frontend/.../engine/scope.js.
@@ -271,7 +296,7 @@ async def chat(payload: ChatRequest, state: dict) -> ChatResponse:
         },
     }
     if payload.mode == "agent" and not _is_explanation(payload.message):
-        request["tools"] = TOOLS
+        request["tools"] = _tools_for(payload.message)
 
     try:
         async with httpx.AsyncClient(timeout=settings.assistant_timeout_seconds, trust_env=False) as client:

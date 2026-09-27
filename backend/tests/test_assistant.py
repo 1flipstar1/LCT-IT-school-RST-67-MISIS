@@ -50,7 +50,9 @@ def test_chat_uses_local_model_catalogs_and_tools(client: TestClient, manager_he
     assert sent["model"] == assistant.settings.ollama_model
     assert sent["stream"] is False
     assert sent["think"] is False
-    assert {tool["function"]["name"] for tool in sent["tools"]} == assistant.ACTION_NAMES
+    assert {tool["function"]["name"] for tool in sent["tools"]} == {
+        "change_stage", "open_interaction", "interaction_details",
+    }
     system = sent["messages"][0]["content"]
     assert "Подписание документов" in system
     assert "Сменить этап" in system
@@ -62,7 +64,7 @@ def test_chat_uses_local_model_catalogs_and_tools(client: TestClient, manager_he
 
 def test_tool_call_becomes_action_for_the_browser(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
     call = {"function": {"name": "create_report", "arguments": {"universities": ["КФУ"], "format": "pdf"}}}
-    mock_ollama(monkeypatch, reply({"content": "", "tool_calls": [call]}))
+    requests = mock_ollama(monkeypatch, reply({"content": "", "tool_calls": [call]}))
 
     response = client.post("/api/v1/assistant/chat", json={"message": "Отчёт по КФУ в PDF"}, headers=manager_headers)
 
@@ -72,6 +74,7 @@ def test_tool_call_becomes_action_for_the_browser(client: TestClient, manager_he
         "message": "",
         "action": {"name": "create_report", "arguments": {"universities": ["КФУ"], "format": "pdf"}},
     }
+    assert {tool["function"]["name"] for tool in requests[0]["tools"]} == {"create_report", "repeat_last_report"}
 
 
 def test_unknown_tool_is_ignored_and_guide_mode_sends_no_tools(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
