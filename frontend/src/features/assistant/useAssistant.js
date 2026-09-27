@@ -67,7 +67,11 @@ function useModelStatus(enabled) {
 
   useEffect(() => {
     if (!enabled) setStatus({ state: 'disabled', model: null, checkedAt: 0 });
-    else refresh();
+    else {
+      refresh();
+      const timer = window.setInterval(refresh, STATUS_TTL_MS);
+      return () => window.clearInterval(timer);
+    }
   }, [enabled, refresh]);
 
   return { ...status, refresh, stale: Date.now() - status.checkedAt > STATUS_TTL_MS };
@@ -245,13 +249,15 @@ export function useAssistant({ settings, page }) {
       return;
     }
 
-    const modelReady = engine !== 'local' && model.state !== 'disabled' && (model.state !== 'offline' || model.stale);
+    const modelReady = engine !== 'local' && model.state !== 'disabled'
+      && (model.state !== 'offline' || Date.now() - model.checkedAt > STATUS_TTL_MS);
     if (modelReady) {
       const controller = new AbortController();
       abortRef.current = controller;
       setBusy(true);
       try {
         reply(await askModel(message, context, controller.signal), 'ai');
+        void model.refresh();
         return;
       } catch (error) {
         if (controller.signal.aborted) {
