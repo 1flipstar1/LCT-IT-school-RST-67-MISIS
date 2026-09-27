@@ -60,6 +60,7 @@ class TelegramError(Exception):
 
 
 CONNECT_TIMEOUT_SECONDS = 5
+PROXY_CONNECT_TIMEOUT_SECONDS = 20
 CONNECT_ATTEMPTS = 3
 
 
@@ -70,7 +71,8 @@ class TelegramClient:
     def __init__(self, token: str, api_url: str, timeout: float, proxy: str | None = None) -> None:
         self._base = f"{api_url.rstrip('/')}/bot{token}"
         self._timeout = timeout
-        self._http = httpx.Client(proxy=proxy, timeout=httpx.Timeout(timeout, connect=CONNECT_TIMEOUT_SECONDS))
+        self._connect_timeout = PROXY_CONNECT_TIMEOUT_SECONDS if proxy else CONNECT_TIMEOUT_SECONDS
+        self._http = httpx.Client(proxy=proxy, timeout=httpx.Timeout(timeout, connect=self._connect_timeout))
 
     def _post(self, method: str, payload: dict[str, Any], timeout: float) -> httpx.Response:
         for attempt in range(CONNECT_ATTEMPTS):
@@ -78,7 +80,7 @@ class TelegramClient:
                 return self._http.post(
                     f"{self._base}/{method}",
                     json=payload,
-                    timeout=httpx.Timeout(timeout, connect=CONNECT_TIMEOUT_SECONDS),
+                    timeout=httpx.Timeout(timeout, connect=self._connect_timeout),
                 )
             except (httpx.ConnectError, httpx.ConnectTimeout):
                 # Запрос не дошёл до Telegram — повтор безопасен даже для sendMessage.
@@ -442,6 +444,7 @@ def status_for(user: dict[str, Any]) -> dict[str, Any]:
     return {
         "configured": get_client() is not None,
         "available": user.get("role") in RECIPIENT_SCOPE,
+        "polling": bool(poller and poller.healthy),
         "scope": RECIPIENT_SCOPE.get(user.get("role")),
         "bot_username": bot_username(),
         "connected": bool(telegram.get("chatId")),

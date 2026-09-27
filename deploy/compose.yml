@@ -34,6 +34,7 @@ services:
       KEYCLOAK_AUDIENCE: rtk-it-school-api
       KEYCLOAK_CLIENT_ID: rtk-it-school-web
       OLLAMA_BASE_URL: http://ollama:11434
+      TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-socks5://telegram-egress:9050}
     volumes:
       - attachments:/app/data/attachments
     depends_on:
@@ -43,6 +44,13 @@ services:
         condition: service_started
       ollama:
         condition: service_started
+
+  telegram-egress:
+    build:
+      context: ./telegram-egress
+    restart: unless-stopped
+    volumes:
+      - tor_data:/var/lib/tor
 
   postgres:
     image: postgres:16-alpine
@@ -93,3 +101,4 @@ volumes:
   postgres:
   attachments:
   ollama:
+  tor_data:

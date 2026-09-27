@@ -35,6 +35,12 @@ export function TelegramSettings() {
     load().catch(() => setStatus({ unreachable: true }));
   }, [load]);
 
+  useEffect(() => {
+    if (!status?.configured || status.polling) return undefined;
+    const timer = setInterval(() => load().catch(() => {}), 15000);
+    return () => clearInterval(timer);
+  }, [load, status?.configured, status?.polling]);
+
   // Пока ссылка действует, ждём, когда бот получит «Старт». Следующий запрос — только после
   // ответа на предыдущий (setTimeout, а не setInterval), чтобы медленная сеть не копила запросы.
   useEffect(() => {
@@ -83,6 +89,14 @@ export function TelegramSettings() {
     return (
       <InlineAlert tone="info" title="Уведомления в Telegram скоро будут доступны">
         Администратору: создайте бота у @BotFather, укажите токен в TELEGRAM_BOT_TOKEN и перезапустите API — см. backend/README.md, раздел «Telegram-бот».
+      </InlineAlert>
+    );
+  }
+
+  if (!status.polling) {
+    return (
+      <InlineAlert tone="warning" title="Нет связи с Telegram">
+        Бот настроен, но сейчас не получает сообщения. Подключение чата станет доступно, когда связь восстановится; состояние обновится автоматически.
       </InlineAlert>
     );
   }

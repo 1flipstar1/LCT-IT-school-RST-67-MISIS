@@ -162,7 +162,7 @@ API:
 
 API (Bearer-токен): `GET /api/v1/me/telegram` — состояние; `POST /api/v1/me/telegram/link` — ссылка для подключения; `POST /api/v1/me/telegram/test` — проверочное сообщение; `DELETE /api/v1/me/telegram` — отключить; `GET /api/v1/telegram/status` — сводка для руководителей и администраторов.
 
-Если Telegram из сети сервера отвечает через раз, клиент повторяет подключение трижды; при постоянных сбоях задайте прокси `TELEGRAM_PROXY_URL` (`http://host:port` или `socks5://host:port`, для SOCKS нужен пакет `httpx[socks]`).
+Если Telegram из сети сервера отвечает через раз, клиент повторяет подключение трижды; при постоянных сбоях задайте прокси `TELEGRAM_PROXY_URL` (`http://host:port` или `socks5://host:port`). Docker-развёртывание по умолчанию использует внутренний SOCKS шлюз `telegram-egress`; пакет `httpx[socks]` уже установлен.
 
 Настройки: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PROXY_URL`, `TELEGRAM_API_URL` (по умолчанию `https://api.telegram.org`), `TELEGRAM_POLLING_ENABLED`, `TELEGRAM_NOTIFY_DELAY_SECONDS`, `TELEGRAM_TIMEOUT_SECONDS`, `PUBLIC_APP_URL`. Без токена бот выключен, CRM работает как обычно.
 

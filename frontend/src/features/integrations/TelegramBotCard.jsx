@@ -63,7 +63,7 @@ export function TelegramBotCard({ canConnect }) {
           Создайте бота у @BotFather, задайте TELEGRAM_BOT_TOKEN в настройках API и перезапустите его. Инструкция — backend/README.md, раздел «Telegram-бот».
         </p>
       )}
-      {canConnect && overview.configured && <ButtonLink to="/profile" icon={SendIcon}>Подключить свой Telegram</ButtonLink>}
+      {canConnect && working && <ButtonLink to="/profile" icon={SendIcon}>Подключить свой Telegram</ButtonLink>}
     </Card>
   );
 }

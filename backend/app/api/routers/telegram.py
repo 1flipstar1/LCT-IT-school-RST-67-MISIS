@@ -16,6 +16,7 @@ router = APIRouter(tags=["telegram"])
 class TelegramStatus(APIModel):
     configured: bool
     available: bool
+    polling: bool
     scope: str | None = None
     bot_username: str | None = None
     connected: bool

@@ -8,5 +8,5 @@ PyJWT[crypto]>=2.10,<3
 python-multipart>=0.0.20,<1
 
 # Kept in the main file so a fresh clone can run the supplied smoke tests.
-httpx>=0.28,<1
+httpx[socks]>=0.28,<1
 pytest>=8.3,<10
