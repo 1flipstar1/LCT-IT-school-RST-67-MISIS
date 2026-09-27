@@ -118,6 +118,13 @@ describe('interpretLocally', () => {
     assert.equal(doIt.args.filters.period.from, '2026-03-01');
   });
 
+  it('перечисляет актуальные этапы целиком, а не ищет взаимодействия', () => {
+    const answer = parse('Какие этапы работы с вузом?');
+    assert.equal(answer.kind, 'answer');
+    assert.equal(answer.article.id, 'stages');
+    assert.match(answer.article.text, /Контроль исполнения/);
+  });
+
   it('распознаёт поиск, статистику, навигацию и изменения', () => {
     assert.equal(parse('Какие вузы на этапе подписания?').name, TOOL.findInteractions);
     assert.equal(parse('покажи просроченные').args.filters.onlyAttention, true);
@@ -170,6 +177,7 @@ describe('assistant routing', () => {
   it('отдаёт вопросы по справке и возможностям модели, команды выполняет сразу', () => {
     const online = { state: 'online', stale: false };
     assert.equal(shouldExplainWithModel('auto', parse('Как сформировать отчёт?'), online), true);
+    assert.equal(shouldExplainWithModel('auto', parse('Какие этапы работы с вузом?'), online), false);
     assert.equal(shouldExplainWithModel('auto', parse('Что ты умеешь?'), online), true);
     assert.equal(shouldExplainWithModel('auto', parse('Сделай отчёт по КФУ'), online), false);
     assert.equal(shouldExplainWithModel('auto', parse('Как сформировать отчёт?'), { state: 'offline', stale: false }), false);

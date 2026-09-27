@@ -42,6 +42,13 @@ export function buildKnowledge({ articles = [], workflows = [] }) {
   const stageList = workflow
     ? PHASES.map((phase) => `**${phase.label}:** ${workflow.stages.filter((stage) => stage.phase === phase.id).map((stage) => stage.name + (stage.optional ? ' (необязательный)' : '')).join('; ')}`)
     : [];
+  const activePhases = workflow ? PHASES.filter((phase) => workflow.stages.some((stage) => stage.phase === phase.id)) : [];
+  const stageNarrative = workflow
+    ? `Сейчас в работе с вузом ${workflow.stages.length} этапов в ${activePhases.length} фазах. ${activePhases.map((phase) => {
+      const names = workflow.stages.filter((stage) => stage.phase === phase.id).map((stage) => `${stage.name}${stage.optional ? ' (необязательный)' : ''}`);
+      return `${phase.label}: ${names.join(', ')}.`;
+    }).join(' ')}`
+    : 'Сведения об этапах пока не загружены.';
 
   const stageEntries = (workflow?.stages ?? []).map((stage, index) =>
     entry({
@@ -59,7 +66,7 @@ export function buildKnowledge({ articles = [], workflows = [] }) {
 
   return [
     ...fromArticles,
-    entry({ id: 'stages', title: 'Этапы работы с вузом', keywords: ['какие этапы', 'список этапов', 'фаз', 'сколько этапов', 'все этапы'], steps: stageList, link: '/help?article=stages-list' }),
+    entry({ id: 'stages', title: 'Этапы работы с вузом', keywords: ['какие этапы', 'список этапов', 'фаз', 'сколько этапов', 'все этапы'], steps: stageList, text: stageNarrative, link: '/help?article=stages-list' }),
     ...stageEntries,
   ];
 }

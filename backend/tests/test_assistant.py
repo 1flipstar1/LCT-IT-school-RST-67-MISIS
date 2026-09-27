@@ -97,7 +97,7 @@ def test_unknown_tool_is_ignored_and_guide_mode_sends_no_tools(client: TestClien
 
 def test_explanation_uses_a_short_prompt_without_tools(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
     requests = mock_ollama(monkeypatch, reply({"content": "Откройте этапы работы."}))
-    response = client.post("/api/v1/assistant/chat", json={"message": "Какие этапы работы с вузом?"}, headers=manager_headers)
+    response = client.post("/api/v1/assistant/chat", json={"message": "Что делать на этапе подписания документов?"}, headers=manager_headers)
     assert response.status_code == 200
     sent = requests[0]
     assert "tools" not in sent
@@ -215,6 +215,15 @@ def test_deleting_employee_is_not_claimed_as_a_feature(client: TestClient, admin
     requests = mock_ollama(monkeypatch, reply({"content": "Удалено."}))
     response = client.post("/api/v1/assistant/chat", json={"message": "Как удалить пользователя?"}, headers=admin_headers)
     assert "не предусмотрено" in response.json()["message"]
+    assert requests == []
+
+
+def test_stage_overview_uses_current_workflow_without_truncating(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "неполный список"}))
+    response = client.post("/api/v1/assistant/chat", json={"message": "Какие этапы работы с вузом?"}, headers=manager_headers)
+    assert response.status_code == 200
+    assert "Контроль исполнения" in response.json()["message"]
+    assert "Знакомство" in response.json()["message"]
     assert requests == []
 
 def test_off_topic_requests_never_reach_the_model(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:

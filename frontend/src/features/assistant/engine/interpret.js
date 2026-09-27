@@ -169,6 +169,10 @@ export function interpretLocally(message, context) {
   if (THANKS.test(text) && tokens.length <= 4) return { kind: 'answer', text: 'Пожалуйста! Обращайтесь.' };
   if (ABOUT.test(text)) return { kind: 'answer', source: 'capabilities', text: `Вот что я умею:\n\n${CAPABILITIES.map((line) => `- ${line}`).join('\n')}` };
   if (isOutOfScope(text)) return { kind: 'answer', text: OUT_OF_SCOPE_TEXT, suggestions: OUT_OF_SCOPE_SUGGESTIONS };
+  if (/^(?:(?:какие|перечисли|назови|покажи)\s+этапы|(?:список|перечень)\s+этапов)/.test(text)) {
+    const article = context.knowledge.find((item) => item.id === 'stages');
+    if (article) return { kind: 'answer', article };
+  }
 
   const info = detectInfoTool(message, text, tokens, context);
   if (info) return { kind: 'tool', ...info };

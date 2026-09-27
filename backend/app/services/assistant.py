@@ -216,6 +216,29 @@ OUT_OF_SCOPE = (
     "этапы, статистика, контакты и справка. С этим вопросом не подскажу."
 )
 
+PHASE_LABELS = {
+    "acquaintance": "Знакомство",
+    "contract": "Договор",
+    "rollout": "Внедрение",
+    "teaching": "Обучение",
+}
+
+
+def _stage_overview(state: dict) -> str:
+    workflows = state.get("workflows") or []
+    if not workflows:
+        return "Набор этапов пока не настроен."
+    stages = workflows[0].get("stages") or []
+    groups: dict[str, list[str]] = {}
+    for stage in stages:
+        if not isinstance(stage, dict):
+            continue
+        label = PHASE_LABELS.get(stage.get("phase"), str(stage.get("phase") or "Другая фаза"))
+        name = str(stage.get("name") or "Этап")
+        groups.setdefault(label, []).append(name + (" (необязательный)" if stage.get("optional") else ""))
+    sections = " ".join(f"{phase}: {', '.join(names)}." for phase, names in groups.items())
+    return f"Сейчас работа с вузом состоит из {len(stages)} этапов в {len(groups)} фазах. {sections}"
+
 
 def is_out_of_scope(message: str) -> bool:
     text = message.lower().replace("ё", "е").strip()
@@ -289,6 +312,7 @@ def _system_prompt(state: dict, payload: ChatRequest, role: str, articles: list[
 def _is_explanation(message: str) -> bool:
     text = message.strip().lower()
     return ((text.startswith(("как ", "какие ", "объясни ", "расскажи ", "что ты умеешь"))
+             or text.startswith(("что делать на этапе", "что нужно на этапе", "что означает этап", "что значит этап"))
              or "можешь помочь" in text
              or "что ты можешь" in text
              or "что умеешь" in text)
@@ -321,6 +345,8 @@ async def chat(payload: ChatRequest, state: dict, role: str = "manager") -> Chat
         return ChatResponse(message=OUT_OF_SCOPE)
 
     question = payload.message.lower().replace("ё", "е")
+    if re.match(r"^(?:(?:какие|перечисли|назови|покажи)\s+этапы|(?:список|перечень)\s+этапов)", question):
+        return ChatResponse(message=_stage_overview(state))
     if re.search(r"удал[а-я]*\s+(?:\w+\s+){0,2}(?:сотрудник|пользовател|менеджер|человек)", question):
         return ChatResponse(message="Удаление сотрудников в CRM не предусмотрено. Руководитель может заблокировать менеджера своей команды, администратор — управлять доступом всех сотрудников.")
     page = navigation_target(payload.message)
