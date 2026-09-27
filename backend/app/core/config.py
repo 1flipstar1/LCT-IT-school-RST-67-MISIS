@@ -81,11 +81,10 @@ class Settings(BaseSettings):
 
     # The first assistant release only answers questions through a local model.
     ollama_base_url: str = "http://127.0.0.1:11434"
-    ollama_model: str = "qwen3:4b"
+    ollama_model: str = "qwen2.5:1.5b-instruct"
     assistant_enabled: bool = True
     assistant_timeout_seconds: int = 60
-    # Системный промпт с инструментами занимает ~5 тыс. токенов; окно Ollama по умолчанию (4096) мало.
-    assistant_context_tokens: int = 8192
+    assistant_context_tokens: int = 4096
 
     # Telegram-бот уведомляет руководителя, когда его менеджер переводит заявку на другой этап.
     # Токен выдаёт @BotFather; без него бот выключен, а CRM работает как обычно.

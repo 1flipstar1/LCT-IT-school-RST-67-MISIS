@@ -54,9 +54,9 @@ def test_chat_uses_local_model_catalogs_and_tools(client: TestClient, manager_he
         "change_stage", "open_interaction", "interaction_details",
     }
     system = sent["messages"][0]["content"]
-    assert "Подписание документов" in system
-    assert "Сменить этап" in system
-    assert "Казанский федеральный университет (КФУ)" in system
+    assert "дословно из запроса" in system
+    assert "Подписание документов" not in system
+    assert "Казанский федеральный университет (КФУ)" not in system
     # Имена сотрудников в модель не передаются: их распознаёт браузер по справочнику.
     assert "Алина Воронова" not in system
     assert [turn["role"] for turn in sent["messages"]] == ["system", "user", "assistant", "user"]

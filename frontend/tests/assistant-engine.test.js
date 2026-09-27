@@ -161,6 +161,7 @@ describe('interpretLocally', () => {
   it('незнакомое оставляет модели', () => {
     assert.equal(parse('посоветуй стратегию переговоров с ректором'), null);
     assert.equal(parse('привет').kind, 'answer');
+    assert.match(parse('ты можешь помочь что сделать?').text, /Вот что я умею/);
   });
 });
 

@@ -19,6 +19,16 @@ if ! docker compose --env-file deploy/.env -f deploy/compose.yml exec -T ollama 
     -e OLLAMA_HOST=http://ollama:11434 ollama pull "$ollama_model"
 fi
 
+# Keep the configured model in memory so the first user request does not pay its load time.
+docker compose --env-file deploy/.env -f deploy/compose.yml exec -T api python3 -c '
+import json, os, urllib.request
+body = json.dumps({"model": os.environ["OLLAMA_MODEL"], "keep_alive": -1}).encode()
+request = urllib.request.Request("http://ollama:11434/api/generate", data=body,
+                                 headers={"Content-Type": "application/json"})
+with urllib.request.urlopen(request, timeout=90) as response:
+    response.read()
+'
+
 for attempt in $(seq 1 40); do
   if grep -qx 'PUBLIC_URL=https://rtk-itschool.ru' deploy/.env; then
     health_url=https://rtk-itschool.ru/api/v1/health
