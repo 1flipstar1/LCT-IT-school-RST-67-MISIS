@@ -9,3 +9,4 @@ When working on the frontend, you must read and follow every applicable file in 
 All frontend typography must use the brand font supplied in [`frontend/design/font/`](frontend/design/font/). Do not substitute another font unless the project instructions are explicitly updated.
 
 The program logic is documented in [`logic/`](logic/). Before implementing or changing functionality, read the relevant files in that directory and ensure the implementation follows them. Do not introduce behavior that conflicts with the documented logic.
+.
