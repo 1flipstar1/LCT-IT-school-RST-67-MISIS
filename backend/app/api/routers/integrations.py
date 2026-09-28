@@ -1,4 +1,4 @@
-"""Server-owned integration operations."""
+"""Интеграции с LMS и сайтом — выполняются только на сервере."""
 
 from __future__ import annotations
 

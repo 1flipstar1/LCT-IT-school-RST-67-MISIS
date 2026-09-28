@@ -1,4 +1,4 @@
-"""Search the checked-in CRM help articles with permissions from the frontend role model."""
+"""Поиск по статьям справки CRM с учётом прав ролей (данные выгружаются из фронтенда)."""
 
 from __future__ import annotations
 

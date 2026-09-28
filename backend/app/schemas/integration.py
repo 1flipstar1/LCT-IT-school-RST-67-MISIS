@@ -1,4 +1,4 @@
-"""External LMS and website integration contracts."""
+"""Схемы интеграций с LMS и сайтом."""
 
 from __future__ import annotations
 

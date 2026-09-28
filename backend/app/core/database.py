@@ -1,4 +1,4 @@
-"""SQLAlchemy engine and session lifecycle."""
+"""Подключение к БД (SQLAlchemy): движок, пул соединений и сессии."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def build_engine(database_url: str | None = None) -> Engine:
     connect_args: dict[str, object] = {}
     pool_args: dict[str, object] = {}
     if url.startswith("sqlite"):
-        # FastAPI sync dependencies can execute in different worker threads.
+        # Синхронные зависимости FastAPI выполняются в разных потоках пула.
         connect_args["check_same_thread"] = False
     else:
         pool_args = {"pool_size": settings.database_pool_size, "max_overflow": settings.database_max_overflow}
@@ -41,7 +41,7 @@ SessionLocal = sessionmaker(
 
 
 def get_db() -> Generator[Session, None, None]:
-    """Provide one transactional session per request."""
+    """Одна сессия (транзакция) на запрос; закрывается после ответа."""
 
     db = SessionLocal()
     try:
@@ -51,7 +51,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def create_database_schema() -> None:
-    # Importing the model registers it on Base.metadata.
+    # Импорт модели регистрирует её таблицу в Base.metadata.
     from app.models.base import Base
     from app.models.attachment import AttachmentModel  # noqa: F401
     from app.models.import_job import ImportJobModel  # noqa: F401

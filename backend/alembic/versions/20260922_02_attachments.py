@@ -1,4 +1,4 @@
-"""add attachment metadata
+"""Таблица метаданных вложений (attachments)
 
 Revision ID: 20260922_02
 Revises: 20260922_01

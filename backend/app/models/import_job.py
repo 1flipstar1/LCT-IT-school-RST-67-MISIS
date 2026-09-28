@@ -1,4 +1,4 @@
-"""History of catalog imports with the data needed to roll one back."""
+"""История импортов справочников и данные, нужные для отката."""
 
 from __future__ import annotations
 
@@ -17,11 +17,10 @@ json_type = JSON().with_variant(JSONB(none_as_null=False), "postgresql")
 
 
 class ImportJobModel(Base):
-    """One applied Excel/CSV import.
+    """Один применённый импорт Excel/CSV.
 
-    ``snapshot_before`` keeps the collections the import replaced, so the
-    import can be undone as a whole; ``revision_after`` tells whether anyone
-    changed the data since.
+    ``snapshot_before`` хранит коллекции, которые импорт заменил, — по ним импорт
+    откатывается целиком; ``revision_after`` показывает, менял ли кто-то данные после него.
     """
 
     __tablename__ = "import_jobs"

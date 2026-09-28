@@ -1,4 +1,4 @@
-"""Account management: CRM users backed by Keycloak identities."""
+"""Управление учётными записями: сотрудники CRM и их учётки в Keycloak."""
 
 from __future__ import annotations
 

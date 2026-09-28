@@ -1,4 +1,4 @@
-"""Canonical state snapshot synchronization endpoints."""
+"""Синхронизация основного снимка данных CRM между браузером и сервером."""
 
 from __future__ import annotations
 

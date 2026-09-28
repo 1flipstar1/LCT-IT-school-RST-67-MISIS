@@ -1,4 +1,4 @@
-"""Shared Pydantic conventions and documented error schemas."""
+"""Общие соглашения Pydantic (camelCase в JSON) и описания ошибок для Swagger."""
 
 from __future__ import annotations
 

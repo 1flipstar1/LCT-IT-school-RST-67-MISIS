@@ -1,4 +1,4 @@
-"""Settings of the signed-in employee that live on the server, not in the browser."""
+"""Настройки вошедшего сотрудника, которые хранятся на сервере, а не в браузере."""
 
 from __future__ import annotations
 

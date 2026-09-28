@@ -1,8 +1,7 @@
-"""Application configuration.
+"""Настройки приложения.
 
-All settings can be supplied through environment variables. A checked-in
-``.env`` is used for the local demo, while containers and production should
-inject their own values.
+Любую настройку можно задать переменной окружения. Файл ``.env`` из репозитория — для
+локального демо; контейнеры и production передают свои значения.
 """
 
 from __future__ import annotations
@@ -20,7 +19,7 @@ PROJECT_DIR = BACKEND_DIR.parent
 
 
 class Settings(BaseSettings):
-    """Runtime settings with safe local-development defaults."""
+    """Настройки времени выполнения; значения по умолчанию безопасны для локальной разработки."""
 
     model_config = SettingsConfigDict(
         # .env.local (не в git) — для секретов конкретной машины, например токена Telegram-бота; перекрывает .env.
@@ -35,8 +34,8 @@ class Settings(BaseSettings):
     app_env: Literal["development", "demo", "test", "production"] = "development"
     api_v1_prefix: str = "/api/v1"
 
-    # SQLite requires no external services. PostgreSQL is enabled by setting,
-    # for example, postgresql+psycopg://user:password@host:5432/database.
+    # SQLite не требует внешних сервисов. PostgreSQL включается строкой подключения,
+    # например postgresql+psycopg://user:password@host:5432/database.
     database_url: str = "sqlite:///./lct_state.db"
     database_echo: bool = False
     # Пул соединений должен быть не меньше пула потоков FastAPI (40): иначе под нагрузкой запросы,
@@ -57,8 +56,8 @@ class Settings(BaseSettings):
     jwt_expires_seconds: int = 8 * 60 * 60
     demo_auth_enabled: bool | None = None
 
-    # If configured, bearer tokens issued by this Keycloak realm are verified
-    # against its JWKS endpoint. The demo remains fully local by default.
+    # Если задано, токены этого realm Keycloak проверяются по его ключам (JWKS).
+    # По умолчанию демо работает полностью локально.
     keycloak_issuer_url: str | None = None
     keycloak_jwks_url: str | None = None
     keycloak_audience: str | None = None
@@ -82,9 +81,8 @@ class Settings(BaseSettings):
     data_encryption_keys: str | None = None
     data_encryption_key_path: Path = BACKEND_DIR / "data" / "encryption.key"
 
-    # The external contracts were not supplied with the task. These optional
-    # URLs let an installation connect the two agreed sources without changing
-    # application code. Empty values intentionally mean "not configured".
+    # Контракты внешних систем к заданию не приложены. Эти необязательные адреса позволяют
+    # подключить оба источника без изменения кода. Пустое значение — «не настроено».
     lms_api_url: str | None = None
     lms_api_token: str | None = None
     website_api_url: str | None = None
@@ -92,7 +90,7 @@ class Settings(BaseSettings):
     integration_timeout_seconds: int = 20
     integration_demo_enabled: bool = False
 
-    # The first assistant release only answers questions through a local model.
+    # Помощник обращается только к локальной модели: данные не уходят во внешние сервисы.
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:1.5b-instruct"
     assistant_enabled: bool = True
@@ -118,7 +116,7 @@ class Settings(BaseSettings):
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_database_url(cls, value: object) -> object:
-        """Accept hosting-provider ``postgres://`` URLs as well as SQLAlchemy URLs."""
+        """Принимает и адреса хостингов вида ``postgres://``, и адреса в формате SQLAlchemy."""
 
         if isinstance(value, str) and value.startswith("postgres://"):
             return "postgresql+psycopg://" + value.removeprefix("postgres://")
@@ -166,7 +164,7 @@ class Settings(BaseSettings):
 
     @property
     def anonymous_state_access(self) -> bool:
-        """The demo is frictionless; production always requires a bearer token."""
+        """В демо снимок можно прочитать без входа; в production всегда нужен Bearer-токен."""
 
         return not self.is_production
 
@@ -213,5 +211,5 @@ def get_settings() -> Settings:
     return Settings()
 
 
-# Kept as a convenience for Alembic and modules that are loaded once at startup.
+# Готовый экземпляр — для Alembic и модулей, которые загружаются один раз при старте.
 settings = get_settings()

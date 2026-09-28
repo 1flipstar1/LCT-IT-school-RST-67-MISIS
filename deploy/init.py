@@ -1,4 +1,4 @@
-"""Create server-only secrets and a safe first-import Keycloak realm."""
+"""Создаёт секреты сервера (deploy/.env) и realm Keycloak для первого импорта со случайными паролями."""
 
 import base64
 import json

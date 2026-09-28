@@ -1,4 +1,4 @@
-"""Demo authentication and bearer identity endpoints."""
+"""Демо-вход и получение пользователя по Bearer-токену."""
 
 from __future__ import annotations
 

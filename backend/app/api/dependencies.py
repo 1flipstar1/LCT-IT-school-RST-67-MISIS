@@ -1,4 +1,4 @@
-"""Reusable FastAPI dependencies."""
+"""Общие зависимости FastAPI: сессия БД и пользователь из Bearer-токена (обязательный или нет)."""
 
 from __future__ import annotations
 

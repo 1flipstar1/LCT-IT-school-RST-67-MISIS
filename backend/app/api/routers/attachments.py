@@ -1,4 +1,4 @@
-"""Upload and authenticated download endpoints for workflow attachments."""
+"""Загрузка файлов к этапам и их скачивание (только с токеном)."""
 
 from __future__ import annotations
 

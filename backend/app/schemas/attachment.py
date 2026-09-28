@@ -1,4 +1,4 @@
-"""Attachment API contracts."""
+"""Схемы API вложений."""
 
 from __future__ import annotations
 

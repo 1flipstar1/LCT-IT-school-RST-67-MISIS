@@ -1,4 +1,4 @@
-"""Bounded chat contract: the model answers with text or picks one browser-side action."""
+"""Контракт чата с помощником: модель отвечает текстом или выбирает одно действие, которое выполнит браузер."""
 
 from typing import Annotated, Any, Literal
 
@@ -22,7 +22,7 @@ AssistantPage = Literal[
     "other",
 ]
 
-# Mirrors frontend/src/features/assistant/engine/tools.js — the browser executes these with the user's rights.
+# Зеркало frontend/src/features/assistant/engine/tools.js — действия выполняет браузер с правами пользователя.
 ActionName = Literal[
     "create_report",
     "repeat_last_report",
@@ -48,7 +48,7 @@ class ChatRequest(BaseModel):
     message: ChatText
     history: list[ChatTurn] = Field(default_factory=list, max_length=8)
     page: AssistantPage = "other"
-    # "agent" lets the model pick an action; "guide" only explains how to do it in the UI.
+    # «agent» — модель может выбрать действие; «guide» — только объясняет, как сделать это в интерфейсе.
     mode: Literal["agent", "guide"] = "agent"
     detail: Literal["short", "detailed"] = "short"
 

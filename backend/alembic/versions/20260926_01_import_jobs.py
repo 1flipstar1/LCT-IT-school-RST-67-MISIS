@@ -1,4 +1,4 @@
-"""import history with rollback snapshots
+"""История импортов с данными для отката (import_jobs)
 
 Revision ID: 20260926_01
 Revises: 20260922_02

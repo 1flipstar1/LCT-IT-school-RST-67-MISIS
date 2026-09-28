@@ -1,4 +1,4 @@
-"""Persistence and optimistic-concurrency operations for the state aggregate."""
+"""Хранение снимка данных CRM и одновременная запись в него (оптимистичные блокировки)."""
 
 from __future__ import annotations
 
@@ -40,14 +40,15 @@ SINGLETON_ID = 1
 MutationResult = TypeVar("MutationResult")
 StateListener = Callable[[dict[str, Any], dict[str, Any]], None]
 _state_listeners: list[StateListener] = []
-# Server-side writes of this process wait here *before* taking a DB connection. The snapshot row lock
-# serialises them anyway; without this queue every waiting write held a pooled connection, and a burst
-# of saves exhausted the pool (30 s waits and 500s for plain reads). Other processes still queue on the row lock.
+# Записи этого процесса ждут своей очереди здесь, *до* того как взять соединение с БД. Блокировка строки
+# снимка всё равно выстраивает их по одной; без этой очереди каждая ждущая запись держала соединение
+# из пула, и всплеск сохранений исчерпывал пул (ожидание 30 с и 500 даже на чтение). Другие процессы
+# по-прежнему ждут на блокировке строки.
 _write_queue = threading.Lock()
 
 
 def _release_read_transaction(db: Session) -> None:
-    """Return the pooled connection while waiting in the write queue (only reads happened so far)."""
+    """Возвращает соединение в пул на время ожидания очереди записи (до этого были только чтения)."""
 
     if db.in_transaction() and not (db.new or db.dirty or db.deleted):
         db.rollback()
@@ -69,7 +70,7 @@ def _notify_listeners(before: dict[str, Any], after: dict[str, Any]) -> None:
 
 
 def empty_state() -> dict[str, Any]:
-    """A shape-safe fallback; normally ``seed_state.json`` supplies demo data."""
+    """Пустой снимок правильной структуры на крайний случай; обычно демо-данные берутся из ``seed_state.json``."""
 
     return {
         "version": 5,
@@ -95,7 +96,7 @@ def load_seed_state(path: Path | None = None) -> dict[str, Any]:
 
 @lru_cache(maxsize=4)
 def _parsed_seed_state(seed_path: Path) -> dict[str, Any]:
-    """Seed is read once per process: replace_state compares every save with it."""
+    """Демо-данные читаются один раз на процесс: replace_state сравнивает с ними каждое сохранение."""
     if not seed_path.is_file():
         logger.warning("Seed file %s does not exist; using an empty state", seed_path)
         return empty_state()
@@ -149,7 +150,7 @@ def initialize_state(db: Session) -> StateSnapshotModel:
     try:
         db.commit()
     except IntegrityError:
-        # Another worker can win initialization between SELECT and INSERT.
+        # Другой процесс мог создать снимок между нашими SELECT и INSERT.
         db.rollback()
         existing = db.get(StateSnapshotModel, SINGLETON_ID)
         if existing is None:
@@ -164,8 +165,8 @@ def get_state(db: Session) -> StateSnapshotResponse:
 
 
 def get_state_for_principal(db: Session, principal: Principal | None) -> StateSnapshotResponse:
-    # The projection copies only what it changes, so the ORM snapshot is not deep-copied first:
-    # on a 1 MB state the copies used to cost more than the whole request.
+    # Проекция копирует только то, что меняет, поэтому снимок из ORM не копируется целиком заранее:
+    # на снимке в 1 МБ такие копии стоили дороже всего остального запроса.
     model = initialize_state(db)
     return _response(project_state_for_principal(model.state, principal), model.revision, model.updated_at)
 
@@ -189,7 +190,7 @@ def replace_state(
 
     current_model = initialize_state(db)
     is_demo_reset = not settings.is_production and state == _parsed_seed_state(settings.seed_state_path)
-    # Read-only below (merge, checks, notifications build new objects), so no deep copy of the snapshot.
+    # Ниже снимок только читается (слияние, проверки и уведомления строят новые объекты) — копия не нужна.
     current_state = current_model.state
     next_state = state
     if principal is not None and not is_demo_reset:
@@ -231,8 +232,8 @@ def replace_state(
         )
 
     if not is_demo_reset and settings.telegram_outbox_enabled and settings.telegram_bot_token:
-        # Queue in the same transaction as the stage change: a restart cannot
-        # leave the new stage saved without its Telegram notification.
+        # Уведомление ставится в очередь в той же транзакции, что и смена этапа: перезапуск
+        # не может оставить новый этап сохранённым, а уведомление о нём — потерянным.
         from app.services.telegram import stage_notifications
 
         for notification in stage_notifications(current_state, next_state):
@@ -251,14 +252,14 @@ def replace_state(
     db.commit()
     if not is_demo_reset and not settings.telegram_outbox_enabled:
         _notify_listeners(current_state, next_state)
-    # ``expire_on_commit=False`` keeps request objects usable, so explicitly
-    # invalidate the singleton after the SQL expression increments revision.
+    # ``expire_on_commit=False`` оставляет объекты запроса рабочими, поэтому после того как SQL
+    # увеличил revision, закэшированный в сессии снимок сбрасывается явно.
     db.expire_all()
-    # Only the new revision is read back: the state we just wrote is already in memory.
+    # Перечитывается только новая ревизия: сам снимок мы только что записали, он уже в памяти.
     row = db.execute(
         select(StateSnapshotModel.revision, StateSnapshotModel.updated_at).where(StateSnapshotModel.id == SINGLETON_ID)
     ).one_or_none()
-    if row is None:  # Defensive: the row cannot disappear through this API.
+    if row is None:  # На всякий случай: через этот API строка исчезнуть не может.
         raise APIError(500, "state_missing", "Состояние приложения не найдено.")
     state_out = project_state_for_principal(next_state, principal) if principal is not None else next_state
     return _response(state_out, row.revision, row.updated_at)
@@ -286,13 +287,13 @@ def mutate_state(
     *,
     attempts: int = 8,
 ) -> tuple[StateSnapshotResponse, MutationResult]:
-    """Apply a server-owned mutation (profile settings, Telegram binding, integrations).
+    """Изменение, которое делает сам сервер (настройки профиля, привязка Telegram, интеграции).
 
-    PostgreSQL: the snapshot row is locked (SELECT … FOR UPDATE) for the read-modify-write, so
-    concurrent mutations queue up instead of failing — before this, 15 simultaneous
-    «/me/onboarding» calls ran out of compare-and-swap retries and half of them returned 409.
-    SQLite ignores the lock but serialises writers itself; the compare-and-swap retry with a
-    short random pause covers the remaining races (and browser PUTs, which never lock).
+    PostgreSQL: на время «прочитать — изменить — записать» строка снимка блокируется
+    (SELECT … FOR UPDATE), поэтому одновременные изменения встают в очередь, а не падают.
+    Раньше из 15 одновременных вызовов «/me/onboarding» половина исчерпывала повторы и получала 409.
+    SQLite блокировку игнорирует, но сама выполняет записи по одной; оставшиеся гонки (и PUT из
+    браузера, который не блокирует строку) закрывает повтор с короткой случайной паузой.
     """
 
     _release_read_transaction(db)
@@ -308,7 +309,7 @@ def mutate_state(
                 .with_for_update()
                 .execution_options(populate_existing=True)
             )
-            next_state = copy.deepcopy(locked.state)  # the mutation edits it in place
+            next_state = copy.deepcopy(locked.state)  # изменение правит копию на месте
             result = mutation(next_state)
             try:
                 saved = replace_state(
@@ -343,11 +344,11 @@ def apply_state_changes(
     principal: Principal,
     attempts: int = 8,
 ) -> StateSnapshotResponse:
-    """Apply the browser's own changes (see app/domain/changes.py) to the latest snapshot.
+    """Накладывает изменения браузера (см. app/domain/changes.py) на актуальный снимок.
 
-    The row lock makes concurrent saves queue up instead of conflicting; the result is validated
-    and authorised exactly like a full replacement, and the response is the caller's projection
-    with everyone's changes, which the browser shows right away.
+    Блокировка строки выстраивает одновременные сохранения в очередь вместо конфликтов; результат
+    проверяется на целостность и права так же, как полная замена, а в ответ уходит проекция
+    под пользователя со всеми изменениями коллег — браузер сразу её показывает.
     """
 
     _release_read_transaction(db)
@@ -363,7 +364,7 @@ def apply_state_changes(
                 .with_for_update()
                 .execution_options(populate_existing=True)
             )
-            next_state = apply_changes(locked.state, changes)  # builds new containers, does not modify locked.state
+            next_state = apply_changes(locked.state, changes)  # строит новые контейнеры, locked.state не меняется
             _drop_events_of_removed_interactions(next_state, changes)
             try:
                 return replace_state(db, next_state, expected_revision=locked.revision, principal=principal, scoped=False)

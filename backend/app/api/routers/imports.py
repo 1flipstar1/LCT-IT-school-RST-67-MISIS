@@ -1,4 +1,4 @@
-"""Catalog imports from Excel/CSV: apply, history, rollback."""
+"""Импорт справочников из Excel/CSV: применение, история и откат."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Import history contract: the browser plans the change, the server applies and records it."""
+"""Контракт импорта: браузер составляет план изменений, сервер применяет его и записывает в историю."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from app.schemas.common import APIModel
 from app.schemas.state import StateSnapshotResponse
 
 
-# Collections an import may replace. Workflows, users and settings are never touched by a file.
+# Коллекции, которые может заменить импорт. Этапы работы, сотрудников и настройки файл не трогает никогда.
 ImportCollection = Literal["universities", "programs", "products", "interactions", "events"]
 
 

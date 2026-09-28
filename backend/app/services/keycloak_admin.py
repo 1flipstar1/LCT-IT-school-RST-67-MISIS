@@ -1,8 +1,8 @@
-"""Minimal Keycloak Admin REST client for account management from the CRM.
+"""Минимальный клиент Admin REST API Keycloak для управления учётками из CRM.
 
-Authenticates as the confidential service client ``rtk-it-school-admin`` (client
-credentials) which has only ``manage-users``/``view-users``/``query-*`` rights in the
-realm. Roles are granted through groups, so a role change is a group swap.
+Входит как служебный клиент ``rtk-it-school-admin`` (client credentials), у которого в realm
+есть только права ``manage-users``/``view-users``/``query-*``. Роли выдаются через группы,
+поэтому смена роли — это перенос сотрудника в другую группу.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Dedicated Telegram poller process, independent from API and frontend deploys."""
+"""Отдельный процесс Telegram-бота: не зависит от перезапусков API и выкладки фронтенда."""
 
 from __future__ import annotations
 

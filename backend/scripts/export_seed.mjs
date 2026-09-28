@@ -1,4 +1,4 @@
-/** Export the frontend's deterministic demo state for first backend startup. */
+/** Выгружает детерминированные демо-данные фронтенда для первого запуска бэкенда (app/seed_state.json). */
 import { writeFile } from 'node:fs/promises';
 
 const sourceUrl = new URL('../../frontend/src/data/seed.js', import.meta.url);

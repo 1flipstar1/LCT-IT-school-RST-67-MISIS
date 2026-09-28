@@ -1,4 +1,4 @@
-"""Versioned state synchronization contracts."""
+"""Схемы синхронизации версионированного снимка данных."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ class StateUpdateRequest(APIModel):
 
 
 class StateChangesRequest(APIModel):
-    """Only what the user changed since the snapshot the server last accepted from this browser."""
+    """Только то, что пользователь изменил с момента последнего снимка, принятого сервером от этого браузера."""
 
     changes: dict[str, Any] = Field(min_length=1)
 

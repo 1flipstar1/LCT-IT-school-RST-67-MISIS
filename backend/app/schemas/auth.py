@@ -1,4 +1,4 @@
-"""Authentication request and response models."""
+"""Схемы запросов и ответов авторизации."""
 
 from __future__ import annotations
 

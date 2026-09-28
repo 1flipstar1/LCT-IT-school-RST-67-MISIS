@@ -1,4 +1,4 @@
-"""Switch an existing IP deployment to the HTTPS domain after DNS and TLS work."""
+"""Переключает сервер с IP-адреса на домен с HTTPS, когда DNS и сертификат уже работают."""
 
 import json
 import os

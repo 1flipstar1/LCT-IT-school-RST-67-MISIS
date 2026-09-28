@@ -1,8 +1,8 @@
-"""Applying, listing and rolling back catalog imports.
+"""Применение, история и откат импортов справочников.
 
-The browser parses the file and plans the change with the same rules the user sees
-on the check step. The server owns everything that must be trustworthy: permissions,
-the revision check, validation of the resulting state, the history and the rollback.
+Браузер разбирает файл и строит план по тем же правилам, что пользователь видит на шаге
+«Проверка». Сервер отвечает за всё, что должно быть надёжным: права, контроль ревизии,
+проверку итоговых данных, историю и откат.
 """
 
 from __future__ import annotations

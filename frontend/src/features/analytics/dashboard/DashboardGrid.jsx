@@ -244,8 +244,8 @@ function useGsapDashboardEditing({
             0,
           );
 
-          // iOS-like hysteresis: reserve the larger slot almost immediately,
-          // but keep it occupied until the card is nearly back to the smaller size.
+          // Гистерезис как в iOS: большее место занимается почти сразу,
+          // а освобождается, только когда карточка почти вернулась к меньшему размеру.
           let reservedIndex = appliedPreviewIndex;
           while (
             reservedIndex < allowedWidths.length - 1
@@ -269,7 +269,7 @@ function useGsapDashboardEditing({
           node.classList.remove(styles.widgetResizing);
           gsap.to(resizeHandle, { x: 0, duration: 0.34, ease: 'back.out(2)', clearProps: 'x' });
           gsap.to(placeholder, { opacity: 0, duration: 0.18, ease: 'power2.out', overwrite: 'auto' });
-          // The release still rounds to the nearest supported size (50% threshold).
+          // После отпускания размер всё равно округляется до ближайшего допустимого (порог 50%).
           applyResizePreview(previewIndex);
           const targetWidth = allowedWidths[previewIndex] ?? startWidth;
           gsap.to(node, {

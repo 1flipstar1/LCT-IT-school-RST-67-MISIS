@@ -1,4 +1,4 @@
-"""Accounts are created and managed from the CRM and stay in sync with Keycloak."""
+"""Учётки создаются и меняются из CRM и не расходятся с Keycloak."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ def _users(response) -> list[dict]:
 
 
 class FakeKeycloak:
-    """Just enough of the Admin REST API to observe what the CRM asks Keycloak to do."""
+    """Минимальная подделка Admin REST API: видно, о чём CRM просит Keycloak."""
 
     def __init__(self) -> None:
         self.users: dict[str, dict] = {}

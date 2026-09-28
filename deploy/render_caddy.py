@@ -1,4 +1,4 @@
-"""Render the proxy configuration from the server-only public URL."""
+"""Собирает конфигурацию прокси Caddy по публичному адресу сервера из deploy/.env."""
 
 import os
 import shutil

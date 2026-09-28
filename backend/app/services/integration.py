@@ -1,4 +1,4 @@
-"""Pull and push ingestion for the LMS and Laravel website JSON contracts."""
+"""Приём данных из LMS и с сайта на Laravel: сервер сам забирает JSON или получает его от них."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ MAX_RESPONSE_BYTES = 10 * 1024 * 1024
 
 
 def source_mode(source_id: str) -> str:
-    """A configured API always wins over the bundled demonstration source."""
+    """Настроенный адрес API всегда важнее встроенного демонстрационного источника."""
 
     if settings.integration_url(source_id):
         return "live"
@@ -33,7 +33,7 @@ def source_mode(source_id: str) -> str:
 
 
 def demo_records(source_id: str, state: dict[str, Any]) -> list[dict[str, Any]]:
-    """One stable sample per source, built from actual CRM catalog references."""
+    """Одна постоянная демо-запись на источник, собранная из настоящих справочников CRM."""
 
     interactions = state.get("interactions", [])
     if not interactions:
@@ -101,7 +101,7 @@ def fetch_records(source_id: str) -> list[dict[str, Any]]:
         headers["Authorization"] = f"Bearer {token}"
     request = Request(url, headers=headers, method="GET")
     try:
-        with urlopen(request, timeout=settings.integration_timeout_seconds) as response:  # noqa: S310 - URL is operator-configured.
+        with urlopen(request, timeout=settings.integration_timeout_seconds) as response:  # noqa: S310 — адрес задаёт администратор сервера.
             raw = response.read(MAX_RESPONSE_BYTES + 1)
     except (HTTPError, URLError, TimeoutError, OSError) as exc:
         raise APIError(502, "integration_unavailable", "Внешняя система не ответила на запрос.", {"sourceId": source_id}) from exc

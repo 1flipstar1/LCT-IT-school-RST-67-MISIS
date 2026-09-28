@@ -1,4 +1,4 @@
-"""FastAPI application entry point."""
+"""Точка входа приложения FastAPI: middleware, маршруты API и раздача собранного фронтенда."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def create_app() -> FastAPI:
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 
     if settings.frontend_dist_path.is_dir():
-        # Registered after API routes so /api/v1/* always keeps API semantics.
+        # Подключается после маршрутов API, чтобы /api/v1/* всегда обрабатывал API, а не статика.
         app.mount(
             "/",
             StaticFiles(directory=settings.frontend_dist_path, html=True),

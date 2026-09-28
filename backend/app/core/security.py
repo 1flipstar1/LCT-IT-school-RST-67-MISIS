@@ -1,4 +1,4 @@
-"""Local demo JWT issuing and optional Keycloak token verification."""
+"""Выдача демо-токенов (JWT) и проверка токенов Keycloak."""
 
 from __future__ import annotations
 
@@ -136,7 +136,7 @@ def verify_access_token(token: str, config: Settings = settings) -> Principal:
             claims = _decode_keycloak(token, config)
         else:
             claims = _decode_local(token, config)
-    except Exception as exc:  # PyJWKClient can raise network errors as well.
+    except Exception as exc:  # PyJWKClient может бросить и сетевую ошибку — это тоже «токен не принят».
         raise APIError(
             401,
             "invalid_token",

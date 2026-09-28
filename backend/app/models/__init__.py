@@ -1,4 +1,4 @@
-"""Database models used by the running API."""
+"""Модели таблиц, с которыми работает API."""
 
 from app.models.base import Base
 from app.models.attachment import AttachmentModel

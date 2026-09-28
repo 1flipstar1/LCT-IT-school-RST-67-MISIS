@@ -1,4 +1,4 @@
-"""Operational health endpoint."""
+"""Проверка готовности сервиса и базы данных."""
 
 from __future__ import annotations
 

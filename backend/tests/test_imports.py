@@ -1,4 +1,4 @@
-"""Imports are applied atomically, recorded in history and can be rolled back."""
+"""Импорт применяется атомарно, записывается в историю и откатывается."""
 
 from __future__ import annotations
 

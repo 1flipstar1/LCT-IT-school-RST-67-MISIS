@@ -975,7 +975,7 @@ font-size:15px
 display:none
 }
 }
-/* Base UI primitives */
+/* Базовые элементы интерфейса */
 .legacy .menu-positioner {
 z-index:20
 }
@@ -998,7 +998,7 @@ position:fixed;inset:0;display:grid;place-items:center;padding:20px;z-index:6
 .legacy .modal {
 outline:0
 }
-/* Fixed sidebar and account controls */
+/* Закреплённая боковая панель и блок учётной записи */
 .legacy .sidebar {
 position:fixed;inset:0 auto 0 0;height:var(--viewport-height);overflow:hidden;z-index:4
 }
@@ -1069,7 +1069,7 @@ overflow-x:auto
 min-width:72px
 }
 }
-/* Brand theme */
+/* Фирменная тема */
 .legacy .sidebar {
 background:#fff;color:#303038;border-right:1px solid #e7e7e9
 }
@@ -1182,9 +1182,9 @@ color:var(--brand-orange)
 .legacy select {
 font-family:'RostelecomBasis',sans-serif!important
 }
-/* ===== Typography per design.rt.ru Gen2 (Atomaro) ===== */
-/* Base body text -> body-m 16/24 */
-/* Heading -> heading-h1..h3 */
+/* ===== Типографика по design.rt.ru Gen2 (Атомаро) ===== */
+/* Основной текст → body-m 16/24 */
+/* Заголовки → heading-h1..h3 */
 .legacy .page-header h1 {
 font-size:28px;line-height:32px;font-weight:700;letter-spacing:0
 }
@@ -1210,7 +1210,7 @@ font-size:28px;line-height:32px;font-weight:700;letter-spacing:0
 .legacy .result-numbers b {
 font-size:22px;line-height:24px;font-weight:700;letter-spacing:0
 }
-/* Body -> body-s / body-s-strong */
+/* Текст → body-s / body-s-strong */
 .legacy .page-header p,
 .legacy .catalog-card p,
 .legacy .check-state p,
@@ -1248,7 +1248,7 @@ font-size:16px;line-height:24px;font-weight:400
 .legacy .rank strong {
 font-size:14px;line-height:20px;font-weight:500
 }
-/* Description -> description-l/m/s */
+/* Подписи → description-l/m/s */
 .legacy .import-steps div,
 .legacy .import-steps span {
 font-size:12px;line-height:16px;font-weight:500
@@ -1298,13 +1298,13 @@ font-size:10px;line-height:12px;font-weight:400;letter-spacing:.4px
 .legacy .file-type {
 font-size:10px;line-height:12px;font-weight:500;letter-spacing:.4px
 }
-/* Buttons -> medium 500 */
+/* Кнопки → medium 500 */
 .legacy .button,
 .legacy .atomaro-button {
 font-size:14px;line-height:20px;font-weight:500
 }
-/* ===== Spacing per design.rt.ru Gen2 (Atomaro), base 16px = 1rem = spacing.4x ===== */
-/* Layout */
+/* ===== Отступы по design.rt.ru Gen2 (Атомаро), база 16px = 1rem = spacing.4x ===== */
+/* Раскладка */
 .legacy .content {
 padding:var(--space-6x) var(--space-6x) var(--space-3x)
 }
@@ -1334,7 +1334,7 @@ gap:var(--space-4x)
 .legacy .donut-wrap {
 gap:var(--space-16x)
 }
-/* Dashboard: combined panel — donut + per-stage breakdown */
+/* Дашборд: общая панель — кольцо и разбивка по этапам */
 .legacy .stage-stats {
 padding:var(--space-6x) var(--space-6x) var(--space-4x)
 }
@@ -1359,7 +1359,7 @@ width:100%;border-radius:8px 8px 0 0;min-height:6px;transition:height .3s ease
 .legacy .stage-bar-label {
 display:flex;align-items:center;gap:var(--space-1x);margin-top:var(--space-1x);font-size:11px;line-height:16px;color:#6c6c75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-/* Cards and panels */
+/* Карточки и панели */
 .legacy .kpi {
 gap:var(--space-3x);padding:var(--space-5x)
 }
@@ -1403,7 +1403,7 @@ margin-top:var(--space-2x)
 .legacy .line-chart {
 padding:var(--space-6x) 0 0 var(--space-10x)
 }
-/* Toolbar and tables */
+/* Панель инструментов и таблицы */
 .legacy .toolbar,
 .legacy .workflow-toolbar {
 gap:var(--space-2x);margin-bottom:var(--space-5x)
@@ -1441,7 +1441,7 @@ padding:var(--space-1x) var(--space-1_5x)
 .legacy .col-count {
 padding:var(--space-0_5x) var(--space-1x)
 }
-/* Workflow board */
+/* Доска этапов */
 .legacy .board-col {
 padding:var(--space-3x)
 }
@@ -1454,7 +1454,7 @@ margin-top:var(--space-3x);padding-top:var(--space-2x)
 .legacy .add-card {
 margin:var(--space-3x) var(--space-0_5x)
 }
-/* Import flow */
+/* Мастер импорта */
 .legacy .import-steps {
 margin:var(--space-6x) auto var(--space-8x)
 }
@@ -1503,7 +1503,7 @@ gap:var(--space-12x);margin:var(--space-8x) 0
 .legacy .result-numbers {
 gap:var(--space-16x);margin:var(--space-8x) 0
 }
-/* Reports, catalogs, settings */
+/* Отчёты, справочники, настройки */
 .legacy .report-card {
 gap:var(--space-3x);padding:var(--space-5x)
 }
@@ -1519,7 +1519,7 @@ padding:var(--space-2x) var(--space-6x)
 .legacy .setting-row {
 gap:var(--space-4x);padding:var(--space-4x) 0
 }
-/* Modal and menus */
+/* Модальные окна и меню */
 .legacy .modal {
 padding:var(--space-6x)
 }
@@ -1550,7 +1550,7 @@ padding:var(--space-2x) var(--space-3x)
 .legacy .toast {
 bottom:var(--space-6x);right:var(--space-8x);padding:var(--space-3x) var(--space-4x)
 }
-/* Sidebar */
+/* Боковая панель */
 .legacy .workspace {
 padding:var(--space-4x) var(--space-3x)
 }
@@ -1575,7 +1575,7 @@ padding:var(--space-4x) var(--space-2x) 0
 .legacy .role-select {
 padding:var(--space-2x) var(--space-3x)
 }
-/* Misc */
+/* Прочее */
 .legacy .file-pill {
 gap:var(--space-2x);padding:var(--space-2x)
 }
@@ -1585,7 +1585,7 @@ gap:var(--space-2x);padding:var(--space-2x)
 .legacy .setting-row div span {
 margin-top:var(--space-1x)
 }
-/* ===== Login page (demo) ===== */
+/* ===== Экран входа (демо) ===== */
 .legacy .login-page {
 position:fixed;inset:0;display:grid;place-items:center;overflow:auto;padding:var(--space-6x);background:linear-gradient(135deg,#8a1aff 0%,#8300ff 35%,#5c00b5 75%,#3d0084 100%)
 }
@@ -1715,7 +1715,7 @@ padding:var(--space-6x)
 align-items:flex-start;flex-direction:column
 }
 }
-/* Desktop navigation is presented as a separate workspace widget. */
+/* На компьютере навигация оформлена отдельным блоком рабочей области. */
 @media (min-width:761px) {
 .legacy .sidebar {
 inset:var(--space-3x) auto var(--space-3x) var(--space-3x);
@@ -1733,11 +1733,11 @@ margin-left:calc(256px + var(--space-3x));
 margin-left:calc(220px + var(--space-3x));
 }
 }
-/* User avatar (bottom-left of the left navigation): brand radial gradient,
-   center #FF4F12 -> edges #7700FF, bold white initials.
-   .user-mini span{display:block} (higher specificity than the base .avatar
-   display:inline-grid) would otherwise strip the grid centering, so re-assert
-   grid + place-items:center here to keep the initials centered in the circle. */
+/* Аватар пользователя (внизу левой навигации): фирменный радиальный градиент
+   от #FF4F12 в центре к #7700FF по краям, белые жирные инициалы.
+   Правило .user-mini span{display:block} специфичнее базового .avatar {display:inline-grid}
+   и сбивает центрирование, поэтому grid и place-items:center заданы здесь повторно —
+   чтобы инициалы стояли по центру круга. */
 .legacy .user-mini .avatar {
 display:grid;
   place-items:center;
@@ -1746,7 +1746,7 @@ display:grid;
   font-weight:700;
   line-height:1;
 }
-/* Universities: clickable column header filter */
+/* Вузы: фильтр по клику на заголовок колонки */
 .legacy th.sortable {
 cursor:pointer;user-select:none;white-space:nowrap;transition:color .15s
 }

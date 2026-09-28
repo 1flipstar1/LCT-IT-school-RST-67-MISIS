@@ -14,8 +14,8 @@ if ! grep -q '^DATA_ENCRYPTION_KEYS=' deploy/.env; then
   echo "Generated DATA_ENCRYPTION_KEYS in deploy/.env"
 fi
 
-# Rebuild application code on every push. Keep the Tor egress image/container
-# intact so routine frontend/backend deployments do not force a new bridge handshake.
+# Код приложения пересобирается при каждом push. Контейнер Tor-шлюза для Telegram не трогаем,
+# чтобы обычная выкладка не заставляла его заново устанавливать соединение с мостом.
 docker compose --env-file deploy/.env -f deploy/compose.yml build api telegram-bot
 docker compose --env-file deploy/.env -f deploy/compose.yml up -d --remove-orphans
 # Демо-вход из README; сбой не должен останавливать выкладку кода.
@@ -31,7 +31,7 @@ if ! docker compose --env-file deploy/.env -f deploy/compose.yml exec -T ollama 
     -e OLLAMA_HOST=http://ollama:11434 ollama pull "$ollama_model"
 fi
 
-# Keep the configured model in memory so the first user request does not pay its load time.
+# Держим модель в памяти, чтобы первый запрос пользователя не ждал её загрузки.
 docker compose --env-file deploy/.env -f deploy/compose.yml exec -T api python3 -c '
 import json, os, urllib.request
 body = json.dumps({

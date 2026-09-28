@@ -1,4 +1,4 @@
-"""Metadata for files stored outside the aggregate JSON snapshot."""
+"""Метаданные вложений: сами файлы лежат на диске, отдельно от снимка данных."""
 
 from __future__ import annotations
 

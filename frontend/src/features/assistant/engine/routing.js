@@ -13,7 +13,7 @@ export function isConversationalMessage(message, history = []) {
   return false;
 }
 
-/** Free-form help and casual conversation use the model when it is available. */
+/** Свободные вопросы и обычный разговор уходят модели, если она доступна. */
 export function shouldExplainWithModel(engine, local, model, message = '', history = []) {
   return engine === 'auto'
     && (isConversationalMessage(message, history)

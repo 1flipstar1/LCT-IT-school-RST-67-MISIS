@@ -1,4 +1,4 @@
-"""Versioned API router assembly."""
+"""Сборка всех маршрутов API под префиксом версии /api/v1."""
 
 from fastapi import APIRouter
 

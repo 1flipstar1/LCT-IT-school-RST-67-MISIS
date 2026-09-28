@@ -1,4 +1,4 @@
-"""Read-only resource views projected from the canonical snapshot."""
+"""Ресурсы только для чтения (каталоги, взаимодействия, журнал…), собранные из основного снимка."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Authenticated assistant endpoints: chat with the local model and its availability."""
+"""Эндпоинты ИИ-помощника (только с токеном): диалог с локальной моделью и её доступность."""
 
 from fastapi import APIRouter
 
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/assistant", tags=["assistant"])
 async def assistant_chat(payload: ChatRequest, db: DbSession, principal: CurrentPrincipal) -> ChatResponse:
     state = get_state(db).state
     user = find_principal_user(state, principal)
-    # A stale token must never grant more assistant access than the current CRM role.
+    # Устаревший токен не должен давать помощнику больше прав, чем текущая роль в CRM.
     role = user.get("role") if user.get("role") == principal.role else "manager"
     return await assistant.chat(payload, state, role)
 

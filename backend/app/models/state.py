@@ -1,4 +1,4 @@
-"""Persistent aggregate snapshot used by the browser client."""
+"""Снимок данных CRM, с которым синхронизируется браузер."""
 
 from __future__ import annotations
 
@@ -13,10 +13,10 @@ from app.models.base import Base
 
 
 class StateSnapshotModel(Base):
-    """The application is a single versioned aggregate for reliable sync.
+    """Все данные приложения — один версионированный снимок: так синхронизация надёжна.
 
-    The fixed primary key makes the invariant explicit and lets PUT use an
-    atomic compare-and-swap on ``revision`` in both SQLite and PostgreSQL.
+    Фиксированный первичный ключ (всегда 1) делает это правило явным и позволяет атомарно
+    сравнивать и увеличивать ``revision`` (compare-and-swap) и в SQLite, и в PostgreSQL.
     """
 
     __tablename__ = "state_snapshots"

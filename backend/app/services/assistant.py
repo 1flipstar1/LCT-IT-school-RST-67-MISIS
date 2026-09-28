@@ -1,7 +1,7 @@
-"""Local Ollama assistant: answers questions or picks one action for the browser to execute.
+"""Помощник на локальной модели Ollama: отвечает на вопросы или выбирает одно действие для браузера.
 
-The model never touches data. It either replies with text or returns a tool call; the frontend
-resolves names against catalogs, checks the user's rights and executes the action itself.
+Модель не касается данных. Она отвечает текстом или возвращает вызов инструмента; фронтенд сам
+сверяет названия со справочниками, проверяет права пользователя и выполняет действие.
 """
 
 from __future__ import annotations
@@ -143,7 +143,7 @@ TOOL_BY_NAME = {tool["function"]["name"]: tool for tool in TOOLS}
 
 
 def _report_tool(message: str) -> dict:
-    """Only expose report arguments mentioned in this request; the browser resolves filters too."""
+    """Показывает модели только те параметры отчёта, что упомянуты в запросе; фильтры всё равно разбирает браузер."""
     fields = {"universities", "format"}
     optional = {
         "directions": ("направлен",),
@@ -168,7 +168,7 @@ def _report_tool(message: str) -> dict:
 
 
 def _tools_for(message: str, role: str = "manager") -> list[dict]:
-    """Send only relevant schemas so a small CPU model can answer before the browser times out."""
+    """Передаёт модели только нужные схемы инструментов — иначе маленькая модель на CPU не успеет ответить."""
     text = message.lower().replace("ё", "е")
     if any(word in text for word in ("открой", "перейди", "зайди")):
         names = ("open_page", "open_interaction") if ("карточ" in text or "вуз" in text or re.search(r"\b[А-ЯЁ]{2,}\b", message)) else ("open_page",)
@@ -189,7 +189,7 @@ def _tools_for(message: str, role: str = "manager") -> list[dict]:
     elif any(word in text for word in ("найди", "покажи", "список", "взаимодейств")):
         names = ("find_interactions", "open_interaction", "interaction_details")
     else:
-        # Questions without an action verb need a text answer, not twelve tool schemas.
+        # Вопросу без глагола-действия нужен текстовый ответ, а не двенадцать схем инструментов.
         if not any(word in text for word in ("сделай", "создай", "выполни", "открой", "дай ", "выведи")):
             return []
         names = ("find_interactions", "show_stats", "open_page", "create_report")
@@ -236,7 +236,7 @@ SOCIAL_FOLLOWUP = re.compile(r"^(?:да|нет|конечно|давай|рас�
 
 
 def is_conversational(message: str, history: list | None = None) -> bool:
-    """Route short social exchanges to the model without hijacking CRM questions."""
+    """Короткие реплики («привет», «спасибо») отдаёт модели, не перехватывая вопросы о CRM."""
 
     text = message.lower().replace("ё", "е").strip()
     if CRM_CONTEXT.search(text) or (text.startswith("как дела у ") and not text.startswith("как дела у тебя")):
@@ -432,7 +432,7 @@ async def chat(payload: ChatRequest, state: dict, role: str = "manager") -> Chat
 
 
 async def status() -> AssistantStatus:
-    """Is the configured model pulled and reachable? Used by the chat header and the offline fallback."""
+    """Загружена ли модель и отвечает ли Ollama: для индикатора в чате и перехода на встроенный движок."""
 
     if not settings.assistant_enabled:
         return AssistantStatus(enabled=False, available=False, model=settings.ollama_model)

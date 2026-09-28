@@ -1,8 +1,7 @@
-"""Server-side invariants and authorization for the aggregate snapshot.
+"""Серверные проверки целостности и прав для снимка данных CRM.
 
-The browser keeps an optimistic local copy for sub-second UX, but it is never
-trusted as an authorization boundary. Every replacement is checked here before
-it reaches the database.
+Браузер держит свою копию, чтобы интерфейс отвечал мгновенно, но ему никогда не доверяют
+в вопросах прав: каждое изменение проверяется здесь, прежде чем попасть в базу.
 """
 
 from __future__ import annotations
@@ -247,14 +246,14 @@ def authorize_state_replacement(current: dict[str, Any], proposed: dict[str, Any
             _reject("universities")
 
 
-# Fields of a user card that only the server writes (through /me endpoints and the Telegram bot).
-# Browsers never receive the Telegram binding and see only their own preferences; on save the
-# server copies these fields back from its own state, so a client snapshot can neither forge nor lose them.
+# Поля карточки сотрудника, которые пишет только сервер (эндпоинты /me и Telegram-бот).
+# Привязку Telegram браузер не получает вовсе, а настройки видит только свои; при сохранении
+# сервер берёт эти поля из своего снимка, поэтому клиент не может ни подделать, ни потерять их.
 SERVER_OWNED_USER_FIELDS = ("preferences", "telegram")
 
 
 def _hide_private_user_fields(state: dict[str, Any], own_id: str) -> dict[str, Any]:
-    """Copies the user cards it changes; the rest of ``state`` may be shared with the stored snapshot."""
+    """Копирует только изменяемые карточки сотрудников; остальное в ``state`` может быть общим с хранимым снимком."""
 
     state["users"] = [
         {
@@ -277,7 +276,7 @@ def _without_server_owned_fields(users: Any) -> Any:
 
 
 def restore_server_owned_user_fields(current: dict[str, Any], proposed: dict[str, Any]) -> dict[str, Any]:
-    """Replace ``proposed["users"]`` with cards whose server-owned fields come from ``current``."""
+    """Заменяет ``proposed["users"]`` карточками, у которых серверные поля взяты из ``current``."""
 
     current_users = {item.get("id"): item for item in current.get("users", []) if isinstance(item, dict)}
     users = []
@@ -297,18 +296,18 @@ def restore_server_owned_user_fields(current: dict[str, Any], proposed: dict[str
 
 
 def project_state_for_principal(state: dict[str, Any], principal: Principal | None) -> dict[str, Any]:
-    """Return only the records visible to a non-admin user.
+    """Оставляет только записи, которые видит пользователь (для администратора — все).
 
-    Catalog names remain available for creating a new interaction, while
-    university contacts and operational records are restricted to the user's
-    data scope. Other employees' personal settings are never exposed.
+    Названия из справочников доступны всем — они нужны для новой заявки, а контакты вузов
+    и рабочие записи ограничены областью видимости пользователя. Личные настройки
+    других сотрудников не отдаются никогда.
     """
 
     if principal is None:
-        # Anonymous access exists only in local development, where server jobs also read the full state.
+        # Анонимный доступ есть только в локальной разработке; серверные задачи тоже читают полный снимок.
         return copy.deepcopy(state)
-    # Shallow copies only: lists are rebuilt below and user cards are copied by _hide_private_user_fields,
-    # nothing mutates the records themselves — so the (large) snapshot is never deep-copied.
+    # Только поверхностные копии: списки собираются заново ниже, карточки копирует _hide_private_user_fields,
+    # сами записи никто не меняет — поэтому большой снимок не копируется целиком.
     if principal.role == "admin":
         return _hide_private_user_fields(dict(state), find_principal_user(state, principal)["id"])
     user = find_principal_user(state, principal)

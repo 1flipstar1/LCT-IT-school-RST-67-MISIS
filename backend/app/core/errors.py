@@ -1,4 +1,4 @@
-"""Consistent public API error responses."""
+"""Единый формат ошибок API: ``{"error": {"code", "message", "details"}}``."""
 
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ def install_error_handlers(app: FastAPI) -> None:
             ),
         )
 
-    # Starlette's base class also covers 404/405 raised by routing and static files, not only FastAPI's own.
+    # Базовый класс Starlette ловит и 404/405 от маршрутизации и статики, а не только ошибки FastAPI.
     @app.exception_handler(HTTPException)
     async def http_error_handler(_: Request, exc: HTTPException) -> JSONResponse:
         if isinstance(exc.detail, dict) and "code" in exc.detail:

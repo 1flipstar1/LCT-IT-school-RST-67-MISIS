@@ -1,9 +1,9 @@
-"""Creating employees, changing their role and access, resetting passwords.
+"""Создание сотрудников, смена роли и доступа, выдача временных паролей.
 
-Keycloak owns the identity (login, password, role group); the CRM state owns the
-employee card (name, e-mail, team, data scope). Every operation changes both, so the
-role in the token and the role in the CRM never diverge. Without a configured Keycloak
-admin client the CRM card is still managed, and the UI says that sign-in is not set up.
+Учётной записью (логин, пароль, группа роли) владеет Keycloak, карточкой сотрудника
+(имя, почта, команда, видимость данных) — CRM. Каждая операция меняет и то и другое, поэтому
+роль в токене и роль в CRM не расходятся. Если служебный клиент Keycloak не настроен,
+карточка в CRM всё равно ведётся, а интерфейс предупреждает, что войти пока нельзя.
 """
 
 from __future__ import annotations

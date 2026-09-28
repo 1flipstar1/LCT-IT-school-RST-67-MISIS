@@ -1,4 +1,4 @@
-"""add canonical state snapshot
+"""Таблица снимка данных CRM (state_snapshots)
 
 Revision ID: 20260922_01
 Revises: 73a0ab7fcc0e

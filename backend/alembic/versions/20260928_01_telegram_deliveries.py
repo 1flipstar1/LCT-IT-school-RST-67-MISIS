@@ -1,4 +1,4 @@
-"""Durable Telegram notification queue.
+"""Очередь уведомлений Telegram (telegram_deliveries)
 
 Revision ID: 20260928_01
 Revises: 20260926_01

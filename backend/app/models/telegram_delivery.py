@@ -1,4 +1,4 @@
-"""Durable queue for stage-change Telegram messages."""
+"""Очередь уведомлений о смене этапа в Telegram: переживает перезапуск и повторяет отправку."""
 
 from __future__ import annotations
 

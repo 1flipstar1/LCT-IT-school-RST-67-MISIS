@@ -1,4 +1,4 @@
-"""Assistant stays authenticated, grounded in catalogs and never executes actions itself."""
+"""Помощник работает только с токеном, опирается на справочники и сам никогда не выполняет действия."""
 
 from __future__ import annotations
 

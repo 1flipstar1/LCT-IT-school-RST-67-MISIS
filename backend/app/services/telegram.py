@@ -436,7 +436,7 @@ notifier = StageNotifier()
 
 
 def deliver_outbox_once() -> bool:
-    """Send one due notification; keep failures in the database for retry."""
+    """Отправляет одно подошедшее уведомление; при сбое оставляет его в базе для повтора."""
 
     client = get_client()
     if client is None:

@@ -1,12 +1,12 @@
-"""Changes a browser made to its copy of the state, applied to the current snapshot.
+"""Изменения, которые браузер внёс в свою копию данных, — применяются к актуальному снимку.
 
-Mirror of ``frontend/src/store/rebase.js`` (``applyChanges``). The browser sends only what the
-user changed since the snapshot the server last accepted from it; the server applies it to the
-latest snapshot under a row lock. Concurrent users therefore never overwrite each other and never
-receive 409 for unrelated edits — before, every save replaced the whole snapshot and all but one
-of the simultaneous writers got a conflict.
+Зеркало ``frontend/src/store/rebase.js`` (``applyChanges``). Браузер присылает только то, что
+пользователь изменил с момента последнего снимка, принятого от него сервером; сервер накладывает
+это на свежий снимок под блокировкой строки. Поэтому одновременные пользователи не затирают
+правки друг друга и не получают 409 из-за чужих изменений — раньше каждое сохранение заменяло
+снимок целиком, и из одновременных сохранений проходило только одно.
 
-Change format per state key:
+Формат изменения для каждого ключа снимка:
     {"op": "list", "set": [items], "prepend": [items], "append": [items], "remove": [ids]}
     {"op": "object", "fields": {key: change}}
     {"op": "value", "value": ...}
@@ -63,6 +63,6 @@ def _apply(current: Any, change: Any, path: str) -> Any:
         if not (isinstance(item, dict) and (item.get("id") in removed or item.get("id") in added))
     ]
     kept_ids = {item.get("id") for item in kept if isinstance(item, dict)}
-    # A record the user edited but someone else deleted comes back: the user's edit wins.
+    # Запись, которую пользователь изменил, а кто-то другой удалил, возвращается: правка пользователя важнее.
     restored = [item for item in parts["set"] if item["id"] not in kept_ids]
     return parts["prepend"] + kept + restored + parts["append"]
