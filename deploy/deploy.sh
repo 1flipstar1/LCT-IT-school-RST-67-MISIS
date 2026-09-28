@@ -7,7 +7,10 @@ if [[ ! -f deploy/.env ]]; then
 fi
 python3 deploy/render_caddy.py
 
-docker compose --env-file deploy/.env -f deploy/compose.yml up -d --build --remove-orphans
+# Rebuild application code on every push. Keep the Tor egress image/container
+# intact so routine frontend/backend deployments do not force a new bridge handshake.
+docker compose --env-file deploy/.env -f deploy/compose.yml build api telegram-bot
+docker compose --env-file deploy/.env -f deploy/compose.yml up -d --remove-orphans
 
 ollama_model="$(sed -n 's/^OLLAMA_MODEL=//p' deploy/.env | head -n 1)"
 if [[ -z "$ollama_model" ]]; then
