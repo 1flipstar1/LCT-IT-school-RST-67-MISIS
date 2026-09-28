@@ -227,6 +227,16 @@
   color: var(--color-text-tertiary);
 }
 
+.legalLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--color-brand);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 @media (max-width: 960px) {
   .page {
     grid-template-columns: 1fr;

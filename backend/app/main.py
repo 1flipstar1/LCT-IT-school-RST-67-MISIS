@@ -11,8 +11,10 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.router import api_router
 from app.core.config import settings
+from app.core.crypto import get_keyring
 from app.core.database import SessionLocal, create_database_schema
 from app.core.errors import install_error_handlers
+from app.core.security_headers import SecurityHeadersMiddleware
 from app.services import telegram
 from app.services.state import add_state_listener, initialize_state
 
@@ -31,6 +33,7 @@ OPENAPI_TAGS = [
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    get_keyring()  # Без ключа шифрования ПДн production не стартует — ошибка видна сразу, а не при первой записи.
     create_database_schema()
     with SessionLocal() as db:
         initialize_state(db)
@@ -66,6 +69,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
         expose_headers=["ETag"],
     )
+    app.add_middleware(SecurityHeadersMiddleware)
     install_error_handlers(app)
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 

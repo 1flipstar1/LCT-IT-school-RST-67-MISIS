@@ -38,10 +38,26 @@ async function createReportPdf(table, { title, subtitle, visuals }) {
   return pdf.toBlob();
 }
 
+/**
+ * Результирующий JSON: метаданные отчёта, описание колонок и строки-объекты с ключами по id колонок —
+ * стабильный машиночитаемый формат для загрузки в другие системы.
+ */
+function createReportJson(table, { title, subtitle }) {
+  const document = {
+    report: title,
+    description: subtitle,
+    generatedAt: new Date().toISOString(),
+    columns: table.columnIds.map((id, index) => ({ id, label: table.header[index] })),
+    rows: table.body.map((row) => Object.fromEntries(table.columnIds.map((id, index) => [id, row[index]]))),
+  };
+  return new Blob([JSON.stringify(document, null, 2)], { type: 'application/json' });
+}
+
 const WRITERS = {
   xlsx: (table) => createXlsx(table),
   xls: (table) => createXls(table),
   pdf: (table, meta) => createReportPdf(table, meta),
+  json: (table, meta) => createReportJson(table, meta),
 };
 
 /**

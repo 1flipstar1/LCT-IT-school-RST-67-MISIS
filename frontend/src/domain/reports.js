@@ -5,6 +5,8 @@ export const REPORT_FORMATS = [
   { id: 'xlsx', label: 'XLSX', description: 'Excel 2007 и новее' },
   { id: 'xls', label: 'XLS', description: 'Excel 97–2003' },
   { id: 'pdf', label: 'PDF', description: 'Для печати и отправки' },
+  // ТЗ, требования к решению, п. 4: результирующий JSON-файл — для обмена с другими системами.
+  { id: 'json', label: 'JSON', description: 'Для других систем' },
 ];
 
 /**
@@ -35,6 +37,7 @@ export function buildReportTable(rows, columnIds) {
 
   const columns = REPORT_COLUMNS.filter((column) => columnIds.includes(column.id));
   return {
+    columnIds: columns.map((column) => column.id),
     header: columns.map((column) => column.label),
     body: rows.map((row) => columns.map((column) => column.value(row))),
   };

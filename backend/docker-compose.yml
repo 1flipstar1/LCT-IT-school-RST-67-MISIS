@@ -20,6 +20,9 @@ services:
       CORS_ORIGINS: http://localhost:8000,http://localhost:5173
 
       ATTACHMENT_STORAGE_PATH: /app/data/attachments
+      # Ключ шифрования ПДн: задайте DATA_ENCRYPTION_KEYS или он создастся в отдельном томе при первом старте.
+      DATA_ENCRYPTION_KEYS: ${DATA_ENCRYPTION_KEYS:-}
+      DATA_ENCRYPTION_KEY_PATH: /app/data/keys/encryption.key
 
       # Браузер получает токены с адреса localhost:8080 — это и есть issuer в токене.
       # Ключи подписи API забирает напрямую из контейнера keycloak по внутренней сети.
@@ -43,6 +46,7 @@ services:
 
     volumes:
       - attachment_data:/app/data/attachments
+      - encryption_key:/app/data/keys
 
   postgres:
     image: postgres:16
@@ -94,3 +98,4 @@ services:
 volumes:
   postgres_data:
   attachment_data:
+  encryption_key:

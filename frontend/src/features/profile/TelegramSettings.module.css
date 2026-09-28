@@ -96,6 +96,13 @@
   background: var(--color-brand-soft);
 }
 
+.consent {
+  max-width: 560px;
+  margin: 0;
+  font: var(--font-caption);
+  opacity: 0.85;
+}
+
 .note,
 .waiting {
   font: var(--font-caption);

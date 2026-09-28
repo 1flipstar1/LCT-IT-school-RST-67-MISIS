@@ -151,11 +151,13 @@ export function useActions() {
         }));
       },
 
+      /** managerId = null снимает ответственного (ТЗ: руководитель ответственных «меняет, удаляет, назначает»). */
       assignManager({ interactionId, managerId }) {
         requirePermission(PERMISSION.assignManager);
         const state = getState();
         const interaction = findInteraction(state, interactionId);
-        const manager = state.users.find((item) => item.id === managerId);
+        const manager = managerId ? state.users.find((item) => item.id === managerId) : null;
+        if (managerId && !manager) throw new AppError('NOT-FOUND-404');
         const at = now();
 
         return undoable({
@@ -172,20 +174,23 @@ export function useActions() {
               fromUserId: interaction.managerId,
               toUserId: managerId,
             },
-            audit: { at, actorId, text: `Назначен ответственный: ${manager.name}`, target: interactionTarget(state, interaction) },
+            audit: { at, actorId, text: manager ? `Назначен ответственный: ${manager.name}` : 'Ответственный снят', target: interactionTarget(state, interaction) },
           },
         });
       },
 
-      updateInteraction({ interactionId, universityId, directionId, programId, productId, managerId, contactIds = [] }) {
+      updateInteraction({ interactionId, universityId, directionId, programId, productId, managerId: requestedManagerId, contactIds = [] }) {
         const state = getState();
         const interaction = findInteraction(state, interactionId);
         const university = state.universities.find((item) => item.id === universityId);
         const direction = state.directions.find((item) => item.id === directionId);
         const program = state.programs.find((item) => item.id === programId && item.directionId === directionId);
         const product = state.products.find((item) => item.id === productId);
-        const manager = state.users.find((item) => item.id === managerId);
-        if (!university || !direction || !program || !product || !manager || !program.productIds.includes(productId)) throw new AppError('NOT-FOUND-404');
+        const manager = requestedManagerId ? state.users.find((item) => item.id === requestedManagerId) : null;
+        // Без ответственного можно оставить только заявку, у которой его и не было: снимают его в окне «Сменить».
+        const managerMissing = requestedManagerId ? !manager : Boolean(interaction.managerId);
+        if (!university || !direction || !program || !product || managerMissing || !program.productIds.includes(productId)) throw new AppError('NOT-FOUND-404');
+        const managerId = manager?.id ?? null;
         if (managerId !== interaction.managerId) requirePermission(PERMISSION.assignManager);
 
         const requestedContactIds = new Set(contactIds);

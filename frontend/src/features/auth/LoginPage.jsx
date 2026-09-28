@@ -8,6 +8,7 @@ import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 import { Button } from '../../ui/Button.jsx';
 import { ArrowRightIcon, CheckIcon, UserIcon, UsersIcon, SettingsIcon } from '../../ui/icons.js';
 import { ErrorAlert, InlineAlert } from '../../ui/InlineAlert.jsx';
+import { PrivacyPolicyDialog } from '../legal/PrivacyPolicyDialog.jsx';
 import styles from './LoginPage.module.css';
 
 const ROLE_ICONS = { [ROLE.manager]: UserIcon, [ROLE.lead]: UsersIcon, [ROLE.admin]: SettingsIcon };
@@ -25,6 +26,7 @@ export function LoginPage() {
   const [ssoUnavailable, setSsoUnavailable] = useState(false);
   const [loginError, setLoginError] = useState(null);
   const [loggingInAs, setLoggingInAs] = useState(null);
+  const [policyOpen, setPolicyOpen] = useState(false);
   const rolesRef = useRef(null);
 
   const handleSso = async () => {
@@ -122,7 +124,11 @@ export function LoginPage() {
             </InlineAlert>
           )}
         </div>
-        <p className={styles.legal}>Обработка персональных данных — в соответствии с 152-ФЗ</p>
+        <p className={styles.legal}>
+          Обработка персональных данных — в соответствии с 152-ФЗ.{' '}
+          <button type="button" className={styles.legalLink} onClick={() => setPolicyOpen(true)}>Политика обработки ПДн</button>
+        </p>
+        {policyOpen && <PrivacyPolicyDialog open onOpenChange={setPolicyOpen} />}
       </main>
     </div>
   );

@@ -2,11 +2,13 @@
 
 Only opaque generated names are used on disk. Original names stay in the
 database and are supplied solely through Content-Disposition on download.
+Files are encrypted on disk (AES-256-GCM, app/core/crypto.py): договоры и протоколы содержат ПДн.
 """
 
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
 from pathlib import Path
 from uuid import uuid4
 
@@ -14,6 +16,7 @@ from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.crypto import get_keyring, is_encrypted_file
 from app.core.errors import APIError
 from app.models.attachment import AttachmentModel
 from app.schemas.attachment import AttachmentResponse
@@ -56,17 +59,21 @@ async def save_attachment(db: Session, upload: UploadFile, *, uploaded_by: str) 
     size = 0
 
     try:
+        # Открытый текст не касается диска: сначала файл читается целиком в память (до 25 МБ),
+        # затем пишется сразу зашифрованным.
+        chunks: list[bytes] = []
+        while chunk := await upload.read(CHUNK_SIZE):
+            size += len(chunk)
+            if size > settings.max_attachment_bytes:
+                raise APIError(
+                    413,
+                    "file_too_large",
+                    "Файл превышает допустимый размер.",
+                    {"fileName": original_name, "maxBytes": settings.max_attachment_bytes},
+                )
+            chunks.append(chunk)
         with temporary_path.open("xb") as stream:
-            while chunk := await upload.read(CHUNK_SIZE):
-                size += len(chunk)
-                if size > settings.max_attachment_bytes:
-                    raise APIError(
-                        413,
-                        "file_too_large",
-                        "Файл превышает допустимый размер.",
-                        {"fileName": original_name, "maxBytes": settings.max_attachment_bytes},
-                    )
-                stream.write(chunk)
+            get_keyring().encrypt_stream(iter(chunks), stream, attachment_aad(attachment_id))
         os.replace(temporary_path, final_path)
     except Exception:
         temporary_path.unlink(missing_ok=True)
@@ -102,3 +109,20 @@ def get_attachment(db: Session, attachment_id: str) -> tuple[AttachmentModel, Pa
     if not path.is_file():
         raise APIError(410, "attachment_missing", "Файл отсутствует в хранилище.")
     return model, path
+
+
+def attachment_aad(attachment_id: str) -> str:
+    """Шифротекст привязан к id вложения: подложить под один id файл другого не получится."""
+
+    return f"attachments.{attachment_id}"
+
+
+def read_attachment(model: AttachmentModel, path: Path) -> Iterator[bytes]:
+    """Открытое содержимое файла блоками; файлы, загруженные до включения шифрования, отдаются как есть."""
+
+    with path.open("rb") as stream:
+        if is_encrypted_file(path):
+            yield from get_keyring().decrypt_stream(stream, attachment_aad(model.id))
+            return
+        while chunk := stream.read(CHUNK_SIZE):
+            yield chunk

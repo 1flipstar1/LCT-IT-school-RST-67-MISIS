@@ -14,6 +14,7 @@ import copy
 import html
 import logging
 import os
+import re
 import secrets
 import threading
 import time
@@ -43,6 +44,10 @@ logger = logging.getLogger(__name__)
 LINK_TTL = timedelta(minutes=15)
 POLL_TIMEOUT_SECONDS = 25
 MAX_COMMENT_LENGTH = 500
+# Серверы Telegram за рубежом: сообщение — трансграничная передача (152-ФЗ, ст. 12). Поэтому в него
+# попадает минимум ПДн — имя и инициал фамилии сотрудника, а почты и телефоны в комментарии скрываются.
+EMAIL_PATTERN = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+PHONE_PATTERN = re.compile(r"(?<![\w])\+?\d[\d\s()\-]{5,}\d")
 NOTIFIED_EVENT_TYPES = {"transition", "completed"}
 # Даты в сообщениях — по Москве: события хранятся в UTC, и около полуночи день иначе «съезжает».
 DISPLAY_TZ = ZoneInfo("Europe/Moscow")
@@ -242,6 +247,21 @@ def _days(count: int) -> str:
     return f"{count} {word}"
 
 
+def short_person_name(name: str | None) -> str:
+    """«Алексей Козлов» → «Алексей К.»: руководителю понятно, кто это, а полное ФИО не уходит за рубеж."""
+
+    parts = (name or "").split()
+    if len(parts) < 2:
+        return parts[0] if parts else ""
+    return f"{parts[0]} {parts[-1][0]}."
+
+
+def mask_contacts(text: str) -> str:
+    """Почты и телефоны из свободного текста комментария в Telegram не передаются."""
+
+    return PHONE_PATTERN.sub("[телефон скрыт]", EMAIL_PATTERN.sub("[почта скрыта]", text))
+
+
 def format_stage_message(state: dict[str, Any], event: dict[str, Any], interaction: dict[str, Any]) -> str:
     """Уведомление в Telegram. Каждая строка начинается со смайлика-метки, чтобы сообщение
     читалось с одного взгляда: что случилось → какой вуз → куда перевели → срок → кто → комментарий."""
@@ -301,11 +321,11 @@ def format_stage_message(state: dict[str, Any], event: dict[str, Any], interacti
 
     actor = users.get(event.get("userId"), {})
     manager = users.get(interaction.get("managerId"), {})
-    lines.append(f"👤 Кто изменил: {escape(actor.get('name', 'Система'))}")
+    lines.append(f"👤 Кто изменил: {escape(short_person_name(actor.get('name')) or 'Система')}")
     if manager and manager.get("id") != actor.get("id"):
-        lines.append(f"🧑‍💼 Ответственный: {escape(manager.get('name', '—'))}")
+        lines.append(f"🧑‍💼 Ответственный: {escape(short_person_name(manager.get('name')) or '—')}")
 
-    comment = str(event.get("comment") or "").strip()
+    comment = mask_contacts(str(event.get("comment") or "").strip())
     if comment:
         if len(comment) > MAX_COMMENT_LENGTH:
             comment = comment[: MAX_COMMENT_LENGTH - 1].rstrip() + "…"

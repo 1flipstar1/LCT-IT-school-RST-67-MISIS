@@ -5,14 +5,11 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, Integer, JSON
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.crypto import EncryptedJSON
 from app.models.base import Base
-
-
-json_type = JSON().with_variant(JSONB(none_as_null=False), "postgresql")
 
 
 class StateSnapshotModel(Base):
@@ -26,7 +23,8 @@ class StateSnapshotModel(Base):
     __table_args__ = (CheckConstraint("id = 1", name="ck_state_snapshots_singleton"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
-    state: Mapped[dict[str, Any]] = mapped_column(json_type, nullable=False)
+    # Весь снимок (ПДн сотрудников и контактов вузов) хранится зашифрованным — app/core/crypto.py.
+    state: Mapped[dict[str, Any]] = mapped_column(EncryptedJSON("state_snapshots.state"), nullable=False)
     revision: Mapped[int] = mapped_column(BigInteger, nullable=False, default=1)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

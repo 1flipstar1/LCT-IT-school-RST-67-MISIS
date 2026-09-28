@@ -88,7 +88,8 @@ def test_lead_connects_and_gets_notified_about_team_transitions(client: TestClie
 
     messages = [text for chat, text in bot.sent if chat == LEAD_CHAT]
     assert len(messages) == 1
-    assert "Переход на следующий этап" in messages[0] and "Алина Воронова" in messages[0]
+    # За рубеж уходит минимум ПДн: имя и инициал фамилии, без полного ФИО.
+    assert "Переход на следующий этап" in messages[0] and "Алина В." in messages[0] and "Воронова" not in messages[0]
     assert "&lt;о встрече&gt;" in messages[0], "комментарий экранируется"
     assert "📊 Этап" in messages[0] and "⏳ Срок этапа" in messages[0] and "🏛 <b>" in messages[0]
 
@@ -249,3 +250,11 @@ def test_worker_heartbeat_expires(monkeypatch, tmp_path) -> None:
     assert telegram.polling_healthy() is True
     path.write_text(str(time.time() - telegram.POLL_HEALTH_SECONDS - 1))
     assert telegram.polling_healthy() is False
+
+
+def test_contacts_are_masked_before_leaving_for_telegram() -> None:
+    from app.services.telegram import mask_contacts
+
+    masked = mask_contacts("Ирина: +7 (912) 345-67-89, i.ivanova@kpfu.ru; договор № 12/2026 от 01.10.2026")
+    assert "912" not in masked and "kpfu" not in masked
+    assert "[телефон скрыт]" in masked and "[почта скрыта]" in masked and "12/2026 от 01.10.2026" in masked

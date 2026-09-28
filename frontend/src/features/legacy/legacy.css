@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
 /*
  * Экраны прежнего дизайна (ветка main): styles.css перенесён без изменений вида,
@@ -8,7 +7,7 @@
  */
 
 .legacy {
-font-family:'DM Sans',sans-serif;color:#182230;font-size:14px;--ink:#182230;--muted:#7c8797;--line:#e7eaf0;--purple:#4f46e5;--nav:#11182b;--panel:#fff;
+font-family:var(--font-family);color:#182230;font-size:14px;--ink:#182230;--muted:#7c8797;--line:#e7eaf0;--purple:#4f46e5;--nav:#11182b;--panel:#fff;
 --brand-purple:#8300ff;--brand-purple-soft:#f0e0ff;--brand-orange:#ff4f12;--brand-orange-soft:#ffeae2;--surface-base:#f4f4f5;--surface-panel:#ffffff;--neutral-gray:#f4f4f5;--purple:var(--brand-purple);--nav:#ffffff;--panel:var(--surface-panel);--line:#e3e3e5;--button-primary-accent-bg-color-default:#8300ff;--button-primary-accent-bg-color-hover:#6f00db;--button-primary-accent-bg-color-active:#5c00b5;--button-primary-accent-border-color-default:transparent;--button-primary-accent-border-color-hover:transparent;--button-primary-accent-border-color-active:transparent;--button-outline-accent-bg-color-default:transparent;--button-outline-accent-bg-color-hover:rgba(131,0,255,.1);--button-outline-accent-bg-color-active:rgba(131,0,255,.2);--button-outline-accent-border-color-default:#a64dff;--button-outline-accent-border-color-hover:#8300ff;--button-outline-accent-border-color-active:#8300ff;--button-outline-accent-label-color-default:#8300ff;--button-outline-accent-label-color-hover:#6f00db;--button-outline-accent-label-color-active:#6f00db;--button-outline-accent-icon-color-default:#8300ff;--button-outline-accent-icon-color-hover:#6f00db;--button-outline-accent-icon-color-active:#6f00db;--button-secondary-accent-bg-color-default:rgba(131,0,255,.1);--button-secondary-accent-bg-color-hover:rgba(131,0,255,.2);--button-secondary-accent-bg-color-active:rgba(131,0,255,.3);--button-secondary-accent-label-color-default:#8300ff;--button-secondary-accent-label-color-hover:#6f00db;--button-secondary-accent-label-color-active:#5c00b5;--button-secondary-accent-icon-color-default:#8300ff;--button-secondary-accent-icon-color-hover:#6f00db;--button-secondary-accent-icon-color-active:#5c00b5;
 --typo-display-l:48px/52px;--typo-display-l-w:500;--typo-display-m:42px/44px;--typo-display-m-w:500;--typo-display-s:32px/44px;--typo-display-s-w:500;--typo-h1:28px/32px;--typo-h1-w:700;--typo-h2:22px/24px;--typo-h2-w:700;--typo-h3:18px/20px;--typo-h3-w:700;--typo-h4:16px/20px;--typo-h4-w:700;--typo-h5:14px/20px;--typo-h5-w:700;--typo-body-l:18px/26px;--typo-body-l-w:400;--typo-body-m:16px/24px;--typo-body-m-w:400;--typo-body-s:14px/20px;--typo-body-s-w:400;--typo-desc-l:12px/16px;--typo-desc-l-w:400;--typo-desc-l-ls:0;--typo-desc-m:11px/16px;--typo-desc-m-w:400;--typo-desc-m-ls:.2px;--typo-desc-s:10px/12px;--typo-desc-s-w:400;--typo-desc-s-ls:.4px;--button-xl-font:500 16px/24px 'RostelecomBasis';--button-l-font:500 16px/24px 'RostelecomBasis';--button-m-font:500 14px/20px 'RostelecomBasis';--button-s-font:500 12px/16px 'RostelecomBasis';
 --space-px:1px;--space-0_5x:2px;--space-1x:4px;--space-1_5x:6px;--space-2x:8px;--space-3x:12px;--space-4x:16px;--space-5x:20px;--space-6x:24px;--space-8x:32px;--space-10x:40px;--space-12x:48px;--space-16x:64px;--space-20x:80px;--space-24x:96px;--space-32x:128px;--space-48x:192px;
@@ -50,7 +49,7 @@ display:flex;align-items:center;gap:10px;padding:0 10px 28px
 width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--brand-purple)
 }
 .legacy .brand strong {
-display:block;font-family:Manrope;font-size:15px
+display:block;font-family:var(--font-family);font-size:15px
 }
 .legacy .brand span {
 display:block;color:#8e9aaf;font-size:9px;letter-spacing:1.7px;margin-top:3px
@@ -193,7 +192,7 @@ display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:25
 font-size:10px;letter-spacing:1.3px;font-weight:700;color:#8994a5;margin-bottom:8px
 }
 .legacy .page-header h1 {
-font-family:Manrope;font-size:28px;letter-spacing:-.7px;margin:0 0 7px;color:#192233
+font-family:var(--font-family);font-size:28px;letter-spacing:-.7px;margin:0 0 7px;color:#192233
 }
 .legacy .page-header p {
 color:#8994a5;margin:0
@@ -253,7 +252,7 @@ background:#fde4f1;color:#dc4e9d
 font-size:11px;color:#8792a2;display:block
 }
 .legacy .kpi-body strong {
-font-family:Manrope;font-size:26px;display:block;margin:7px 0 9px;letter-spacing:-1px
+font-family:var(--font-family);font-size:26px;display:block;margin:7px 0 9px;letter-spacing:-1px
 }
 .legacy .kpi-body b {
 color:#0da576;font-size:11px;margin-right:7px
@@ -281,7 +280,7 @@ min-height:295px;padding:22px
 display:flex;justify-content:space-between;align-items:flex-start
 }
 .legacy .panel-head h2 {
-font-family:Manrope;font-size:15px;margin:0 0 7px
+font-family:var(--font-family);font-size:15px;margin:0 0 7px
 }
 .legacy .panel-head span {
 color:#929dab;font-size:11px
@@ -309,7 +308,7 @@ z-index:1;text-align:center
 display:block
 }
 .legacy .donut strong {
-font-family:Manrope;font-size:24px
+font-family:var(--font-family);font-size:24px
 }
 .legacy .donut span {
 font-size:10px;color:#9aa4b1
@@ -546,7 +545,7 @@ display:flex;justify-content:space-around;color:#a9b1bd;font-size:10px
 display:grid;grid-template-columns:25px 1fr 45px;align-items:center;gap:10px;margin:25px 0
 }
 .legacy .rank-num {
-font-family:Manrope;font-size:12px;color:#aab3bf
+font-family:var(--font-family);font-size:12px;color:#aab3bf
 }
 .legacy .rank b {
 font-size:11px;color:#536073
@@ -592,7 +591,7 @@ border:1px dashed #a64dff;background:var(--brand-purple-soft);border-radius:9px;
 width:52px;height:52px;margin:auto;border-radius:50%;background:#eae9ff;color:#5954db;display:grid;place-items:center
 }
 .legacy .upload-zone h2 {
-font-family:Manrope;font-size:16px;margin:16px 0 5px
+font-family:var(--font-family);font-size:16px;margin:16px 0 5px
 }
 .legacy .upload-zone p {
 color:#9da6b2;margin:0 0 20px;font-size:12px
@@ -622,7 +621,7 @@ display:flex;justify-content:space-between;align-items:center;border-bottom:1px 
 .legacy .import-title h2,
 .legacy .result-state h2,
 .legacy .check-state h2 {
-font-family:Manrope;font-size:17px;margin:0 0 6px
+font-family:var(--font-family);font-size:17px;margin:0 0 6px
 }
 .legacy .import-title p,
 .legacy .check-state p,
@@ -664,7 +663,7 @@ display:flex;justify-content:center;gap:55px;margin:35px 0
 display:block
 }
 .legacy .validation b {
-font-family:Manrope;font-size:24px
+font-family:var(--font-family);font-size:24px
 }
 .legacy .validation span {
 font-size:10px;color:#9ba4b0;margin-top:5px
@@ -692,7 +691,7 @@ display:flex;justify-content:center;gap:60px;margin:28px 0
 display:block
 }
 .legacy .result-numbers b {
-font-family:Manrope;font-size:23px
+font-family:var(--font-family);font-size:23px
 }
 .legacy .result-numbers span {
 font-size:10px;color:#9ca6b2;margin-top:4px
@@ -734,7 +733,7 @@ display:block
 color:#9ba5b2;font-size:11px;margin-top:18px
 }
 .legacy .catalog-card h2 {
-color:#344052;font-family:Manrope;font-size:17px;margin:6px 0
+color:#344052;font-family:var(--font-family);font-size:17px;margin:6px 0
 }
 .legacy .catalog-card p {
 color:#929dab;font-size:11px;line-height:1.5;padding-right:20px
@@ -774,7 +773,7 @@ position:absolute;right:19px;top:19px;color:#8994a2
 display:flex;align-items:center;gap:13px
 }
 .legacy .modal-heading h2 {
-font-family:Manrope;font-size:18px;margin:0 0 5px;max-width:420px
+font-family:var(--font-family);font-size:18px;margin:0 0 5px;max-width:420px
 }
 .legacy .modal-heading .eyebrow {
 margin:0 0 4px
@@ -796,7 +795,7 @@ font-size:10px;color:#9aa5b1;margin-bottom:5px
 font-size:11px;color:#3f4b5b
 }
 .legacy .modal h3 {
-font-family:Manrope;font-size:13px
+font-family:var(--font-family);font-size:13px
 }
 .legacy .modal-interaction {
 display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f1f4
@@ -1941,7 +1940,7 @@ display:flex;align-items:center;gap:var(--space-2x);margin:0 0 5px;font-size:16p
 font-size:12px;line-height:17px;color:#8792a2
 }
 .legacy .dash-feed-head .dash-feed-count {
-display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 6px;border-radius:7px;background:#fff0e9;color:#d54b21;font:600 12px/16px Manrope,sans-serif
+display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 6px;border-radius:7px;background:#fff0e9;color:#d54b21;font:600 12px/16px var(--font-family)
 }
 .legacy .dash-feed-list {
 flex:1;min-width:0;margin-top:var(--space-2x)

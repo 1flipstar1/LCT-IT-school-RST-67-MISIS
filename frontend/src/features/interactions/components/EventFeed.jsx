@@ -19,7 +19,7 @@ export function describeEvent(event, workflow, users) {
     case 'comment':
       return event.comment ? 'Комментарий' : 'Добавлены файлы';
     case 'assign':
-      return `Ответственный: ${users.get(event.toUserId)?.name ?? '—'}`;
+      return event.toUserId ? `Ответственный: ${users.get(event.toUserId)?.name ?? '—'}` : 'Ответственный снят';
     case 'updated':
       return 'Параметры взаимодействия изменены';
     case 'completed':

@@ -75,6 +75,13 @@ class Settings(BaseSettings):
     attachment_storage_path: Path = BACKEND_DIR / "data" / "attachments"
     max_attachment_bytes: int = 25 * 1024 * 1024
 
+    # 152-ФЗ (ст. 19) и приказ ФСТЭК № 117: персональные данные хранятся зашифрованными (AES-256-GCM):
+    # снимок данных CRM, история импортов, очередь Telegram и вложения. Формат: «id:ключ-base64url»
+    # через запятую; первым ключом шифруются новые записи, остальные нужны, чтобы читать старые (ротация).
+    # Без переменной ключ создаётся в data_encryption_key_path — только вне production.
+    data_encryption_keys: str | None = None
+    data_encryption_key_path: Path = BACKEND_DIR / "data" / "encryption.key"
+
     # The external contracts were not supplied with the task. These optional
     # URLs let an installation connect the two agreed sources without changing
     # application code. Empty values intentionally mean "not configured".
@@ -138,6 +145,7 @@ class Settings(BaseSettings):
         "telegram_bot_token",
         "telegram_proxy_url",
         "public_app_url",
+        "data_encryption_keys",
         mode="before",
     )
     @classmethod

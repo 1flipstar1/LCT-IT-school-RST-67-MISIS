@@ -1,5 +1,6 @@
 """Create server-only secrets and a safe first-import Keycloak realm."""
 
+import base64
 import json
 import os
 import secrets
@@ -9,6 +10,12 @@ from pathlib import Path
 
 def token() -> str:
     return secrets.token_urlsafe(36)
+
+
+def data_key() -> str:
+    """Ключ AES-256 для шифрования ПДн при хранении — формат DATA_ENCRYPTION_KEYS (backend/app/core/crypto.py)."""
+
+    return "k1:" + base64.urlsafe_b64encode(secrets.token_bytes(32)).decode().rstrip("=")
 
 
 def main() -> None:
@@ -50,6 +57,7 @@ def main() -> None:
         "APP_ENV": "production",
         "CORS_ORIGINS": public_url,
         "JWT_SECRET": token(),
+        "DATA_ENCRYPTION_KEYS": data_key(),
         "DEMO_AUTH_ENABLED": "true",
         "ASSISTANT_ENABLED": "true",
         "OLLAMA_MODEL": "qwen2.5:1.5b-instruct",

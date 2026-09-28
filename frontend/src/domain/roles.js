@@ -83,7 +83,8 @@ export function createVisibilityFilter(user, users) {
   if (scope === DATA_SCOPE.all) return byDirection;
   if (scope === DATA_SCOPE.team) {
     const team = new Set(users.filter((u) => u.leadId === user.id).map((u) => u.id).concat(user.id));
-    return (interaction) => team.has(interaction.managerId) && byDirection(interaction);
+    // Заявки без ответственного видит руководитель — чтобы назначить им менеджера (так же на сервере).
+    return (interaction) => (team.has(interaction.managerId) || !interaction.managerId) && byDirection(interaction);
   }
   return (interaction) => interaction.managerId === user.id && byDirection(interaction);
 }

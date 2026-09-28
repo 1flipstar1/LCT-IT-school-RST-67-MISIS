@@ -18,6 +18,7 @@ import { downloadBlob, safeFileName } from '../../lib/download.js';
 import { createXlsx } from '../../lib/export/spreadsheet.js';
 import { localStore } from '../../lib/storage.js';
 import { usePersistentState } from '../../lib/usePersistentState.js';
+import { readXls } from '../../lib/xlsx/readXls.js';
 import { readXlsx } from '../../lib/xlsx/readXlsx.js';
 import { useStoreState } from '../../store/StoreProvider.jsx';
 import { useActions } from '../../store/useActions.js';
@@ -50,12 +51,13 @@ const ROW_FILTERS = [
 
 const STATUS_TONE = { updated: 'success', created: 'brand', catalog: 'warning', skipped: 'danger' };
 
-/** Файл → строки таблицы. XLSX читается как книга, CSV — с автоопределением разделителя и кодировки. */
+/** Файл → строки таблицы. XLSX и XLS читаются как книга, CSV — с автоопределением разделителя и кодировки. */
 async function readRows(file) {
   const name = file.name.toLowerCase();
   if (name.endsWith('.xlsx')) return readXlsx(file);
+  if (name.endsWith('.xls')) return readXls(file);
   if (name.endsWith('.csv')) return parseCsv(await readTextFile(file));
-  throw new AppError('IMPORT-400', 'Поддерживаются XLSX и CSV');
+  throw new AppError('IMPORT-400', 'Поддерживаются XLSX, XLS и CSV');
 }
 
 /**
@@ -170,7 +172,7 @@ export function ImportPage() {
       <Card className={styles.panel} data-tour="import-panel">
         {step === 0 && (
           <div className={styles.stack}>
-            <FileDropzone files={[]} multiple={false} accept=".xlsx,.csv" onChange={handleFile} title="Перетащите файл XLSX или CSV" hint="Первая строка — заголовки колонок · до 25 МБ · CSV через «;» или «,»" />
+            <FileDropzone files={[]} multiple={false} accept=".xlsx,.xls,.csv" onChange={handleFile} title="Перетащите файл XLSX, XLS или CSV" hint="Первая строка — заголовки колонок · до 25 МБ · CSV через «;» или «,»" />
             <ErrorAlert error={error} />
             <InlineAlert tone="info" title="Нет файла под рукой?">
               Скачайте шаблон с колонками из регламента или попробуйте мастер на готовом примере.

@@ -88,7 +88,7 @@ export function EditInteractionDialog({ row, open, onOpenChange }) {
             variant="primary"
             type="submit"
             form="edit-interaction-form"
-            disabled={unchanged || !form.universityId || !form.directionId || !form.programId || !form.productId || !form.managerId}
+            disabled={unchanged || !form.universityId || !form.directionId || !form.programId || !form.productId || (!form.managerId && Boolean(row.managerId))}
           >
             Сохранить
           </Button>
@@ -137,6 +137,7 @@ export function EditInteractionDialog({ row, open, onOpenChange }) {
               value={form.managerId}
               onChange={update('managerId')}
               options={toOptions(managers)}
+              placeholder="Не назначен"
             />
           )}
         </div>

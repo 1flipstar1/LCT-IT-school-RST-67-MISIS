@@ -9,6 +9,7 @@ from sqlalchemy import BigInteger, DateTime, JSON, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.crypto import EncryptedJSON
 from app.models.base import Base
 
 
@@ -32,8 +33,9 @@ class ImportJobModel(Base):
     summary: Mapped[str] = mapped_column(String(500), nullable=False, default="")
     options: Mapped[dict[str, Any]] = mapped_column(json_type, nullable=False, default=dict)
     stats: Mapped[dict[str, Any]] = mapped_column(json_type, nullable=False, default=dict)
-    issues: Mapped[list[dict[str, Any]]] = mapped_column(json_type, nullable=False, default=list)
-    snapshot_before: Mapped[dict[str, Any]] = mapped_column(json_type, nullable=False, default=dict)
+    # Строки файла и копия заменённых коллекций содержат ПДн — хранятся зашифрованными.
+    issues: Mapped[list[dict[str, Any]]] = mapped_column(EncryptedJSON("import_jobs.issues"), nullable=False, default=list)
+    snapshot_before: Mapped[dict[str, Any]] = mapped_column(EncryptedJSON("import_jobs.snapshot_before"), nullable=False, default=dict)
     revision_after: Mapped[int] = mapped_column(BigInteger, nullable=False)
     created_by: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     created_by_name: Mapped[str] = mapped_column(String(255), nullable=False, default="")

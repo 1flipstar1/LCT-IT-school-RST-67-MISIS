@@ -7,6 +7,13 @@ if [[ ! -f deploy/.env ]]; then
 fi
 python3 deploy/render_caddy.py
 
+# 152-ФЗ: персональные данные хранятся зашифрованными. Ключ создаётся один раз и больше не меняется
+# этим скриптом: без него зашифрованные данные не прочитать — храните копию deploy/.env отдельно от бэкапов БД.
+if ! grep -q '^DATA_ENCRYPTION_KEYS=' deploy/.env; then
+  python3 -c 'import base64, secrets; print("DATA_ENCRYPTION_KEYS=k1:" + base64.urlsafe_b64encode(secrets.token_bytes(32)).decode().rstrip("="))' >> deploy/.env
+  echo "Generated DATA_ENCRYPTION_KEYS in deploy/.env"
+fi
+
 # Rebuild application code on every push. Keep the Tor egress image/container
 # intact so routine frontend/backend deployments do not force a new bridge handshake.
 docker compose --env-file deploy/.env -f deploy/compose.yml build api telegram-bot

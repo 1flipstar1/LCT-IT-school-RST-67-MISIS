@@ -99,6 +99,9 @@ def validate_state(state: dict[str, Any], *, max_attachment_bytes: int) -> None:
             "workflowId": workflows,
         }
         for field, collection in references.items():
+            # Ответственного руководитель может снять (ТЗ: «менять, удалять, назначать») — тогда managerId пуст.
+            if field == "managerId" and interaction.get(field) is None:
+                continue
             if interaction.get(field) not in collection:
                 raise APIError(422, "invalid_state", f"Взаимодействие ссылается на неизвестное поле {field}.", {"interactionId": interaction_id})
         program = programs[interaction["programId"]]
@@ -152,6 +155,7 @@ def visible_interaction_ids(state: dict[str, Any], user: dict[str, Any]) -> set[
     elif scope == "team":
         managers = {item["id"] for item in users if item.get("leadId") == user["id"]}
         managers.add(user["id"])
+        managers.add(None)  # Заявки без ответственного видит руководитель — чтобы назначить им менеджера.
     else:
         managers = {user["id"]}
     return {
@@ -202,7 +206,7 @@ def authorize_state_replacement(current: dict[str, Any], proposed: dict[str, Any
         if existing is None or existing != item:
             if role == "manager" and item.get("managerId") != user["id"]:
                 _reject(f"interactions.{interaction_id}.managerId")
-            if role == "lead" and item.get("managerId") not in team_ids:
+            if role == "lead" and item.get("managerId") not in team_ids | {None}:
                 _reject(f"interactions.{interaction_id}.managerId")
             if existing is not None and role == "manager" and item.get("managerId") != existing.get("managerId"):
                 _reject(f"interactions.{interaction_id}.managerId")

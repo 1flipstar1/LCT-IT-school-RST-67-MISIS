@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, File, UploadFile
-from fastapi.responses import FileResponse
+from urllib.parse import quote
+
+from fastapi.responses import StreamingResponse
 
 from app.api.dependencies import CurrentPrincipal, DbSession
 from app.schemas.attachment import AttachmentResponse
 from app.schemas.common import ERROR_RESPONSES
-from app.services.attachment import get_attachment, save_attachment
+from app.services.attachment import get_attachment, read_attachment, save_attachment
 
 
 router = APIRouter(prefix="/attachments", tags=["attachments"])
@@ -38,11 +40,15 @@ def download_attachment(
     attachment_id: str,
     db: DbSession,
     _: CurrentPrincipal,
-) -> FileResponse:
+) -> StreamingResponse:
     model, path = get_attachment(db, attachment_id)
-    return FileResponse(
-        path,
+    # Файл на диске зашифрован — отдаём расшифрованный поток; размер известен из базы.
+    return StreamingResponse(
+        read_attachment(model, path),
         media_type=model.content_type or "application/octet-stream",
-        filename=model.original_name,
-        headers={"Cache-Control": "private, no-store"},
+        headers={
+            "Cache-Control": "private, no-store",
+            "Content-Length": str(model.size),
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quote(model.original_name)}",
+        },
     )

@@ -85,3 +85,19 @@ def test_only_lead_and_admin_delete_interactions(
     saved = client.get("/api/v1/state", headers=admin_headers).json()["state"]
     assert all(item["id"] != own["id"] for item in saved["interactions"])
     assert all(event["interactionId"] != own["id"] for event in saved["events"])
+
+
+def test_lead_can_unassign_manager_and_still_sees_the_interaction(
+    client: TestClient, admin_headers: dict[str, str], manager_headers: dict[str, str]
+) -> None:
+    _reset(client, admin_headers)
+    lead = {"Authorization": f"Bearer {client.post('/api/v1/auth/demo', json={'role': 'lead'}).json()['accessToken']}"}
+    own = next(item for item in client.get("/api/v1/state", headers=manager_headers).json()["state"]["interactions"] if item["managerId"] == "usr-1")
+
+    unassign = {"interactions": {"op": "list", "set": [{**own, "managerId": None}]}}
+    assert client.post("/api/v1/state/changes", headers=manager_headers, json={"changes": unassign}).status_code == 403
+    assert client.post("/api/v1/state/changes", headers=lead, json={"changes": unassign}).status_code == 200
+
+    visible = client.get("/api/v1/state", headers=lead).json()["state"]["interactions"]
+    assert next(item for item in visible if item["id"] == own["id"])["managerId"] is None
+    assert all(item["id"] != own["id"] for item in client.get("/api/v1/state", headers=manager_headers).json()["state"]["interactions"])

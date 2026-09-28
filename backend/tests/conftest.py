@@ -14,6 +14,8 @@ os.environ["APP_ENV"] = "test"
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DATABASE.as_posix()}"
 os.environ["JWT_SECRET"] = "test-secret-that-is-not-used-outside-tests"
 os.environ["ATTACHMENT_STORAGE_PATH"] = str(TEST_ATTACHMENTS)
+# Отдельный ключ шифрования ПДн: тесты не трогают ключ локального стенда в backend/data.
+os.environ["DATA_ENCRYPTION_KEYS"] = "test-new:" + "A" * 43 + ",test-old:" + "B" * 43
 # Тесты не должны ходить к настоящему боту из backend/.env.local — в test_telegram.py свой поддельный клиент.
 os.environ["TELEGRAM_BOT_TOKEN"] = ""
 

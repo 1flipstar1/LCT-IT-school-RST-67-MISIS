@@ -7,7 +7,7 @@ import { SelectField } from '../../ui/Field.jsx';
 import { ErrorAlert } from '../../ui/InlineAlert.jsx';
 import { useToast } from '../../ui/Toast.jsx';
 
-/** Смена ответственного — право руководителя (ТЗ, ролевая модель). */
+/** Смена ответственного — право руководителя (ТЗ, ролевая модель: ответственных «менять, удалять, назначать»). */
 export function AssignManagerDialog({ row, open, onOpenChange }) {
   const managers = useManagers();
   const actions = useActions();
@@ -15,15 +15,19 @@ export function AssignManagerDialog({ row, open, onOpenChange }) {
   const [managerId, setManagerId] = useState(row.managerId ?? '');
   const [error, setError] = useState(null);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const assign = (nextManagerId) => {
     try {
-      const { undo } = actions.assignManager({ interactionId: row.id, managerId });
+      const { undo } = actions.assignManager({ interactionId: row.id, managerId: nextManagerId });
       onOpenChange(false);
-      toast.success('Ответственный изменён', { undo });
+      toast.success(nextManagerId ? 'Ответственный изменён' : 'Ответственный снят', { undo });
     } catch (caught) {
       setError(caught);
     }
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    assign(managerId);
   };
 
   return (
@@ -35,8 +39,11 @@ export function AssignManagerDialog({ row, open, onOpenChange }) {
       description="Новый ответственный увидит взаимодействие в своём списке и получит уведомление."
       footer={
         <>
+          {row.managerId && (
+            <Button variant="ghost" tone="warning" onClick={() => assign(null)}>Снять ответственного</Button>
+          )}
           <Button onClick={() => onOpenChange(false)}>Отмена</Button>
-          <Button variant="primary" type="submit" form="assign-form" disabled={managerId === row.managerId}>
+          <Button variant="primary" type="submit" form="assign-form" disabled={!managerId || managerId === row.managerId}>
             Назначить
           </Button>
         </>
@@ -48,6 +55,7 @@ export function AssignManagerDialog({ row, open, onOpenChange }) {
           value={managerId}
           onChange={(event) => setManagerId(event.target.value)}
           options={managers.map((manager) => ({ value: manager.id, label: manager.name }))}
+          placeholder="Выберите менеджера"
         />
         <ErrorAlert error={error} />
       </DialogForm>
