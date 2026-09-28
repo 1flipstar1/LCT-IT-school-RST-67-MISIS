@@ -155,7 +155,7 @@ API:
 
 Как устроено (`app/services/telegram.py`):
 
-- Входящие сообщения бот получает long polling'ом (`getUpdates`) в фоновом потоке API — публичный адрес и HTTPS не нужны. При нескольких экземплярах API оставьте `TELEGRAM_POLLING_ENABLED=true` только в одном.
+- Входящие сообщения бот получает long polling'ом (`getUpdates`) без публичного webhook. В Docker этим занимается отдельный контейнер `telegram-bot`: обновления интерфейса не останавливают его, а процесс с зависшим poller перезапускается. API читает отметку последнего успешного обмена из `telegram_runtime`. При нескольких экземплярах вне Docker оставьте `TELEGRAM_POLLING_ENABLED=true` только в одном.
 - Привязка — одноразовая ссылка `t.me/<бот>?start=<код>`, действует 15 минут. Chat ID хранится в карточке сотрудника в поле `telegram`: его пишет только сервер, в браузер он не уходит, а сохранение состояния клиентом не может его ни подменить, ни стереть.
 - Уведомление уходит через `TELEGRAM_NOTIFY_DELAY_SECONDS` (15 с по умолчанию) после сохранения. Если за это время менеджер нажал «Отменить», событие пропадает из состояния и сообщение не отправляется. О собственных действиях руководителю не пишем.
 - Получатели — руководитель ответственного менеджера (`leadId`, только его команда) и администраторы (все заявки). Менеджерам уведомления не нужны — они сами меняют этапы.
@@ -165,7 +165,7 @@ API (Bearer-токен): `GET /api/v1/me/telegram` — состояние; `POST
 
 Если Telegram из сети сервера отвечает через раз, клиент повторяет подключение трижды; при постоянных сбоях задайте прокси `TELEGRAM_PROXY_URL` (`http://host:port` или `socks5://host:port`). Docker-развёртывание по умолчанию использует внутренний SOCKS шлюз `telegram-egress`; пакет `httpx[socks]` уже установлен.
 
-Настройки: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PROXY_URL`, `TELEGRAM_API_URL` (по умолчанию `https://api.telegram.org`), `TELEGRAM_POLLING_ENABLED`, `TELEGRAM_NOTIFY_DELAY_SECONDS`, `TELEGRAM_TIMEOUT_SECONDS`, `PUBLIC_APP_URL`. Без токена бот выключен, CRM работает как обычно.
+Настройки: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PROXY_URL`, `TELEGRAM_API_URL` (по умолчанию `https://api.telegram.org`), `TELEGRAM_POLLING_ENABLED`, `TELEGRAM_HEARTBEAT_PATH`, `TELEGRAM_NOTIFY_DELAY_SECONDS`, `TELEGRAM_TIMEOUT_SECONDS`, `PUBLIC_APP_URL`. Без токена бот выключен, CRM работает как обычно.
 
 ## PostgreSQL и Docker
 

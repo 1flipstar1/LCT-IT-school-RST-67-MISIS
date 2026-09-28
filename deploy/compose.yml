@@ -35,9 +35,12 @@ services:
       KEYCLOAK_CLIENT_ID: rtk-it-school-web
       OLLAMA_BASE_URL: http://ollama:11434
       TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-socks5://telegram-egress:9050}
+      TELEGRAM_POLLING_ENABLED: "false"
+      TELEGRAM_HEARTBEAT_PATH: /app/data/telegram/heartbeat
       INTEGRATION_DEMO_ENABLED: ${INTEGRATION_DEMO_ENABLED:-true}
     volumes:
       - attachments:/app/data/attachments
+      - telegram_runtime:/app/data/telegram:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +55,25 @@ services:
     restart: unless-stopped
     volumes:
       - tor_data:/var/lib/tor
+
+  telegram-bot:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile.bot
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://rtk:${POSTGRES_PASSWORD}@postgres:5432/lct_db
+      TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-socks5://telegram-egress:9050}
+      TELEGRAM_POLLING_ENABLED: "true"
+      TELEGRAM_HEARTBEAT_PATH: /app/data/telegram/heartbeat
+    volumes:
+      - telegram_runtime:/app/data/telegram
+    depends_on:
+      postgres:
+        condition: service_healthy
+      telegram-egress:
+        condition: service_started
 
   postgres:
     image: postgres:16-alpine
@@ -103,3 +125,4 @@ volumes:
   attachments:
   ollama:
   tor_data:
+  telegram_runtime:

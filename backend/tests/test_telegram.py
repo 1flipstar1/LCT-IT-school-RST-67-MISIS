@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -120,7 +121,7 @@ def test_only_leads_connect_and_admin_saves_keep_the_binding(client: TestClient,
 
     with SessionLocal() as db:
         expired = telegram.handle_update(db, {"message": {"chat": {"id": LEAD_CHAT, "type": "private"}, "text": "/start expired-code"}})
-        assert "Ссылка устарела" in expired
+        assert "Чат уже подключён" in expired
         assert "Алексей Козлов" in telegram.handle_update(db, {"message": {"chat": {"id": LEAD_CHAT, "type": "private"}, "text": "/status"}})
         assert telegram.handle_update(db, {"message": {"chat": {"id": LEAD_CHAT, "type": "private"}, "text": "/stop"}}).startswith("🔕 <b>Уведомления отключены")
         assert telegram.handle_update(db, {"message": {"chat": {"id": LEAD_CHAT, "type": "private"}, "text": "/status"}}).startswith("🔌 <b>Чат не подключён")
@@ -165,3 +166,14 @@ def test_failed_getme_is_not_repeated_on_every_status_request(monkeypatch) -> No
     telegram._username_failed_at.clear()
     assert telegram.bot_username() is None and telegram.bot_username() is None
     assert len(calls) == 1, "повторный запрос ждёт минуту, а не таймаутов подключения"
+
+
+def test_worker_heartbeat_expires(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "heartbeat"
+    monkeypatch.setattr(settings, "telegram_heartbeat_path", path)
+    monkeypatch.setattr(telegram, "poller", None)
+    assert telegram.polling_healthy() is False
+    path.write_text(str(time.time()))
+    assert telegram.polling_healthy() is True
+    path.write_text(str(time.time() - telegram.POLL_HEALTH_SECONDS - 1))
+    assert telegram.polling_healthy() is False

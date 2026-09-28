@@ -15,6 +15,7 @@ from __future__ import annotations
 import copy
 import html
 import logging
+import os
 import secrets
 import threading
 import time
@@ -48,6 +49,7 @@ DISPLAY_TZ = ZoneInfo("Europe/Moscow")
 # Если Telegram не ответил на getMe, не спрашиваем снова минуту — иначе каждый запрос
 # статуса из браузера ждал бы таймаутов подключения.
 USERNAME_RETRY_SECONDS = 60
+POLL_HEALTH_SECONDS = 90
 
 
 class TelegramError(Exception):
@@ -444,7 +446,7 @@ def status_for(user: dict[str, Any]) -> dict[str, Any]:
     return {
         "configured": get_client() is not None,
         "available": user.get("role") in RECIPIENT_SCOPE,
-        "polling": bool(poller and poller.healthy),
+        "polling": polling_healthy(),
         "scope": RECIPIENT_SCOPE.get(user.get("role")),
         "bot_username": bot_username(),
         "connected": bool(telegram.get("chatId")),
@@ -568,7 +570,7 @@ def overview(db: Session) -> dict[str, Any]:
     return {
         "configured": get_client() is not None,
         "bot_username": bot_username(),
-        "polling": bool(poller and poller.healthy),
+        "polling": polling_healthy(),
         "recipients": len(recipients),
         "connected": connected,
     }
@@ -640,6 +642,9 @@ def handle_update(db: Session, update: dict[str, Any]) -> str | None:
     if command == "/start" and argument.strip():
         owner = bind_chat(db, argument.strip(), chat, message.get("from") or {})
         if owner is None:
+            connected = _owner_of_chat(db, chat["id"])
+            if connected:
+                return f"✅ <b>Чат уже подключён к CRM</b>\n\n👤 Учётная запись: <b>{html.escape(connected.get('name', ''))}</b>"
             return f"⌛ <b>Ссылка устарела или уже использована</b>\n\nПолучите новую:\n{CONNECT_HINT}"
         name = html.escape(owner.get("name", ""))
         scope = SCOPE_TEXT.get(owner.get("role"), "о переходах заявок")
@@ -685,7 +690,19 @@ class TelegramPoller(threading.Thread):
 
         if not self.is_alive() or self._last_success is None:
             return False
-        return time.monotonic() - self._last_success < (POLL_TIMEOUT_SECONDS + settings.telegram_timeout_seconds) * 2
+        return time.monotonic() - self._last_success < POLL_HEALTH_SECONDS
+
+    def _record_success(self) -> None:
+        self._last_success = time.monotonic()
+        path = settings.telegram_heartbeat_path
+        if path:
+            try:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                temporary = path.with_suffix(".tmp")
+                temporary.write_text(str(time.time()))
+                os.replace(temporary, path)
+            except OSError as exc:
+                logger.warning("Telegram heartbeat write failed: %s", type(exc).__name__)
 
     def stop(self) -> None:
         self._stopped.set()
@@ -702,25 +719,43 @@ class TelegramPoller(threading.Thread):
                     ready = True
                     logger.info("Telegram bot is ready")
                 updates = self._client.get_updates(offset)
-                self._last_success = time.monotonic()
+                self._record_success()
             except TelegramError as exc:
                 logger.warning("Telegram polling failed: %s", exc)
                 self._stopped.wait(5)
                 continue
             for update in updates:
-                # Сдвигаем offset до обработки: сообщение, на котором бот упал, не будет
-                # приходить снова бесконечно (лучше потерять один ответ, чем зациклиться).
-                offset = update["update_id"] + 1
                 try:
                     with SessionLocal() as db:
                         reply = handle_update(db, update)
                     if reply:
-                        self._client.send_message(update["message"]["chat"]["id"], reply)
+                        while not self._stopped.is_set():
+                            try:
+                                self._client.send_message(update["message"]["chat"]["id"], reply)
+                                break
+                            except TelegramError as exc:
+                                logger.warning("Telegram reply failed: %s", exc)
+                                self._stopped.wait(5)
                 except Exception:  # noqa: BLE001 — одно сломанное сообщение не должно останавливать бота.
                     logger.exception("Telegram update %s failed", update.get("update_id"))
+                # Подтверждаем update только после ответа: при кратком сетевом сбое
+                # бот продолжит отправку, а не потеряет команду пользователя.
+                offset = update["update_id"] + 1
 
 
 poller: TelegramPoller | None = None
+
+
+def polling_healthy() -> bool:
+    if poller and poller.healthy:
+        return True
+    path = settings.telegram_heartbeat_path
+    if not path:
+        return False
+    try:
+        return time.time() - float(path.read_text()) < POLL_HEALTH_SECONDS
+    except (OSError, ValueError):
+        return False
 
 
 def start_bot() -> None:

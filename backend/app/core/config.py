@@ -93,6 +93,7 @@ class Settings(BaseSettings):
     telegram_api_url: str = "https://api.telegram.org"
     # Long polling не требует публичного адреса. В нескольких экземплярах API включайте его только в одном.
     telegram_polling_enabled: bool = True
+    telegram_heartbeat_path: Path | None = None
     # Пауза перед отправкой: если менеджер нажмёт «Отменить», уведомление не уйдёт.
     telegram_notify_delay_seconds: float = 15.0
     telegram_timeout_seconds: int = 10
