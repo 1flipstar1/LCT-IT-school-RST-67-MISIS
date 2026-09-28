@@ -1,5 +1,5 @@
 # Project Instructions
-
+.
 Before starting work, read and follow the instructions relevant to the task.
 
 ## Frontend
