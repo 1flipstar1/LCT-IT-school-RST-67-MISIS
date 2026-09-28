@@ -187,6 +187,30 @@ def test_integration_ingest_updates_snapshot(
     assert body["snapshot"]["state"]["inbox"][0]["payload"]["externalId"] == "lms-test-1"
 
 
+def test_demo_sources_sync_once_without_external_api(
+    client: TestClient,
+    admin_headers: dict[str, str],
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(settings, "integration_demo_enabled", True)
+    monkeypatch.setattr(settings, "lms_api_url", None)
+    monkeypatch.setattr(settings, "website_api_url", None)
+    modes = client.get("/api/v1/integrations/sources", headers=admin_headers).json()["sources"]
+    assert modes == {"lms": "demo", "site": "demo"}
+
+    for source_id in ("lms", "site"):
+        first = client.post(f"/api/v1/integrations/{source_id}/sync", headers=admin_headers)
+        assert first.status_code == 200, first.text
+        assert first.json()["logEntry"]["mode"] == "demo"
+        assert first.json()["logEntry"]["records"] == 1
+        payload = first.json()["snapshot"]["state"]["inbox"][0]["payload"]
+        assert payload["demo"] is True
+
+        repeat = client.post(f"/api/v1/integrations/{source_id}/sync", headers=admin_headers)
+        assert repeat.status_code == 200, repeat.text
+        assert repeat.json()["logEntry"]["records"] == 0
+
+
 def test_json_export(client: TestClient) -> None:
     response = client.get("/api/v1/state/export")
     assert response.status_code == 200

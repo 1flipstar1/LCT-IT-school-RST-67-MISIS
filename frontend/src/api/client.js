@@ -133,6 +133,7 @@ export function createApiClient({
       request(`/imports/${encodeURIComponent(importId)}/rollback`, { ...options, method: 'POST', body: { force } }),
     syncIntegration: (sourceId, options = {}) =>
       request(`/integrations/${encodeURIComponent(sourceId)}/sync`, { ...options, method: 'POST' }),
+    getIntegrationSources: (options = {}) => request('/integrations/sources', options),
   });
 }
 

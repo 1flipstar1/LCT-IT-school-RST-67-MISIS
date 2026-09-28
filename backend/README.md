@@ -93,6 +93,7 @@ Frontend поддерживает Keycloak Authorization Code + PKCE без хр
 - `POST /api/v1/attachments` принимает `multipart/form-data`, проверяет расширение и лимит 25 МБ, сохраняет содержимое под непрозрачным именем; `GET /api/v1/attachments/{id}` скачивает файл с авторизацией.
 - `POST /api/v1/integrations/{lms|site}/ingest` принимает согласованный JSON вручную или от шлюза.
 - `POST /api/v1/integrations/{lms|site}/sync` забирает JSON с адресов `LMS_API_URL` / `WEBSITE_API_URL`. Поддерживается массив либо объект с массивом в `items`, `records` или `data`. Bearer-токены задаются отдельными переменными.
+- Если адрес источника отсутствует и включён `INTEGRATION_DEMO_ENABLED`, эта же кнопка загружает одну помеченную тестовую запись из текущего каталога CRM. Повторная загрузка не создаёт дубль. `GET /api/v1/integrations/sources` сообщает интерфейсу режим каждого источника: `live`, `demo` или `unconfigured`. Настроенный реальный API всегда имеет приоритет над демо-режимом.
 - `GET /api/v1/state/export` скачивает результирующий JSON.
 
 Контракты заказчика для LMS и Laravel-сайта в исходном ТЗ не приложены, поэтому маппинг сохраняет исходный объект в `payload`, а известные поля (`title`, `id`/`externalId`) нормализует. После получения финального контракта этот адаптер расширяется в `app/services/integration.py`, не затрагивая UI.

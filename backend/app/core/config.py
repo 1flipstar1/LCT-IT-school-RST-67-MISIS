@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     website_api_url: str | None = None
     website_api_token: str | None = None
     integration_timeout_seconds: int = 20
+    integration_demo_enabled: bool = False
 
     # The first assistant release only answers questions through a local model.
     ollama_base_url: str = "http://127.0.0.1:11434"

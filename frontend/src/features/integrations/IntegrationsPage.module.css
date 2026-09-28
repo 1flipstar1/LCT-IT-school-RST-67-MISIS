@@ -59,6 +59,15 @@
   color: var(--color-warning-text);
 }
 
+.sourceDemo {
+  margin-bottom: var(--space-4x);
+  padding: var(--space-3x);
+  border-radius: var(--radius-m);
+  background: var(--color-brand-soft);
+  color: var(--color-text-secondary);
+  font: var(--font-body-s);
+}
+
 /* ---------- Входящие ---------- */
 .inbox {
   margin-bottom: var(--space-4x);

@@ -35,6 +35,7 @@ services:
       KEYCLOAK_CLIENT_ID: rtk-it-school-web
       OLLAMA_BASE_URL: http://ollama:11434
       TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-socks5://telegram-egress:9050}
+      INTEGRATION_DEMO_ENABLED: ${INTEGRATION_DEMO_ENABLED:-true}
     volumes:
       - attachments:/app/data/attachments
     depends_on:

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from '../../app/router.jsx';
+import { apiClient } from '../../api/client.js';
 import { useSession } from '../../auth/SessionProvider.jsx';
 import { ERROR_CODES } from '../../domain/errors.js';
 import { formatRelativeDateTime } from '../../domain/format.js';
@@ -26,18 +27,33 @@ export function IntegrationsPage() {
   const { role } = useSession();
   const { integrations, inbox } = useStoreState();
   const [tab, setTab] = useState('new');
+  const [sourceModes, setSourceModes] = useState(null);
   const newItems = inbox.filter((item) => item.status === 'new');
   const resolvedItems = inbox.filter((item) => item.status !== 'new');
+
+  useEffect(() => {
+    let active = true;
+    apiClient.getIntegrationSources()
+      .then((result) => { if (active) setSourceModes(result.sources); })
+      .catch(() => { if (active) setSourceModes({}); });
+    return () => { active = false; };
+  }, []);
+
+  const visibleLog = sourceModes
+    ? integrations.log.filter((entry) => sourceModes[entry.sourceId] === 'demo'
+      ? entry.mode === 'demo'
+      : sourceModes[entry.sourceId] === 'live' && entry.mode !== 'demo')
+    : [];
 
   return (
     <>
       <PageHeader
-        title="Интеграции" hint="LMS и сайт ИТ Школы передают данные по API в формате JSON. Новые записи разберите: добавьте к существующему взаимодействию или создайте новое."
+        title="Интеграции" hint="Здесь можно проверить обмен с LMS и сайтом ИТ Школы. Демонстрационные источники загружают тестовые записи; реальные API подключаются отдельно."
       />
 
       <section className={styles.sources} aria-label="Источники данных" data-tour="integration-sources">
         {integrations.sources.map((source) => (
-          <SourceCard key={source.id} source={source} />
+          <SourceCard key={source.id} source={source} mode={sourceModes?.[source.id]} log={visibleLog} />
         ))}
         <TelegramBotCard canConnect={role === ROLE.lead || role === ROLE.admin} />
       </section>
@@ -62,24 +78,28 @@ export function IntegrationsPage() {
       </Card>
 
       <Card padding="none">
-        <CardHeader title="Журнал синхронизаций" hint="Когда система обменивалась данными с LMS и сайтом по API и чем закончился каждый обмен." description="Последние обмены данными с внешними системами." />
-        <SyncLog log={integrations.log} sources={integrations.sources} />
+        <CardHeader title="Журнал синхронизаций" hint="Показывает результаты реального обмена и демонстрационных загрузок с явной отметкой режима." description="Последние загрузки данных из источников." />
+        <SyncLog log={visibleLog} sources={integrations.sources} />
       </Card>
     </>
   );
 }
 
-function SourceCard({ source }) {
+function SourceCard({ source, mode, log }) {
   const actions = useActions();
   const toast = useToast();
   const [syncing, setSyncing] = useState(false);
-  const failed = source.lastStatus === 'failed';
+  const demo = mode === 'demo';
+  const failed = mode === 'live' && source.lastStatus === 'failed';
+  const lastDemoSync = demo ? log.find((entry) => entry.sourceId === source.id)?.at : null;
 
   const sync = async () => {
     setSyncing(true);
     try {
       const entry = await actions.syncIntegration(source.id);
-      if (entry.status === 'success') toast.success(`${source.name}: получено записей — ${entry.records}`);
+      if (entry.status === 'success') toast.success(demo && entry.records === 0
+        ? `${source.name}: демо-запись уже загружена`
+        : `${source.name}: получено записей — ${entry.records}`);
       else toast.error('Синхронизация не удалась', { code: entry.errorCode });
     } catch (error) {
       toast.error('Синхронизация не удалась', { code: error.code });
@@ -97,39 +117,42 @@ function SourceCard({ source }) {
           </Hint>
           <p className={styles.sourceDescription}>{source.description}</p>
         </div>
-        {failed ? (
+        {demo ? (
+          <Badge tone="brand" icon={SuccessIcon}>Демо подключено</Badge>
+        ) : failed ? (
           <Badge tone="warning" icon={ErrorIcon}>
             Ошибка
           </Badge>
-        ) : (
+        ) : mode === 'live' && source.lastStatus === 'success' ? (
           <Badge tone="success" icon={SuccessIcon}>
             Работает
           </Badge>
+        ) : (
+          <Badge tone="warning">{mode === 'unconfigured' ? 'Не настроено' : 'Проверяем'}</Badge>
         )}
       </div>
       <dl className={styles.sourceFacts}>
         <div>
-          <dt>Адрес API</dt>
-          <dd>
-            <code>{source.endpoint}</code>
-          </dd>
+          <dt>Источник</dt>
+          <dd>{demo ? 'Тестовые данные внутри CRM' : mode === 'live' ? 'Внешний API' : 'Адрес API не указан'}</dd>
         </div>
         <div>
           <dt>Расписание</dt>
-          <dd>{source.schedule}</dd>
+          <dd>{demo ? 'По нажатию' : 'Ручная синхронизация'}</dd>
         </div>
         <div>
           <dt>Последний обмен</dt>
-          <dd>{formatRelativeDateTime(source.lastSyncAt)}</dd>
+          <dd>{demo ? (lastDemoSync ? formatRelativeDateTime(lastDemoSync) : 'Ещё не запускали') : mode === 'live' && source.lastSyncAt ? formatRelativeDateTime(source.lastSyncAt) : '—'}</dd>
         </div>
       </dl>
+      {demo && <p className={styles.sourceDemo}>Демонстрационный источник: загружает тестовую запись для проверки сценария. Реальная LMS или сайт пока не подключены.</p>}
       {failed && (
         <p className={styles.sourceError}>
           {ERROR_CODES[source.lastErrorCode]?.title}. {ERROR_CODES[source.lastErrorCode]?.hint} Код: {source.lastErrorCode}
         </p>
       )}
-      <Button icon={SyncIcon} onClick={sync} disabled={syncing}>
-        {syncing ? 'Синхронизация…' : 'Синхронизировать сейчас'}
+      <Button icon={SyncIcon} onClick={sync} disabled={syncing || !mode}>
+        {syncing ? 'Синхронизация…' : demo ? 'Загрузить демо-данные' : 'Синхронизировать сейчас'}
       </Button>
     </Card>
   );
@@ -267,7 +290,7 @@ function SyncLog({ log, sources }) {
           cell: (entry) =>
             entry.status === 'success' ? (
               <Badge tone="success" icon={SuccessIcon}>
-                Успешно
+                {entry.mode === 'demo' ? 'Демо · Успешно' : 'Успешно'}
               </Badge>
             ) : (
               <Badge tone="warning" icon={ErrorIcon}>

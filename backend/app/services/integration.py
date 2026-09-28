@@ -24,6 +24,42 @@ SUPPORTED_SOURCES = {"lms", "site"}
 MAX_RESPONSE_BYTES = 10 * 1024 * 1024
 
 
+def source_mode(source_id: str) -> str:
+    """A configured API always wins over the bundled demonstration source."""
+
+    if settings.integration_url(source_id):
+        return "live"
+    return "demo" if settings.integration_demo_enabled else "unconfigured"
+
+
+def demo_records(source_id: str, state: dict[str, Any]) -> list[dict[str, Any]]:
+    """One stable sample per source, built from actual CRM catalog references."""
+
+    interactions = state.get("interactions", [])
+    if not interactions:
+        return []
+    interaction = interactions[0 if source_id == "lms" or len(interactions) == 1 else 1]
+    universities = {item["id"]: item for item in state.get("universities", [])}
+    university = universities.get(interaction.get("universityId"), {})
+    payload = {
+        "universityId": interaction["universityId"],
+        "universityName": university.get("name", "Вуз"),
+        "directionId": interaction["directionId"],
+        "programId": interaction["programId"],
+        "productId": interaction["productId"],
+        "suggestedInteractionId": interaction["id"],
+        "demo": True,
+    }
+    if source_id == "lms":
+        title = "Демо LMS: обновление учебного потока"
+        payload["message"] = "Тестовые данные: открыта новая учебная группа, зачислено 24 обучающихся."
+    else:
+        title = "Демо сайта: заявка от вуза"
+        payload["message"] = "Тестовые данные: вуз интересуется запуском обучения преподавателей."
+        payload["contact"] = {"name": "Тестовый заявитель", "position": "Представитель вуза"}
+    return [{"externalId": f"demo-{source_id}-{interaction['id']}", "title": title, "payload": payload}]
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
@@ -90,6 +126,7 @@ def ingest_records(
     source_id: str,
     records: list[dict[str, Any]],
     principal: Principal,
+    mode: str = "live",
 ) -> IntegrationSyncResult:
     if source_id not in SUPPORTED_SOURCES:
         raise APIError(404, "integration_source_not_found", "Источник интеграции не найден.")
@@ -102,6 +139,7 @@ def ingest_records(
         "at": timestamp,
         "status": "success",
         "records": len(records),
+        "mode": mode,
     }
 
     def mutation(state: dict[str, Any]) -> dict[str, Any]:
@@ -144,7 +182,7 @@ def ingest_records(
                 "id": f"audit-{uuid4()}",
                 "at": timestamp,
                 "userId": actor["id"],
-                "text": f"Синхронизация {source_id.upper()}: получено записей — {added}",
+                "text": f"{'Демо-синхронизация' if mode == 'demo' else 'Синхронизация'} {source_id.upper()}: получено записей — {added}",
                 "target": {"type": "integration", "id": source_id, "label": source_id.upper()},
             },
         )
