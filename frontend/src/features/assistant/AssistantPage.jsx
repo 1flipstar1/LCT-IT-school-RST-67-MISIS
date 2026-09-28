@@ -151,7 +151,7 @@ function Welcome({ page, onPick }) {
       <span className={styles.welcomeMark} data-intro aria-hidden="true"><MagicIcon size={48} fill="currentColor" /></span>
       <h2 id="assistant-welcome" className={styles.welcomeTitle} data-intro>Чем помочь?</h2>
       <p className={styles.welcomeText} data-intro>
-        Спросите, <strong>как</strong> что-то сделать, — объясню по шагам. Или попросите <strong>сделать</strong>: сформирую отчёт, найду просроченные этапы, переведу этап.
+        Спросите, <strong>как</strong> что-то сделать, — объясню по шагам. Или попросите <strong>сделать</strong>: сформирую отчёт, найду просроченные этапы, переведу этап. Можно и просто поболтать.
       </p>
       <div className={styles.starters} data-intro>
         {prompts.map((prompt) => (

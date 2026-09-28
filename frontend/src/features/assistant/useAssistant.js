@@ -245,7 +245,7 @@ export function useAssistant({ settings, page }) {
     const context = executionContext();
     const { engine } = context.settings;
     const local = engine === 'ai' ? null : interpretLocally(message, context);
-    const explainWithModel = shouldExplainWithModel(engine, local, model);
+    const explainWithModel = shouldExplainWithModel(engine, local, model, message, context.messages);
     if (local && !explainWithModel) {
       reply(answerLocally(local, context, message), 'local');
       return;

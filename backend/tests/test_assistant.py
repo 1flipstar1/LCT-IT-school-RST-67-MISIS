@@ -116,6 +116,34 @@ def test_open_question_does_not_send_all_tool_schemas(client: TestClient, manage
     assert "tools" not in requests[0]
 
 
+def test_small_talk_uses_model_with_history_without_crm_tools(client: TestClient, manager_headers: dict[str, str], monkeypatch) -> None:
+    requests = mock_ollama(monkeypatch, reply({"content": "На связи и готова помочь. С чего начнём?"}))
+    response = client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "Как дела, готова работать?", "history": [
+            {"role": "user", "content": "Привет!"},
+            {"role": "assistant", "content": "Привет! Чем займёмся?"},
+        ]},
+        headers=manager_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "На связи и готова помочь. С чего начнём?"
+    sent = requests[0]
+    assert "tools" not in sent
+    assert "Это обычная переписка" in sent["messages"][0]["content"]
+    assert "Справка CRM" not in sent["messages"][0]["content"]
+    assert [turn["role"] for turn in sent["messages"]] == ["system", "user", "assistant", "user"]
+    assert sent["options"]["temperature"] > 0.35
+
+
+def test_small_talk_does_not_steal_university_status() -> None:
+    assert assistant.is_conversational("Привет, как дела?")
+    assert assistant.is_conversational("Готова работать?")
+    assert assistant.is_conversational("Ну что, поехали?")
+    assert not assistant.is_conversational("Как дела у КФУ?")
+    assert not assistant.is_conversational("Привет, как удалить сотрудника?")
+
+
 def test_chat_requires_auth_and_limits_input(client: TestClient, manager_headers: dict[str, str]) -> None:
     assert client.post("/api/v1/assistant/chat", json={"message": "Привет"}).status_code == 401
     assert client.get("/api/v1/assistant/status").status_code == 401

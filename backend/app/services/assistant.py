@@ -223,6 +223,40 @@ PHASE_LABELS = {
     "teaching": "Обучение",
 }
 
+CRM_CONTEXT = re.compile(r"(?:вуз|заявк|этап|отчет|отчёт|карточк|договор|менеджер|сотрудник|пользовател|кфу|аналитик|справочн|интеграц|лмс|lms)")
+SOCIAL_START = re.compile(
+    r"^(?:привет|здравствуй(?:те)?|доброе утро|добрый (?:день|вечер)|hello|hi|"
+    r"как (?:у тебя )?дела|как ты|ты как|как настроение|как поживаешь|"
+    r"готов[аы]? (?:ли )?(?:ты )?(?:к работе|работать|помочь)|ты (?:тут|на связи|готова работать)|"
+    r"можем поговорить|поболтаем|поговорим|чем ты занимаешься|что нового|"
+    r"спасибо|благодарю|спс|супер|отлично|класс|поехали|ну что[,]?\s*поехали|начинаем|начнем|давай начнем|"
+    r"а у тебя|и у тебя|рад тебя видеть)(?:\b|[!?.,]|$)"
+)
+SOCIAL_FOLLOWUP = re.compile(r"^(?:да|нет|конечно|давай|расскажи еще|и что дальше|почему|а ты|а у тебя)(?:\b|[!?.,]|$)")
+
+
+def is_conversational(message: str, history: list | None = None) -> bool:
+    """Route short social exchanges to the model without hijacking CRM questions."""
+
+    text = message.lower().replace("ё", "е").strip()
+    if CRM_CONTEXT.search(text) or (text.startswith("как дела у ") and not text.startswith("как дела у тебя")):
+        return False
+    if SOCIAL_START.search(text):
+        return True
+    if SOCIAL_FOLLOWUP.search(text) and len(text.split()) <= 5:
+        previous = next((turn.content for turn in reversed(history or []) if turn.role == "user"), None)
+        return bool(previous and is_conversational(previous))
+    return False
+
+
+CONVERSATION_PROMPT = (
+    "Ты помощница в CRM ИТ Школы. Это обычная переписка: ответь по смыслу последней реплики, "
+    "учитывая предыдущие слова собеседника. Пиши коротко, живо и своими словами, обычно одной фразой. "
+    "На «как дела?» уместно сказать, что ты на связи; на «готова работать?» — что да, готова. "
+    "Не перечисляй функции, не задавай встречный вопрос в каждом ответе, не начинай с «Здравствуйте» "
+    "и не пиши «Как я могу помочь?». Не выдавай себя за человека и не утверждай, что уже выполнила действие."
+)
+
 
 def _stage_overview(state: dict) -> str:
     workflows = state.get("workflows") or []
@@ -345,21 +379,22 @@ async def chat(payload: ChatRequest, state: dict, role: str = "manager") -> Chat
     if is_out_of_scope(payload.message):
         return ChatResponse(message=OUT_OF_SCOPE)
 
+    conversational = is_conversational(payload.message, payload.history)
     question = payload.message.lower().replace("ё", "е")
-    if re.match(r"^(?:(?:какие|перечисли|назови|покажи)\s+этапы|(?:список|перечень)\s+этапов)", question):
+    if not conversational and re.match(r"^(?:(?:какие|перечисли|назови|покажи)\s+этапы|(?:список|перечень)\s+этапов)", question):
         return ChatResponse(message=_stage_overview(state))
-    if re.search(r"удал[а-я]*\s+(?:\w+\s+){0,2}(?:сотрудник|пользовател|менеджер|человек)", question):
+    if not conversational and re.search(r"удал[а-я]*\s+(?:\w+\s+){0,2}(?:сотрудник|пользовател|менеджер|человек)", question):
         return ChatResponse(message="Удаление сотрудников в CRM не предусмотрено. Руководитель может заблокировать менеджера своей команды, администратор — управлять доступом всех сотрудников.")
-    page = navigation_target(payload.message)
+    page = None if conversational else navigation_target(payload.message)
     if page:
         if page["id"] not in allowed_pages(role):
             return ChatResponse(message=f"Раздел «{page['label']}» недоступен для вашей роли.")
         return ChatResponse(type="action", action=AssistantAction(name="open_page", arguments={"page": page["id"]}))
-    articles, restricted = retrieve(payload.message, role)
+    articles, restricted = ([], None) if conversational else retrieve(payload.message, role)
     if restricted:
         return ChatResponse(message=access_denial(restricted, role))
 
-    messages = [{"role": "system", "content": _system_prompt(state, payload, role, articles)}]
+    messages = [{"role": "system", "content": CONVERSATION_PROMPT if conversational else _system_prompt(state, payload, role, articles)}]
     messages.extend({"role": turn.role, "content": turn.content[:500]} for turn in payload.history[-4:])
     messages.append({"role": "user", "content": payload.message.strip()})
 
@@ -369,14 +404,14 @@ async def chat(payload: ChatRequest, state: dict, role: str = "manager") -> Chat
         "stream": False,
         "think": False,
         "options": {
-            "num_predict": 220 if payload.detail == "detailed" else 115,
+            "num_predict": 72 if conversational else 220 if payload.detail == "detailed" else 115,
             "num_ctx": settings.assistant_context_tokens,
             "num_thread": 2,
-            "temperature": 0.35,
+            "temperature": 0.6 if conversational else 0.35,
         },
         "keep_alive": -1,
     }
-    if payload.mode == "agent" and not _is_explanation(payload.message):
+    if payload.mode == "agent" and not conversational and not _is_explanation(payload.message):
         relevant_tools = _tools_for(payload.message, role)
         if relevant_tools:
             request["tools"] = relevant_tools

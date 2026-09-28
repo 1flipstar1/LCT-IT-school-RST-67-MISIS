@@ -9,7 +9,7 @@ import { executeTool } from '../src/features/assistant/engine/execute.js';
 import { interpretLocally, resolveModelCall } from '../src/features/assistant/engine/interpret.js';
 import { buildKnowledge } from '../src/features/assistant/engine/knowledge.js';
 import { parsePeriod } from '../src/features/assistant/engine/period.js';
-import { shouldExplainWithModel } from '../src/features/assistant/engine/routing.js';
+import { isConversationalMessage, shouldExplainWithModel } from '../src/features/assistant/engine/routing.js';
 import { OUT_OF_SCOPE_TEXT } from '../src/features/assistant/engine/scope.js';
 import { STAGE_MOVE, TOOL } from '../src/features/assistant/engine/tools.js';
 import { DEFAULT_SETTINGS } from '../src/features/assistant/settings.js';
@@ -174,6 +174,17 @@ describe('interpretLocally', () => {
 });
 
 describe('assistant routing', () => {
+  it('отправляет живой диалог модели, сохраняя вопросы о CRM', () => {
+    const online = { state: 'online', stale: false };
+    assert.equal(isConversationalMessage('Как дела, готова работать?'), true);
+    assert.equal(isConversationalMessage('Привет как дела?'), true);
+    assert.equal(isConversationalMessage('Ну что, поехали?'), true);
+    assert.equal(isConversationalMessage('Как дела у КФУ?'), false);
+    assert.equal(shouldExplainWithModel('auto', parse('Привет'), online, 'Привет'), true);
+    assert.equal(shouldExplainWithModel('auto', parse('Как дела, готова работать?'), online, 'Как дела, готова работать?'), true);
+    assert.equal(shouldExplainWithModel('auto', parse('Привет'), { state: 'offline', stale: false }, 'Привет'), false);
+    assert.equal(shouldExplainWithModel('auto', parse('Сделай отчёт по КФУ'), online, 'Сделай отчёт по КФУ'), false);
+  });
   it('отдаёт вопросы по справке и возможностям модели, команды выполняет сразу', () => {
     const online = { state: 'online', stale: false };
     assert.equal(shouldExplainWithModel('auto', parse('Как сформировать отчёт?'), online), true);
