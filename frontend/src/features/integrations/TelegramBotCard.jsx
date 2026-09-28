@@ -19,7 +19,7 @@ export function TelegramBotCard({ canConnect }) {
     let active = true;
     apiClient.getTelegramOverview()
       .then((result) => active && setOverview(result))
-      .catch(() => active && setOverview({ unreachable: true }));
+      .catch((error) => active && setOverview({ unreachable: true, sessionExpired: error?.status === 401 }));
     return () => { active = false; };
   }, []);
 
@@ -35,14 +35,16 @@ export function TelegramBotCard({ canConnect }) {
           </Hint>
           <p className={styles.sourceDescription}>Уведомления руководителям и администраторам о смене этапа заявки.</p>
         </div>
-        {working ? (
+        {overview.unreachable ? (
+          <Badge tone="warning" icon={ErrorIcon}>Не удалось проверить</Badge>
+        ) : working ? (
           <Badge tone="success" icon={SuccessIcon}>Работает</Badge>
         ) : (
           <Badge tone="warning" icon={ErrorIcon}>{overview.configured ? 'Нет связи' : 'Не настроен'}</Badge>
         )}
       </div>
       {overview.unreachable ? (
-        <p className={styles.sourceError}>Не удалось получить состояние бота.</p>
+        <p className={styles.sourceError}>{overview.sessionExpired ? 'Сеанс истёк. Войдите снова, чтобы увидеть состояние бота.' : 'Не удалось получить состояние бота. Обновите страницу и попробуйте ещё раз.'}</p>
       ) : overview.configured ? (
         <dl className={styles.sourceFacts}>
           <div>

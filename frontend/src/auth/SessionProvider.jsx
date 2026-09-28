@@ -17,8 +17,30 @@ const SessionContext = createContext(null);
 export function SessionProvider({ children }) {
   const { users } = useStoreState();
   const { rehydrate } = useStoreApi();
-  const [session, setSession] = useState(readStoredSession);
+  const [session, setSession] = useState(() => {
+    const stored = readStoredSession();
+    if (stored?.expiresAt && stored.expiresAt <= Date.now()) {
+      clearStoredSession();
+      return null;
+    }
+    return stored;
+  });
   const [keycloakError, setKeycloakError] = useState(null);
+
+  useEffect(() => {
+    if (!session?.expiresAt) return undefined;
+    const expire = () => {
+      clearStoredSession();
+      setSession(null);
+    };
+    const remaining = session.expiresAt - Date.now();
+    if (remaining <= 0) {
+      expire();
+      return undefined;
+    }
+    const timer = setTimeout(expire, remaining);
+    return () => clearTimeout(timer);
+  }, [session]);
 
   useEffect(() => {
     if (!hasKeycloakCallback()) return;
