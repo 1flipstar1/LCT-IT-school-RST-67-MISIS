@@ -2170,6 +2170,7 @@
       "permissions": [
         "interactions.view-all",
         "interactions.assign",
+        "interactions.delete",
         "catalogs.import",
         "workflows.manage",
         "integrations.manage",
@@ -2183,6 +2184,7 @@
       "permissions": [
         "interactions.view-all",
         "interactions.assign",
+        "interactions.delete",
         "catalogs.import",
         "workflows.manage",
         "integrations.manage",
