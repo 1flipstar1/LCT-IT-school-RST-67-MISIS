@@ -12,11 +12,12 @@ import { Button } from '../../ui/Button.jsx';
 import { Card, CardHeader } from '../../ui/Card.jsx';
 import { Hint } from '../../ui/Hint.jsx';
 import { EmptyState } from '../../ui/EmptyState.jsx';
-import { AttachmentIcon, CatalogIcon, DocumentIcon, EditIcon, EducationIcon, MailIcon, PhoneIcon, UniversityIcon, WorkflowIcon } from '../../ui/icons.js';
+import { AttachmentIcon, CatalogIcon, DocumentIcon, EditIcon, EducationIcon, MailIcon, PhoneIcon, TrashIcon, UniversityIcon, WorkflowIcon } from '../../ui/icons.js';
 import { PageHeader } from '../../ui/PageHeader.jsx';
 import { Tabs } from '../../ui/Tabs.jsx';
 import { ErrorPage } from '../errors/ErrorPage.jsx';
 import { AssignManagerDialog } from './AssignManagerDialog.jsx';
+import { DeleteInteractionDialog } from './DeleteInteractionDialog.jsx';
 import { EditInteractionDialog } from './EditInteractionDialog.jsx';
 import { CommentComposer } from './components/CommentComposer.jsx';
 import { EventFeed } from './components/EventFeed.jsx';
@@ -41,6 +42,7 @@ function InteractionView({ row }) {
   const [transitionOpen, setTransitionOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const ownEvents = useMemo(
     () => events.filter((event) => event.interactionId === row.id).sort((a, b) => b.at.localeCompare(a.at)),
@@ -175,6 +177,11 @@ function InteractionView({ row }) {
                 <dd>{row.workflow.name}</dd>
               </div>
             </dl>
+            {session.can(PERMISSION.deleteInteractions) && (
+              <Button variant="ghost" tone="warning" size="s" icon={TrashIcon} className={styles.deleteButton} onClick={() => setDeleteOpen(true)}>
+                Удалить заявку
+              </Button>
+            )}
           </Card>
 
           <Card data-tour="card-people">
@@ -230,6 +237,7 @@ function InteractionView({ row }) {
       {transitionOpen && <TransitionDialog key={`${row.id}:${row.stageId}`} row={row} open onOpenChange={setTransitionOpen} />}
       {assignOpen && <AssignManagerDialog row={row} open onOpenChange={setAssignOpen} />}
       {editOpen && <EditInteractionDialog row={row} open onOpenChange={setEditOpen} />}
+      {deleteOpen && <DeleteInteractionDialog row={row} eventCount={ownEvents.length} open onOpenChange={setDeleteOpen} />}
     </>
   );
 }

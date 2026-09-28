@@ -8,6 +8,15 @@ React 19 · Vite · FastAPI · PostgreSQL · Keycloak · Ollama · Telegram · D
 
 <br>
 
+<table>
+  <tr><th colspan="2">🚀 Попробовать</th></tr>
+  <tr><td>Сервис</td><td><a href="https://rtk-itschool.ru"><b>rtk-itschool.ru</b></a></td></tr>
+  <tr><td>Логин (Keycloak)</td><td><code>testuser</code></td></tr>
+  <tr><td>Пароль</td><td><code>ItSchool-2026!</code></td></tr>
+</table>
+
+<br>
+
 <img src="docs/readme/dashboard.png" alt="Дашборд" width="100%">
 
 </div>

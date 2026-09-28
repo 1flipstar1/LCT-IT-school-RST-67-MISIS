@@ -5,9 +5,10 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException
 
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,7 @@ def install_error_handlers(app: FastAPI) -> None:
             ),
         )
 
+    # Starlette's base class also covers 404/405 raised by routing and static files, not only FastAPI's own.
     @app.exception_handler(HTTPException)
     async def http_error_handler(_: Request, exc: HTTPException) -> JSONResponse:
         if isinstance(exc.detail, dict) and "code" in exc.detail:

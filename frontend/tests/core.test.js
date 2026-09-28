@@ -6,6 +6,7 @@ import { can, createVisibilityFilter, DATA_SCOPE, PERMISSION, ROLE } from '../sr
 import { getStage } from '../src/domain/workflow.js';
 import { createZip } from '../src/lib/export/zip.js';
 import { ACTION, reducer } from '../src/store/reducer.js';
+import { rebaseState } from '../src/store/rebase.js';
 
 describe('format', () => {
   it('plural склоняет по правилам русского языка', () => {
@@ -98,6 +99,22 @@ describe('interaction editing', () => {
     assert.equal(next.events.at(-1), event);
     assert.equal(next.audit[0].text, audit.text);
     assert.notEqual(next.interactions, state.interactions);
+  });
+
+  it('удаляет заявку вместе с её событиями, а отмена возвращает всё на место', () => {
+    const state = createSeedState(new Date('2026-09-17T12:00:00'));
+    const target = state.interactions[0];
+    const audit = { id: 'audit-del', at: '2026-09-17T13:00:00.000Z', actorId: 'usr-6', text: 'Заявка удалена', target: { type: 'interaction', id: target.id } };
+    const next = reducer(state, { type: ACTION.interactionDeleted, payload: { interactionId: target.id, audit } });
+
+    assert.ok(!next.interactions.some((item) => item.id === target.id));
+    assert.ok(!next.events.some((event) => event.interactionId === target.id));
+    assert.equal(next.events.length, state.events.filter((event) => event.interactionId !== target.id).length);
+    assert.equal(next.audit[0].text, audit.text);
+
+    const restored = rebaseState(next, state, next);
+    assert.ok(restored.interactions.some((item) => item.id === target.id));
+    assert.equal(restored.events.length, state.events.length);
   });
 });
 

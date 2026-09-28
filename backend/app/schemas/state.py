@@ -22,6 +22,12 @@ class StateUpdateRequest(APIModel):
     force: bool = False
 
 
+class StateChangesRequest(APIModel):
+    """Only what the user changed since the snapshot the server last accepted from this browser."""
+
+    changes: dict[str, Any] = Field(min_length=1)
+
+
 class StateResetRequest(APIModel):
     expected_revision: int | None = Field(default=None, ge=1)
     force: bool = False

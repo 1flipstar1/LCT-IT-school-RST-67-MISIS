@@ -1,9 +1,12 @@
 import { ApiError, apiClient } from '../api/client.js';
 import { createSeedState, SEED_VERSION } from '../data/seed.js';
 import { localStore } from '../lib/storage.js';
+import { diffState, rebaseState } from './rebase.js';
 
 const STORAGE_KEY = 'crm.state';
 const SYNC_KEY = 'crm.state.sync';
+// Последний снимок, который сервер принял от этого браузера: от него считаются несохранённые изменения.
+const BASE_KEY = 'crm.state.base';
 
 const REQUIRED_ARRAYS = [
   'universities',
@@ -40,6 +43,7 @@ export function createStateCache(storage = localStore) {
       const cached = storage.read(STORAGE_KEY);
       const hasCachedState = isUsableState(cached);
       const metadata = storage.read(SYNC_KEY, {});
+      const base = storage.read(BASE_KEY);
       return {
         state: hasCachedState ? cached : createSeedState(),
         revision: Number.isInteger(metadata?.revision) ? metadata.revision : null,
@@ -47,15 +51,20 @@ export function createStateCache(storage = localStore) {
         // Кэш старой версии приложения не имеет metadata: считаем его несинхронизированным.
         dirty: hasCachedState ? metadata?.dirty !== false : false,
         hasCachedState,
+        base: hasCachedState && isUsableState(base) ? base : null,
       };
     },
-    write({ state, revision = null, updatedAt = null, dirty = false }) {
+    /** base: undefined — не менять сохранённую базу, null — забыть её. */
+    write({ state, revision = null, updatedAt = null, dirty = false, base }) {
       storage.write(STORAGE_KEY, state);
       storage.write(SYNC_KEY, { revision, updatedAt, dirty });
+      if (base) storage.write(BASE_KEY, base);
+      else if (base === null) storage.remove(BASE_KEY);
     },
     remove() {
       storage.remove(STORAGE_KEY);
       storage.remove(SYNC_KEY);
+      storage.remove(BASE_KEY);
     },
   };
 }
@@ -83,7 +92,11 @@ export async function hydrateState(client = apiClient, cache = stateCache, optio
     }
 
     if (cached.hasCachedState && cached.dirty) {
-      const result = { ...cached, revision: remote.revision, source: 'cache', needsSync: true };
+      // Офлайн-изменения накладываем на свежий снимок: иначе они уйдут с новой ревизией
+      // и перезапишут то, что другие сотрудники сохранили за это время.
+      const state = cached.base ? rebaseState(cached.base, cached.state, remote.state) : cached.state;
+      const base = cached.base ? remote.state : null;
+      const result = { ...cached, state, base, revision: remote.revision, source: 'cache', needsSync: true };
       cache.write(result);
       return result;
     }
@@ -94,6 +107,7 @@ export async function hydrateState(client = apiClient, cache = stateCache, optio
       updatedAt: remote.updatedAt ?? null,
       dirty: false,
       hasCachedState: true,
+      base: remote.state,
       source: 'server',
       needsSync: false,
     };
@@ -104,15 +118,30 @@ export async function hydrateState(client = apiClient, cache = stateCache, optio
   }
 }
 
+const isConflict = (error) => error instanceof ApiError && (error.status === 409 || error.code === 'revision_conflict');
+
 /**
- * Сохраняет снимок с optimistic locking. При 409 локальная работа остаётся в UI и кэше,
- * а повторный PUT явно разрешает замену целого снимка на актуальной ревизии.
+ * Сохраняет изменения пользователя.
+ *
+ * С base (снимок, который сервер уже принял от этого браузера) отправляются только изменения —
+ * POST /state/changes: сервер накладывает их на актуальный снимок, поэтому одновременная работа
+ * не конфликтует и не затирает чужие смены этапов и отчёты. Ответ — актуальный снимок со всеми
+ * изменениями коллег (rebasedState), его сразу показывает UI.
+ *
+ * Без base (кэш старой версии приложения) — прежний путь: PUT целого снимка, при 409 — повтор с force.
  */
-export async function persistState(state, expectedRevision, client = apiClient) {
+export async function persistState(state, expectedRevision, client = apiClient, { base = null } = {}) {
+  if (base) {
+    const changes = diffState(base, state);
+    if (Object.keys(changes).length === 0) return { revision: expectedRevision, rebasedState: null };
+    const saved = await client.postStateChanges({ changes });
+    return { ...saved, rebasedState: saved.state };
+  }
+
   try {
     return await client.putState({ state, expectedRevision });
   } catch (error) {
-    if (!(error instanceof ApiError) || (error.status !== 409 && error.code !== 'revision_conflict')) throw error;
+    if (!isConflict(error)) throw error;
 
     let currentRevision = error.details?.currentRevision;
     if (!Number.isInteger(currentRevision)) {

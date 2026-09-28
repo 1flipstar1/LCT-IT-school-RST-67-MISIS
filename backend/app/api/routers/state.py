@@ -12,11 +12,12 @@ from fastapi.responses import Response
 from app.api.dependencies import CurrentPrincipal, DbSession, StateAccess
 from app.schemas.common import ERROR_RESPONSES
 from app.schemas.state import (
+    StateChangesRequest,
     StateResetRequest,
     StateSnapshotResponse,
     StateUpdateRequest,
 )
-from app.services.state import get_state_for_principal, replace_state, reset_state
+from app.services.state import apply_state_changes, get_state_for_principal, replace_state, reset_state
 
 
 router = APIRouter(prefix="/state", tags=["state"])
@@ -49,6 +50,20 @@ def export_state(db: DbSession, principal: StateAccess) -> Response:
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="crm-state.json"'},
     )
+
+
+@router.post(
+    "/changes",
+    response_model=StateSnapshotResponse,
+    responses=ERROR_RESPONSES,
+    summary="Применить изменения пользователя к актуальному состоянию",
+)
+def write_changes(
+    payload: StateChangesRequest,
+    db: DbSession,
+    principal: CurrentPrincipal,
+) -> StateSnapshotResponse:
+    return apply_state_changes(db, payload.changes, principal=principal)
 
 
 @router.put(

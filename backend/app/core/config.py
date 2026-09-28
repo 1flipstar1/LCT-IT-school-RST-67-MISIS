@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     # for example, postgresql+psycopg://user:password@host:5432/database.
     database_url: str = "sqlite:///./lct_state.db"
     database_echo: bool = False
+    # Пул соединений должен быть не меньше пула потоков FastAPI (40): иначе под нагрузкой запросы,
+    # уже взявшие соединение, ждут поток, а потоки ждут соединение — сервер встаёт до тайм-аута.
+    # 20 + 30 = 50 соединений; у PostgreSQL по умолчанию max_connections = 100 (остальное — бот и Keycloak).
+    database_pool_size: int = 20
+    database_max_overflow: int = 30
 
     cors_origins: str = (
         "http://localhost:3000,http://localhost:4173,http://localhost:5173,"

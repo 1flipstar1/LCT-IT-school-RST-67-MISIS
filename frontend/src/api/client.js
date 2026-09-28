@@ -100,6 +100,7 @@ export function createApiClient({
         method: 'PUT',
         body: { state, expectedRevision, ...(force ? { force: true } : {}) },
       }),
+    postStateChanges: ({ changes }, options = {}) => request('/state/changes', { ...options, method: 'POST', body: { changes } }),
     demoLogin: (role, options = {}) => request('/auth/demo', { ...options, method: 'POST', body: { role } }),
     chatWithAssistant: (payload, options = {}) =>
       request('/assistant/chat', { ...options, method: 'POST', body: payload, timeoutMs: 150_000 }),

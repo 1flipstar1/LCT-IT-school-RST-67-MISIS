@@ -27,6 +27,8 @@ export const ROLE_INFO = {
 export const PERMISSION = Object.freeze({
   viewAllInteractions: 'interactions.view-all',
   assignManager: 'interactions.assign',
+  // Удаление заявки вместе с её историей и файлами; менеджер удалить заявку не может.
+  deleteInteractions: 'interactions.delete',
   importCatalogs: 'catalogs.import',
   manageWorkflows: 'workflows.manage',
   manageIntegrations: 'integrations.manage',
@@ -41,6 +43,7 @@ const GRANTS = {
   [ROLE.lead]: [
     PERMISSION.viewAllInteractions,
     PERMISSION.assignManager,
+    PERMISSION.deleteInteractions,
     PERMISSION.importCatalogs,
     PERMISSION.manageWorkflows,
     PERMISSION.manageIntegrations,

@@ -51,6 +51,7 @@
 | Прогресс этапа | «6 из 14» + название + полоса | `interactions/components/StageProgress.jsx` |
 | Доска этапов | Колонки этапов по фазам с перетаскиванием | `interactions/components/InteractionBoard.jsx` |
 | Окно смены этапа | Выбор этапа, комментарий, файлы | `interactions/TransitionDialog.jsx` |
+| Удаление заявки | Кнопка «Удалить заявку» в характеристиках заявки (руководитель, админ) и окно подтверждения; отменяется из уведомления | `interactions/DeleteInteractionDialog.jsx` |
 | Лента событий | История переходов, комментариев и файлов | `interactions/components/EventFeed.jsx` |
 | Путь взаимодействия | Вертикальный список этапов с отметками | `interactions/components/StageStepper.jsx` |
 | Данные договора | Поля из шаблона импорта, режим редактирования | `interactions/components/ContractDetails.jsx` |

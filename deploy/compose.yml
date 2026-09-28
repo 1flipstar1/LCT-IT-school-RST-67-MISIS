@@ -79,6 +79,8 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    # Два процесса API (пул до 50 соединений каждый), бот и Keycloak: стандартных 100 соединений может не хватить.
+    command: ["postgres", "-c", "max_connections=200"]
     restart: unless-stopped
     environment:
       POSTGRES_USER: rtk

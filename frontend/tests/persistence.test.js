@@ -62,7 +62,46 @@ describe('state persistence', () => {
     assert.equal(result.state.interactions[0].startedAt, localState.interactions[0].startedAt);
   });
 
-  it('после конфликта повторяет PUT с текущей ревизией и force', async () => {
+  it('офлайн-изменения при гидратации накладываются на свежий снимок сервера', async () => {
+    const cache = createStateCache(createMemoryStorage());
+    const baseState = seed('21');
+    const localState = { ...baseState, audit: [{ id: 'offline-change' }, ...baseState.audit] };
+    const remoteState = { ...baseState, audit: [{ id: 'colleague-change' }, ...baseState.audit] };
+    cache.write({ state: localState, revision: 2, dirty: true, base: baseState });
+
+    const result = await hydrateState({ getState: async () => ({ state: remoteState, revision: 5 }) }, cache);
+    assert.equal(result.revision, 5);
+    assert.deepEqual(result.state.audit.map((item) => item.id).slice(0, 2), ['offline-change', 'colleague-change']);
+    assert.equal(result.base, remoteState);
+  });
+
+  it('с базой отправляет только свои изменения и возвращает актуальный снимок', async () => {
+    const baseState = seed('22');
+    const localState = { ...baseState, reports: [{ id: 'r-mine' }, ...baseState.reports] };
+    const sent = [];
+    const client = {
+      async postStateChanges(body) {
+        sent.push(body);
+        return { state: { ...baseState, reports: [{ id: 'r-mine' }, { id: 'r-colleague' }, ...baseState.reports] }, revision: 7 };
+      },
+      async putState() {
+        throw new Error('PUT целого снимка не должен вызываться');
+      },
+    };
+
+    const result = await persistState(localState, 4, client, { base: baseState });
+    assert.deepEqual(sent, [{ changes: { reports: { op: 'list', set: [], prepend: [{ id: 'r-mine' }], append: [], remove: [] } } }]);
+    assert.equal(result.revision, 7);
+    assert.deepEqual(result.rebasedState.reports.map((r) => r.id).slice(0, 2), ['r-mine', 'r-colleague']);
+  });
+
+  it('без изменений ничего не отправляет', async () => {
+    const baseState = seed('22');
+    const result = await persistState(baseState, 4, { postStateChanges: () => assert.fail('лишний запрос') }, { base: baseState });
+    assert.equal(result.revision, 4);
+  });
+
+  it('без базы (кэш старой версии) после конфликта повторяет PUT с текущей ревизией и force', async () => {
     const calls = [];
     const client = {
       async putState(body) {

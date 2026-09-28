@@ -14,15 +14,19 @@ from app.core.config import settings
 def build_engine(database_url: str | None = None) -> Engine:
     url = database_url or settings.database_url
     connect_args: dict[str, object] = {}
+    pool_args: dict[str, object] = {}
     if url.startswith("sqlite"):
         # FastAPI sync dependencies can execute in different worker threads.
         connect_args["check_same_thread"] = False
+    else:
+        pool_args = {"pool_size": settings.database_pool_size, "max_overflow": settings.database_max_overflow}
 
     return create_engine(
         url,
         echo=settings.database_echo,
         pool_pre_ping=not url.startswith("sqlite"),
         connect_args=connect_args,
+        **pool_args,
     )
 
 

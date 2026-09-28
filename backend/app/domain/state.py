@@ -190,6 +190,9 @@ def authorize_state_replacement(current: dict[str, Any], proposed: dict[str, Any
     for interaction_id, existing in current_interactions.items():
         if interaction_id not in allowed_ids and proposed_interactions.get(interaction_id) != existing:
             _reject(f"interactions.{interaction_id}")
+        # Удалять заявки может только руководитель (свою команду) и администратор.
+        if role == "manager" and interaction_id not in proposed_interactions:
+            _reject(f"interactions.{interaction_id}")
 
     users = current["users"]
     team_ids = {item["id"] for item in users if item.get("leadId") == user["id"]}
@@ -247,10 +250,16 @@ SERVER_OWNED_USER_FIELDS = ("preferences", "telegram")
 
 
 def _hide_private_user_fields(state: dict[str, Any], own_id: str) -> dict[str, Any]:
-    for item in state["users"]:
-        item.pop("telegram", None)
-        if item.get("id") != own_id:
-            item.pop("preferences", None)
+    """Copies the user cards it changes; the rest of ``state`` may be shared with the stored snapshot."""
+
+    state["users"] = [
+        {
+            key: value
+            for key, value in item.items()
+            if key != "telegram" and (key != "preferences" or item.get("id") == own_id)
+        }
+        for item in state["users"]
+    ]
     return state
 
 
@@ -263,17 +272,23 @@ def _without_server_owned_fields(users: Any) -> Any:
     ]
 
 
-def _restore_server_owned_user_fields(current: dict[str, Any], proposed: dict[str, Any]) -> dict[str, Any]:
+def restore_server_owned_user_fields(current: dict[str, Any], proposed: dict[str, Any]) -> dict[str, Any]:
+    """Replace ``proposed["users"]`` with cards whose server-owned fields come from ``current``."""
+
     current_users = {item.get("id"): item for item in current.get("users", []) if isinstance(item, dict)}
+    users = []
     for item in proposed.get("users", []):
         if not isinstance(item, dict):
+            users.append(item)
             continue
         existing = current_users.get(item.get("id"), {})
+        restored = {key: value for key, value in item.items() if key not in SERVER_OWNED_USER_FIELDS}
         for field in SERVER_OWNED_USER_FIELDS:
             if field in existing:
-                item[field] = copy.deepcopy(existing[field])
-            else:
-                item.pop(field, None)
+                restored[field] = copy.deepcopy(existing[field])
+        users.append(restored)
+    if "users" in proposed:
+        proposed["users"] = users
     return proposed
 
 
@@ -288,8 +303,10 @@ def project_state_for_principal(state: dict[str, Any], principal: Principal | No
     if principal is None:
         # Anonymous access exists only in local development, where server jobs also read the full state.
         return copy.deepcopy(state)
+    # Shallow copies only: lists are rebuilt below and user cards are copied by _hide_private_user_fields,
+    # nothing mutates the records themselves — so the (large) snapshot is never deep-copied.
     if principal.role == "admin":
-        return _hide_private_user_fields(copy.deepcopy(state), find_principal_user(state, principal)["id"])
+        return _hide_private_user_fields(dict(state), find_principal_user(state, principal)["id"])
     user = find_principal_user(state, principal)
     visible_ids = visible_interaction_ids(state, user)
     interactions = [item for item in state["interactions"] if item["id"] in visible_ids]
@@ -305,26 +322,24 @@ def project_state_for_principal(state: dict[str, Any], principal: Principal | No
         related_user_ids = {user["id"]}
     related_user_ids.update(item.get("userId") for item in events if item.get("userId"))
 
-    projected = copy.deepcopy(state)
-    projected["interactions"] = copy.deepcopy(interactions)
-    projected["events"] = copy.deepcopy(events)
+    projected = dict(state)
+    projected["interactions"] = interactions
+    projected["events"] = events
     projected["metrics"] = [
-        copy.deepcopy(item)
-        for item in state["metrics"]
-        if (item.get("universityId"), item.get("directionId")) in visible_pairs
+        item for item in state["metrics"] if (item.get("universityId"), item.get("directionId")) in visible_pairs
     ]
-    projected["users"] = [copy.deepcopy(item) for item in state["users"] if item["id"] in related_user_ids]
+    projected["users"] = [item for item in state["users"] if item["id"] in related_user_ids]
     projected["universities"] = [
-        copy.deepcopy(item) if item["id"] in visible_university_ids else {**copy.deepcopy(item), "contacts": []}
+        item if item["id"] in visible_university_ids else {**item, "contacts": []}
         for item in state["universities"]
     ]
     if principal.role == "manager":
-        projected["reports"] = [copy.deepcopy(item) for item in state["reports"] if item.get("userId") == user["id"]]
-        projected["audit"] = [copy.deepcopy(item) for item in state["audit"] if item.get("userId") == user["id"]]
+        projected["reports"] = [item for item in state["reports"] if item.get("userId") == user["id"]]
+        projected["audit"] = [item for item in state["audit"] if item.get("userId") == user["id"]]
         projected["inbox"] = []
         projected["integrations"] = {"sources": [], "log": []}
     else:
-        projected["audit"] = [copy.deepcopy(item) for item in state["audit"] if item.get("userId") in related_user_ids]
+        projected["audit"] = [item for item in state["audit"] if item.get("userId") in related_user_ids]
     return _hide_private_user_fields(projected, user["id"])
 
 
@@ -336,7 +351,7 @@ def merge_state_for_principal(
     """Merge a scoped browser snapshot back into the canonical aggregate."""
 
     if principal.role == "admin":
-        return _restore_server_owned_user_fields(current, copy.deepcopy(proposed))
+        return restore_server_owned_user_fields(current, copy.deepcopy(proposed))
     user = find_principal_user(current, principal)
     projected_current = project_state_for_principal(current, principal)
     protected = {"version"}

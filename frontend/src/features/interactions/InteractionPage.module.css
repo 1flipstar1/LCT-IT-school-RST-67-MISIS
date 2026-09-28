@@ -151,6 +151,10 @@
   margin-bottom: 0;
 }
 
+.deleteButton {
+  justify-self: start;
+}
+
 .universitySummary {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);

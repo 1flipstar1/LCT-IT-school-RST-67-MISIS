@@ -10,6 +10,7 @@ export const ACTION = Object.freeze({
   interactionCommented: 'interaction/commented',
   interactionAssigned: 'interaction/assigned',
   interactionUpdated: 'interaction/updated',
+  interactionDeleted: 'interaction/deleted',
   workflowSaved: 'workflow/saved',
   userUpdated: 'user/updated',
   inboxResolved: 'inbox/resolved',
@@ -21,8 +22,8 @@ export const ACTION = Object.freeze({
 
 const replaceById = (items, id, update) => items.map((item) => (item.id === id ? update(item) : item));
 
-function withAudit(state, { at, actorId, text, target }) {
-  const entry = { id: createId('audit'), at, userId: actorId, text, target };
+function withAudit(state, { id = createId('audit'), at, actorId, text, target }) {
+  const entry = { id, at, userId: actorId, text, target };
   return { ...state, audit: [entry, ...state.audit].slice(0, 500) };
 }
 
@@ -68,6 +69,13 @@ export function reducer(state, action) {
       const { interactionId, patch, event, audit } = payload;
       const interactions = replaceById(state.interactions, interactionId, (item) => ({ ...item, ...patch, updatedAt: audit.at }));
       return withAudit({ ...state, interactions, events: [...state.events, event] }, audit);
+    }
+
+    case ACTION.interactionDeleted: {
+      const { interactionId, audit } = payload;
+      const interactions = state.interactions.filter((item) => item.id !== interactionId);
+      const events = state.events.filter((event) => event.interactionId !== interactionId);
+      return withAudit({ ...state, interactions, events }, audit);
     }
 
     case ACTION.workflowSaved: {

@@ -6,7 +6,8 @@ import { AppError } from '../domain/errors.js';
 import { createId } from '../domain/format.js';
 import { PERMISSION } from '../domain/roles.js';
 import { getStage, isFinalStage, requiresComment, validateWorkflow } from '../domain/workflow.js';
-import { ACTION } from './reducer.js';
+import { rebaseState } from './rebase.js';
+import { ACTION, reducer } from './reducer.js';
 import { useStoreApi } from './StoreProvider.jsx';
 
 /**
@@ -41,11 +42,19 @@ export function useActions() {
 
     const interactionTarget = (state, interaction) => ({ type: 'interaction', id: interaction.id, label: labelOf(state, interaction) });
 
-    /** Выполняет dispatch и возвращает функцию отмены, восстанавливающую снимок до изменения. */
-    const undoable = (action) => {
-      const snapshot = getState();
+    /**
+     * Выполняет dispatch и возвращает функцию отмены. Отмена откатывает только то, что изменило это
+     * действие, поверх текущих данных: изменения коллег, пришедшие с сервера, и более поздние
+     * действия пользователя остаются на месте.
+     */
+    const undoable = (plainAction) => {
+      // id записи журнала задаём заранее: reducer должен дать тот же результат, что и в store.
+      const { audit } = plainAction.payload ?? {};
+      const action = audit && !audit.id ? { ...plainAction, payload: { ...plainAction.payload, audit: { ...audit, id: createId('audit') } } } : plainAction;
+      const before = getState();
+      const after = reducer(before, action);
       dispatch(action);
-      return { undo: () => dispatch({ type: ACTION.stateRestored, payload: snapshot }) };
+      return { undo: () => dispatch({ type: ACTION.stateRestored, payload: rebaseState(after, before, getState()) }) };
     };
 
     const withUploadedFiles = (files, perform) => {
@@ -202,6 +211,17 @@ export function useActions() {
             event: { id: createId('ev'), interactionId, type: 'updated', userId: actorId, at, comment: text },
             audit: { at, actorId, text, target: interactionTarget(state, interaction) },
           },
+        });
+      },
+
+      /** Заявка удаляется вместе с историей; запись в журнале остаётся, отменить можно из уведомления. */
+      deleteInteraction({ interactionId }) {
+        requirePermission(PERMISSION.deleteInteractions);
+        const state = getState();
+        const interaction = findInteraction(state, interactionId);
+        return undoable({
+          type: ACTION.interactionDeleted,
+          payload: { interactionId, audit: { at: now(), actorId, text: 'Заявка удалена', target: interactionTarget(state, interaction) } },
         });
       },
 

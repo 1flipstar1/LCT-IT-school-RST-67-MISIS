@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { PageLoader } from '../ui/PageLoader.jsx';
 import { hydrateState, isUsableState, loadState, persistState, saveState, stateCache } from './persistence.js';
+import { rebaseState } from './rebase.js';
 import { ACTION, reducer } from './reducer.js';
 
 const StateContext = createContext(null);
@@ -17,6 +18,8 @@ export function StoreProvider({ children }) {
   const [ready, setReady] = useState(false);
   const stateRef = useRef(state);
   const revisionRef = useRef(null);
+  // Снимок, который сервер уже принял: от него считаются несохранённые изменения при конфликте.
+  const baseRef = useRef(null);
   const updatedAtRef = useRef(null);
   const pendingStateRef = useRef(null);
   const saveTimerRef = useRef(null);
@@ -62,15 +65,28 @@ export function StoreProvider({ children }) {
     let finishSaving;
     inFlightRef.current = new Promise((resolve) => { finishSaving = resolve; });
     try {
-      const saved = await persistState(snapshot, revisionRef.current);
+      const saved = await persistState(snapshot, revisionRef.current, undefined, { base: baseRef.current });
       if (syncGeneration !== syncGenerationRef.current) return;
       if (Number.isInteger(saved?.revision)) revisionRef.current = saved.revision;
       updatedAtRef.current = saved?.updatedAt ?? updatedAtRef.current;
+      const accepted = saved?.rebasedState ?? snapshot;
+      baseRef.current = accepted;
+      if (saved?.rebasedState) {
+        // Сервер принял наши изменения поверх чужих — показываем объединённые данные.
+        // То, что пользователь успел сделать во время сохранения, переносим на них же.
+        const pending = pendingStateRef.current;
+        const next = pending ? rebaseState(snapshot, pending, accepted) : accepted;
+        pendingStateRef.current = null;
+        skipPersistRef.current = !pending;
+        stateRef.current = next;
+        dispatch({ type: ACTION.stateRestored, payload: next });
+      }
       if (!pendingStateRef.current) {
-        saveState(snapshot, {
+        saveState(accepted, {
           revision: revisionRef.current,
           updatedAt: updatedAtRef.current,
           dirty: false,
+          base: accepted,
         });
       }
     } catch {
@@ -108,6 +124,7 @@ export function StoreProvider({ children }) {
     if (!mountedRef.current || hydrationId !== hydrationIdRef.current) return snapshot;
 
     revisionRef.current = snapshot.revision;
+    baseRef.current = snapshot.base ?? null;
     updatedAtRef.current = snapshot.updatedAt;
     syncHydratedStateRef.current = snapshot.needsSync;
     skipPersistRef.current = true;
@@ -126,6 +143,7 @@ export function StoreProvider({ children }) {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = null;
     revisionRef.current = snapshot.revision;
+    baseRef.current = snapshot.state;
     updatedAtRef.current = snapshot.updatedAt ?? null;
     skipPersistRef.current = true;
     stateRef.current = snapshot.state;
@@ -133,6 +151,7 @@ export function StoreProvider({ children }) {
       revision: snapshot.revision,
       updatedAt: snapshot.updatedAt ?? null,
       dirty: false,
+      base: snapshot.state,
     });
     dispatch({ type: ACTION.stateRestored, payload: snapshot.state });
     setReady(true);
