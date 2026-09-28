@@ -36,6 +36,7 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
       TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-socks5://telegram-egress:9050}
       TELEGRAM_POLLING_ENABLED: "false"
+      TELEGRAM_OUTBOX_ENABLED: "true"
       TELEGRAM_HEARTBEAT_PATH: /app/data/telegram/heartbeat
       INTEGRATION_DEMO_ENABLED: ${INTEGRATION_DEMO_ENABLED:-true}
     volumes:
@@ -66,6 +67,7 @@ services:
       DATABASE_URL: postgresql+psycopg://rtk:${POSTGRES_PASSWORD}@postgres:5432/lct_db
       TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-socks5://telegram-egress:9050}
       TELEGRAM_POLLING_ENABLED: "true"
+      TELEGRAM_OUTBOX_ENABLED: "true"
       TELEGRAM_HEARTBEAT_PATH: /app/data/telegram/heartbeat
     volumes:
       - telegram_runtime:/app/data/telegram

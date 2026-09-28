@@ -5,7 +5,8 @@ from __future__ import annotations
 import copy
 import json
 import logging
-from datetime import UTC, datetime
+import uuid
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from collections.abc import Callable
 from typing import Any, TypeVar
@@ -24,6 +25,7 @@ from app.domain.state import (
 )
 from app.core.security import Principal
 from app.models.state import StateSnapshotModel
+from app.models.telegram_delivery import TelegramDeliveryModel
 from app.schemas.state import StateSnapshotResponse
 
 
@@ -191,8 +193,26 @@ def replace_state(
             },
         )
 
+    if not is_demo_reset and settings.telegram_outbox_enabled and settings.telegram_bot_token:
+        # Queue in the same transaction as the stage change: a restart cannot
+        # leave the new stage saved without its Telegram notification.
+        from app.services.telegram import stage_notifications
+
+        for notification in stage_notifications(current_state, next_state):
+            due_at = now + timedelta(seconds=settings.telegram_notify_delay_seconds)
+            db.add(TelegramDeliveryModel(
+                id=str(uuid.uuid4()),
+                event_id=notification.event_id,
+                chat_id=notification.chat_id,
+                text=notification.text,
+                url=notification.url,
+                due_at=due_at,
+                next_attempt_at=due_at,
+                attempts=0,
+            ))
+
     db.commit()
-    if not is_demo_reset:
+    if not is_demo_reset and not settings.telegram_outbox_enabled:
         _notify_listeners(current_state, next_state)
     # ``expire_on_commit=False`` keeps request objects usable, so explicitly
     # invalidate the singleton after the SQL expression increments revision.

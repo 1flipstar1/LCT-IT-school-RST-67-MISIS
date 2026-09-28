@@ -82,7 +82,7 @@ export function ProfilePage() {
       <PageHeader title="Настройки профиля" hint="Личные настройки интерфейса: видны только вам и действуют на любом компьютере, где вы входите в CRM." />
 
       <div className={styles.layout}>
-        {(role === 'lead' || role === 'admin') && <TelegramSettings />}
+        {['manager', 'lead', 'admin'].includes(role) && <TelegramSettings />}
 
         <Card>
           <div className={styles.identity}>

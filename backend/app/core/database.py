@@ -52,5 +52,6 @@ def create_database_schema() -> None:
     from app.models.attachment import AttachmentModel  # noqa: F401
     from app.models.import_job import ImportJobModel  # noqa: F401
     from app.models.state import StateSnapshotModel  # noqa: F401
+    from app.models.telegram_delivery import TelegramDeliveryModel  # noqa: F401
 
     Base.metadata.create_all(bind=engine)

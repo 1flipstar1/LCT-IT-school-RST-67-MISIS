@@ -1,12 +1,10 @@
-"""Telegram-бот CRM: руководитель привязывает свой чат и получает уведомления,
-когда менеджер его команды переводит заявку на другой этап или завершает её.
+"""Telegram-бот CRM: сотрудники привязывают чаты и получают смены этапов.
 
 Как это устроено:
 * привязка — одноразовая ссылка ``t.me/<бот>?start=<код>`` из настроек профиля; бот получает
   ``/start <код>`` и записывает chat_id в карточку сотрудника (поле ``telegram``, его видит только сервер);
-* уведомления — после каждого сохранения состояния ищем новые события смены этапа
-  и через паузу отправляем их руководителю ответственного менеджера. Если за паузу событие
-  исчезло (менеджер нажал «Отменить»), сообщение не уходит;
+* уведомления — после сохранения ищем новые события смены этапа и отправляем
+  менеджеру, его руководителю и администраторам. В Docker очередь хранится в БД;
 * входящие сообщения — long polling (``getUpdates``) в фоновом потоке: публичный адрес не нужен.
 """
 
@@ -28,6 +26,7 @@ from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 import httpx
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -35,6 +34,7 @@ from app.core.database import SessionLocal
 from app.core.errors import APIError
 from app.core.security import Principal
 from app.domain.state import find_principal_user
+from app.models.telegram_delivery import TelegramDeliveryModel
 from app.services.state import get_state, mutate_state
 
 
@@ -319,8 +319,8 @@ def format_stage_message(state: dict[str, Any], event: dict[str, Any], interacti
 def stage_notifications(before: dict[str, Any], after: dict[str, Any]) -> list[StageNotification]:
     """Новые смены этапа между двумя версиями состояния и кому о них сообщить.
 
-    Получатели с привязанным Telegram: руководитель ответственного менеджера (``leadId``) —
-    о своей команде, администраторы — обо всех заявках. О собственных действиях не пишем.
+    Получатели с привязанным Telegram: ответственный менеджер — о своей заявке,
+    его руководитель — о команде, администраторы — обо всех заявках.
     """
 
     known = {item.get("id") for item in before.get("events", []) if isinstance(item, dict)}
@@ -337,10 +337,10 @@ def stage_notifications(before: dict[str, Any], after: dict[str, Any]) -> list[S
         manager = users.get(interaction.get("managerId"))
         lead = users.get(manager.get("leadId")) if manager else None
         chats: list[int] = []
-        for recipient in ([lead] if lead else []) + admins:
+        for recipient in ([manager] if manager else []) + ([lead] if lead else []) + admins:
             telegram = recipient.get("telegram") if isinstance(recipient.get("telegram"), dict) else {}
             chat_id = telegram.get("chatId")
-            if chat_id and recipient.get("active") is not False and recipient.get("id") != event.get("userId") and chat_id not in chats:
+            if chat_id and recipient.get("active") is not False and chat_id not in chats:
                 chats.append(chat_id)
         if not chats:
             continue
@@ -415,6 +415,47 @@ def _event_still_exists(event_id: str) -> bool:
 notifier = StageNotifier()
 
 
+def deliver_outbox_once() -> bool:
+    """Send one due notification; keep failures in the database for retry."""
+
+    client = get_client()
+    if client is None:
+        return False
+    now = _now()
+    with SessionLocal() as db:
+        item = db.scalar(
+            select(TelegramDeliveryModel)
+            .where(TelegramDeliveryModel.delivered_at.is_(None), TelegramDeliveryModel.next_attempt_at <= now)
+            .order_by(TelegramDeliveryModel.next_attempt_at, TelegramDeliveryModel.id)
+            .limit(1)
+        )
+        if item is None:
+            return False
+        state = get_state(db).state
+        event_exists = any(isinstance(event, dict) and event.get("id") == item.event_id for event in state.get("events", []))
+        chat_connected = any(
+            isinstance(user.get("telegram"), dict) and user["telegram"].get("chatId") == item.chat_id
+            for user in state.get("users", [])
+        )
+        if not event_exists or not chat_connected:
+            item.delivered_at = now
+            db.commit()
+            return True
+        button = ("Открыть карточку", item.url) if item.url else None
+        try:
+            client.send_message(item.chat_id, item.text, button=button)
+        except TelegramError as exc:
+            item.attempts += 1
+            delay = min(60, 2 ** min(item.attempts, 6))
+            item.next_attempt_at = _now() + timedelta(seconds=delay)
+            db.commit()
+            logger.warning("Telegram delivery %s failed (%s); retry in %s s", item.id, exc, delay)
+            return True
+        item.delivered_at = _now()
+        db.commit()
+        return True
+
+
 # ---------------------------------------------------------------------------
 # Привязка чата к сотруднику
 # ---------------------------------------------------------------------------
@@ -433,12 +474,12 @@ def _parse(value: str) -> datetime:
 
 
 # Кто может получать уведомления: руководитель — о своей команде, администратор — обо всех заявках.
-RECIPIENT_SCOPE = {"lead": "team", "admin": "all"}
+RECIPIENT_SCOPE = {"manager": "own", "lead": "team", "admin": "all"}
 
 
 def _require_recipient(user: dict[str, Any]) -> None:
     if user.get("role") not in RECIPIENT_SCOPE:
-        raise APIError(403, "telegram_leads_only", "Уведомления в Telegram получают руководители и администраторы.")
+        raise APIError(403, "telegram_role_not_supported", "Уведомления в Telegram недоступны для этой роли.")
 
 
 def status_for(user: dict[str, Any]) -> dict[str, Any]:
@@ -613,7 +654,7 @@ LEGEND = (
     "👤 кто изменил · 💬 комментарий · 📎 файлы"
 )
 
-SCOPE_TEXT = {"lead": "о заявках вашей команды", "admin": "обо всех заявках"}
+SCOPE_TEXT = {"manager": "о ваших заявках", "lead": "о заявках вашей команды", "admin": "обо всех заявках"}
 
 
 def _owner_of_chat(db: Session, chat_id: int) -> dict[str, Any] | None:

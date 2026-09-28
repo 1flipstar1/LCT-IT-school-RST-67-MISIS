@@ -95,7 +95,8 @@ class Settings(BaseSettings):
     telegram_polling_enabled: bool = True
     telegram_heartbeat_path: Path | None = None
     # Пауза перед отправкой: если менеджер нажмёт «Отменить», уведомление не уйдёт.
-    telegram_notify_delay_seconds: float = 15.0
+    telegram_notify_delay_seconds: float = 1.0
+    telegram_outbox_enabled: bool = False
     telegram_timeout_seconds: int = 10
     # Прокси до api.telegram.org, если прямой доступ из сети сервера нестабилен: http://host:port или socks5://host:port.
     telegram_proxy_url: str | None = None

@@ -24,7 +24,7 @@ OPENAPI_TAGS = [
     {"name": "state", "description": "Версионная синхронизация всего состояния CRM."},
     {"name": "attachments", "description": "Загрузка и скачивание файлов этапов."},
     {"name": "integrations", "description": "Получение JSON из LMS и сайта."},
-    {"name": "telegram", "description": "Telegram-бот: уведомления руководителям о смене этапа."},
+    {"name": "telegram", "description": "Telegram-бот: уведомления о смене этапа."},
     {"name": "resources", "description": "Read-only представления данных из snapshot."},
 ]
 
@@ -34,7 +34,8 @@ async def lifespan(_: FastAPI):
     create_database_schema()
     with SessionLocal() as db:
         initialize_state(db)
-    add_state_listener(telegram.notifier.on_state_saved)
+    if not settings.telegram_outbox_enabled:
+        add_state_listener(telegram.notifier.on_state_saved)
     telegram.start_bot()
     yield
     telegram.stop_bot()

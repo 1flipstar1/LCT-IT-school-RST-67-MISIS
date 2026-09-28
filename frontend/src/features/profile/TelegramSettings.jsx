@@ -12,16 +12,16 @@ import styles from './TelegramSettings.module.css';
 const LINK_POLL_MS = 3000;
 
 const BENEFITS = {
+  own: ['Заявки, за которые вы отвечаете', 'Свои изменения тоже приходят', 'Подключение — за 30 секунд'],
   team: ['Только заявки вашей команды', 'Отменённые переходы не приходят', 'Подключение — за 30 секунд'],
   all: ['Все заявки всех команд', 'Отменённые переходы не приходят', 'Подключение — за 30 секунд'],
 };
-const WHO = { team: 'менеджер вашей команды', all: 'любой менеджер' };
+const WHO = { own: 'меняется ваша заявка', team: 'меняется заявка вашей команды', all: 'меняется любая заявка' };
 
 /**
- * Уведомления в Telegram для руководителя: бот пишет, когда менеджер команды переводит заявку
- * на другой этап. Пока чат не подключён — заметный баннер вверху настроек с примером сообщения;
- * после подключения — компактная строка состояния. Руководитель получает переходы своей команды,
- * администратор — всех заявок; менеджерам блок не показывается.
+ * Уведомления в Telegram: менеджеру по своим заявкам, руководителю по команде,
+ * администратору по всем. Пока чат не подключён — баннер с примером сообщения;
+ * после подключения — компактная строка состояния.
  */
 export function TelegramSettings() {
   const toast = useToast();
@@ -36,10 +36,9 @@ export function TelegramSettings() {
   }, [load]);
 
   useEffect(() => {
-    if (!status?.configured || status.polling) return undefined;
-    const timer = setInterval(() => load().catch(() => {}), 15000);
+    const timer = setInterval(() => load().catch(() => setStatus({ unreachable: true })), 10000);
     return () => clearInterval(timer);
-  }, [load, status?.configured, status?.polling]);
+  }, [load]);
 
   // Пока ссылка действует, ждём, когда бот получит «Старт». Следующий запрос — только после
   // ответа на предыдущий (setTimeout, а не setInterval), чтобы медленная сеть не копила запросы.
@@ -109,7 +108,7 @@ export function TelegramSettings() {
           <h2 className={styles.connectedTitle}>Уведомления в Telegram подключены</h2>
           <p>
             Чат <b>{status.username ? `@${status.username}` : status.chatName ?? 'в Telegram'}</b> с {formatDate(status.linkedAt)}.
-            Бот пишет, когда {WHO[status.scope] ?? 'менеджер'} переводит заявку. Команда /stop в чате тоже отключит уведомления.
+            Бот пишет, когда {WHO[status.scope] ?? 'меняется заявка'}. Команда /stop в чате тоже отключит уведомления.
           </p>
         </div>
         <div className={styles.connectedActions}>
@@ -150,9 +149,9 @@ export function TelegramSettings() {
         ) : (
           <>
             <span className={styles.eyebrow}>Новое · Telegram</span>
-            <h2 id="telegram-banner-title" className={styles.title}>Узнавайте о каждом шаге команды — прямо в Telegram</h2>
+            <h2 id="telegram-banner-title" className={styles.title}>Узнавайте об изменениях заявок — прямо в Telegram</h2>
             <p className={styles.lead}>
-              Бот сразу напишет, когда {WHO[status.scope] ?? 'менеджер'} переведёт заявку на новый этап, вернёт её на доработку или завершит работу с вузом.
+              Бот напишет, когда {WHO[status.scope] ?? 'меняется заявка'}: переход на новый этап, возврат на доработку или завершение работы с вузом.
               Не нужно держать CRM открытой, чтобы быть в курсе.
             </p>
             <ul className={styles.benefits}>

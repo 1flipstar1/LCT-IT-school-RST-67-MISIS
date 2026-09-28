@@ -17,10 +17,12 @@ export function TelegramBotCard({ canConnect }) {
 
   useEffect(() => {
     let active = true;
-    apiClient.getTelegramOverview()
+    const load = () => apiClient.getTelegramOverview()
       .then((result) => active && setOverview(result))
       .catch((error) => active && setOverview({ unreachable: true, sessionExpired: error?.status === 401 }));
-    return () => { active = false; };
+    load();
+    const timer = setInterval(load, 10000);
+    return () => { active = false; clearInterval(timer); };
   }, []);
 
   if (!overview) return null;
@@ -30,10 +32,10 @@ export function TelegramBotCard({ canConnect }) {
     <Card>
       <div className={styles.sourceHead}>
         <div>
-          <Hint text="Бот пишет в Telegram, когда менеджер переводит заявку на другой этап, возвращает на доработку или завершает: руководителю — о его команде, администратору — обо всех. Чат подключают в настройках профиля.">
+          <Hint text="Бот пишет о смене этапа: менеджеру — по его заявкам, руководителю — по команде, администратору — по всем. Чат подключают в настройках профиля.">
             <h2 className={styles.sourceName}>Telegram-бот</h2>
           </Hint>
-          <p className={styles.sourceDescription}>Уведомления руководителям и администраторам о смене этапа заявки.</p>
+          <p className={styles.sourceDescription}>Уведомления о смене этапа заявки всем подключённым сотрудникам.</p>
         </div>
         {overview.unreachable ? (
           <Badge tone="warning" icon={ErrorIcon}>Не удалось проверить</Badge>

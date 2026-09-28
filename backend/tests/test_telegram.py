@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import copy
 import time
+from datetime import UTC, datetime
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+from app.models.telegram_delivery import TelegramDeliveryModel
 from app.services import telegram
 
 
@@ -106,8 +109,7 @@ def test_undone_transition_is_not_sent(client: TestClient, bot: FakeTelegram, mo
     assert not [text for chat, text in bot.sent if chat == LEAD_CHAT and "Переход" in text]
 
 
-def test_only_leads_connect_and_admin_saves_keep_the_binding(client: TestClient, bot: FakeTelegram) -> None:
-    assert client.post("/api/v1/me/telegram/link", headers=_headers(client, "manager")).status_code == 403
+def test_admin_saves_keep_the_binding(client: TestClient, bot: FakeTelegram) -> None:
     _connect_lead(client)
 
     admin = _headers(client, "admin")
@@ -127,7 +129,7 @@ def test_only_leads_connect_and_admin_saves_keep_the_binding(client: TestClient,
         assert telegram.handle_update(db, {"message": {"chat": {"id": LEAD_CHAT, "type": "private"}, "text": "/status"}}).startswith("🔌 <b>Чат не подключён")
 
 
-def test_admin_gets_every_transition_but_not_own(client: TestClient, bot: FakeTelegram) -> None:
+def test_admin_gets_every_transition_including_own(client: TestClient, bot: FakeTelegram) -> None:
     admin = _headers(client, "admin")
     link = client.post("/api/v1/me/telegram/link", headers=admin).json()["url"]
     assert client.get("/api/v1/me/telegram", headers=admin).json()["scope"] == "all"
@@ -141,6 +143,76 @@ def test_admin_gets_every_transition_but_not_own(client: TestClient, bot: FakeTe
     client.put("/api/v1/state", json={"state": state, "expectedRevision": snapshot["revision"]}, headers=manager)
     telegram.notifier.wait()
     assert [chat for chat, text in bot.sent if "Переход" in text and chat == 6001], "администратор получает переходы всех менеджеров"
+
+    snapshot = client.get("/api/v1/state", headers=admin).json()
+    state = _transition(copy.deepcopy(snapshot["state"]), interaction_id, "ev-telegram-own-admin")
+    state["events"][-1]["userId"] = "usr-8"
+    saved = client.put("/api/v1/state", json={"state": state, "expectedRevision": snapshot["revision"]}, headers=admin)
+    assert saved.status_code == 200, saved.text
+    telegram.notifier.wait()
+    assert len([chat for chat, text in bot.sent if "Переход" in text and chat == 6001]) == 2
+
+
+def test_manager_can_connect_and_receive_own_transition(client: TestClient, bot: FakeTelegram) -> None:
+    manager = _headers(client, "manager")
+    link = client.post("/api/v1/me/telegram/link", headers=manager)
+    assert link.status_code == 200, link.text
+    code = link.json()["url"].split("start=")[1]
+    with SessionLocal() as db:
+        telegram.handle_update(db, {"message": {"chat": {"id": 8001, "type": "private"}, "text": f"/start {code}"}})
+    status = client.get("/api/v1/me/telegram", headers=manager).json()
+    assert status["connected"] and status["scope"] == "own"
+
+    snapshot = client.get("/api/v1/state", headers=manager).json()
+    interaction_id = next(item["id"] for item in snapshot["state"]["interactions"] if item["managerId"] == "usr-1" and not item.get("completedAt"))
+    state = _transition(copy.deepcopy(snapshot["state"]), interaction_id, "ev-telegram-own-manager")
+    saved = client.put("/api/v1/state", json={"state": state, "expectedRevision": snapshot["revision"]}, headers=manager)
+    assert saved.status_code == 200, saved.text
+    telegram.notifier.wait()
+    assert [chat for chat, text in bot.sent if chat == 8001 and "Переход" in text]
+
+
+def test_outbox_survives_send_failure_and_retries(client: TestClient, bot: FakeTelegram, monkeypatch) -> None:
+    monkeypatch.setattr(settings, "telegram_outbox_enabled", True)
+    manager = _headers(client, "manager")
+    link = client.post("/api/v1/me/telegram/link", headers=manager).json()["url"]
+    with SessionLocal() as db:
+        telegram.handle_update(db, {"message": {"chat": {"id": 8002, "type": "private"}, "text": f"/start {link.split('start=')[1]}"}})
+
+    snapshot = client.get("/api/v1/state", headers=manager).json()
+    interaction_id = next(item["id"] for item in snapshot["state"]["interactions"] if item["managerId"] == "usr-1" and not item.get("completedAt"))
+    state = _transition(copy.deepcopy(snapshot["state"]), interaction_id, "ev-outbox-retry")
+    saved = client.put("/api/v1/state", json={"state": state, "expectedRevision": snapshot["revision"]}, headers=manager)
+    assert saved.status_code == 200, saved.text
+    with SessionLocal() as db:
+        for other in db.scalars(select(TelegramDeliveryModel).where(TelegramDeliveryModel.chat_id != 8002)):
+            other.delivered_at = datetime.now(UTC)
+        db.commit()
+        queued = db.scalar(select(TelegramDeliveryModel).where(TelegramDeliveryModel.event_id == "ev-outbox-retry", TelegramDeliveryModel.chat_id == 8002))
+        assert queued and queued.delivered_at is None
+
+    original_send = bot.send_message
+    failed = False
+
+    def send_once_with_failure(chat_id, text, *, button=None):
+        nonlocal failed
+        if not failed:
+            failed = True
+            raise telegram.TelegramError("temporary outage")
+        original_send(chat_id, text, button=button)
+
+    monkeypatch.setattr(bot, "send_message", send_once_with_failure)
+    assert telegram.deliver_outbox_once()
+    with SessionLocal() as db:
+        queued = db.scalar(select(TelegramDeliveryModel).where(TelegramDeliveryModel.event_id == "ev-outbox-retry", TelegramDeliveryModel.chat_id == 8002))
+        assert queued.attempts == 1 and queued.delivered_at is None
+        queued.next_attempt_at = datetime.now(UTC)
+        db.commit()
+    assert telegram.deliver_outbox_once()
+    with SessionLocal() as db:
+        queued = db.scalar(select(TelegramDeliveryModel).where(TelegramDeliveryModel.event_id == "ev-outbox-retry", TelegramDeliveryModel.chat_id == 8002))
+        assert queued.delivered_at is not None
+    assert len([message for chat, message in bot.sent if chat == 8002 and "Переход" in message]) == 1
 
 
 def test_chat_without_username_keeps_the_name_separately(client: TestClient, bot: FakeTelegram) -> None:
