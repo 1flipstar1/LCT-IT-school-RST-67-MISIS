@@ -124,10 +124,47 @@ async function exchangeCode(query, fetchImpl) {
       active: true,
     },
     accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token ?? null,
     idToken: tokens.id_token ?? null,
     tokenType: tokens.token_type ?? 'Bearer',
     expiresAt: Date.now() + Number(tokens.expires_in ?? 300) * 1_000,
     provider: 'keycloak',
+  };
+}
+
+export async function refreshKeycloakSession(session, fetchImpl = fetch) {
+  if (!keycloakConfigured || session?.provider !== 'keycloak' || !session.refreshToken) {
+    throw new Error('Сеанс Keycloak нельзя продлить. Войдите снова.');
+  }
+  const response = await fetchImpl(`${issuer}/protocol/openid-connect/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: clientId,
+      refresh_token: session.refreshToken,
+    }),
+  });
+  const tokens = await response.json();
+  if (!response.ok || !tokens.access_token) throw new Error('Сеанс Keycloak истёк. Войдите снова.');
+  const claims = decodeToken(tokens.access_token);
+  const role = roleFromClaims(claims);
+  if (!role) throw new Error('Для пользователя больше не назначена роль CRM.');
+  return {
+    ...session,
+    role,
+    user: {
+      ...session.user,
+      id: claims.sub,
+      name: claims.name ?? claims.preferred_username ?? claims.email,
+      email: claims.email ?? null,
+      role,
+    },
+    accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token ?? session.refreshToken,
+    idToken: tokens.id_token ?? session.idToken,
+    tokenType: tokens.token_type ?? 'Bearer',
+    expiresAt: Date.now() + Number(tokens.expires_in ?? 300) * 1_000,
   };
 }
 

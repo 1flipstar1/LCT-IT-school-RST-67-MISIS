@@ -31,6 +31,7 @@ function AppRoutes() {
   const { path } = useRouter();
   const session = useSession();
 
+  if (session.authPending) return <PageLoader />;
   if (!session.user) return <LoginPage />;
 
   return (

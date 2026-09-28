@@ -4,7 +4,7 @@ import { DEMO_USER_BY_ROLE } from '../data/catalogs.js';
 import { can } from '../domain/roles.js';
 import { useStoreApi, useStoreState } from '../store/StoreProvider.jsx';
 import { stateCache } from '../store/persistence.js';
-import { beginKeycloakLogin, finishKeycloakLogin, hasKeycloakCallback, keycloakLogoutUrl } from './keycloak.js';
+import { beginKeycloakLogin, finishKeycloakLogin, hasKeycloakCallback, keycloakLogoutUrl, refreshKeycloakSession } from './keycloak.js';
 import { clearStoredSession, readStoredSession, writeStoredSession } from './sessionStorage.js';
 
 const SessionContext = createContext(null);
@@ -19,16 +19,41 @@ export function SessionProvider({ children }) {
   const { rehydrate } = useStoreApi();
   const [session, setSession] = useState(() => {
     const stored = readStoredSession();
-    if (stored?.expiresAt && stored.expiresAt <= Date.now()) {
+    if (stored?.expiresAt && stored.expiresAt <= Date.now() && !(stored.provider === 'keycloak' && stored.refreshToken)) {
       clearStoredSession();
       return null;
     }
     return stored;
   });
   const [keycloakError, setKeycloakError] = useState(null);
+  const [authPending, setAuthPending] = useState(() => {
+    const stored = readStoredSession();
+    return hasKeycloakCallback() || Boolean(stored?.provider === 'keycloak' && stored.refreshToken && stored.expiresAt <= Date.now());
+  });
 
   useEffect(() => {
     if (!session?.expiresAt) return undefined;
+    let active = true;
+    if (session.provider === 'keycloak' && session.refreshToken) {
+      const refresh = async () => {
+        if (session.expiresAt <= Date.now()) setAuthPending(true);
+        try {
+          const next = await refreshKeycloakSession(session);
+          if (!active) return;
+          writeStoredSession(next);
+          setSession(next);
+          setAuthPending(false);
+        } catch {
+          if (!active) return;
+          clearStoredSession();
+          setSession(null);
+          setAuthPending(false);
+        }
+      };
+      const delay = Math.max(0, session.expiresAt - Date.now() - 60_000);
+      const timer = setTimeout(refresh, delay);
+      return () => { active = false; clearTimeout(timer); };
+    }
     const expire = () => {
       clearStoredSession();
       setSession(null);
@@ -39,7 +64,7 @@ export function SessionProvider({ children }) {
       return undefined;
     }
     const timer = setTimeout(expire, remaining);
-    return () => clearTimeout(timer);
+    return () => { active = false; clearTimeout(timer); };
   }, [session]);
 
   useEffect(() => {
@@ -50,10 +75,16 @@ export function SessionProvider({ children }) {
         if (!next || !active) return;
         writeStoredSession(next);
         await rehydrate();
-        if (active) setSession(next);
+        if (active) {
+          setSession(next);
+          setAuthPending(false);
+        }
       })
       .catch((error) => {
-        if (active) setKeycloakError(error);
+        if (active) {
+          setKeycloakError(error);
+          setAuthPending(false);
+        }
       });
     return () => {
       active = false;
@@ -108,9 +139,10 @@ export function SessionProvider({ children }) {
       loginWithKeycloak,
       logout,
       keycloakError,
+      authPending,
       can: (permission) => can(role, permission),
     };
-  }, [session, users, login, loginWithKeycloak, logout, keycloakError]);
+  }, [session, users, login, loginWithKeycloak, logout, keycloakError, authPending]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
