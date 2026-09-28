@@ -55,6 +55,8 @@ def _apply(current: Any, change: Any, path: str) -> Any:
     removed = set(parts["remove"])
     updates = {item["id"]: item for item in parts["set"]}
     added = {item["id"] for item in parts["prepend"] + parts["append"]}
+    # Добавляемые записи убираются из текущих: повтор того же сохранения (сеть оборвалась после
+    # записи, браузер отправил ещё раз) не создаёт дублей.
     kept = [
         updates.get(item.get("id"), item)
         for item in items

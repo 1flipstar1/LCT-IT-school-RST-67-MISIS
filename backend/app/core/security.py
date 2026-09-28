@@ -68,6 +68,9 @@ def _jwks_client(url: str) -> PyJWKClient:
 
 
 def _extract_role(claims: dict[str, Any], config: Settings) -> str | None:
+    """Роль CRM из токена. Keycloak кладёт роли в realm_access (роли realm) и resource_access (роли клиента);
+    демо-токен — в поле role. Первая роль, известная приложению (ROLE_ALIASES: kam → manager и т. п.), побеждает."""
+
     candidates: list[str] = []
     direct = claims.get("role")
     if isinstance(direct, str):
@@ -110,6 +113,9 @@ def _decode_keycloak(token: str, config: Settings) -> dict[str, Any]:
 
 
 def _decode_local(token: str, config: Settings) -> dict[str, Any]:
+    # Демо-токены (HS256, выдаёт /auth/demo) не принимаются, если демо-вход выключен — даже с верной подписью.
+    if not config.effective_demo_auth_enabled:
+        raise InvalidTokenError("Demo authentication is disabled")
     return jwt.decode(
         token,
         key=config.jwt_secret,
@@ -121,6 +127,8 @@ def _decode_local(token: str, config: Settings) -> dict[str, Any]:
 
 def verify_access_token(token: str, config: Settings = settings) -> Principal:
     try:
+        # Непроверенный iss только выбирает, чем проверять подпись: Keycloak (RS256 по JWKS) или демо-секретом.
+        # Подделать его бесполезно — ниже токен в любом случае проходит полную проверку подписи, iss и aud.
         unverified = jwt.decode(token, options={"verify_signature": False})
         issuer = str(unverified.get("iss", "")).rstrip("/")
         keycloak_issuer = (config.keycloak_issuer_url or "").rstrip("/")

@@ -31,15 +31,6 @@ export const LEGACY_CARDS = [
   { id: 8, university: 'Южный федеральный университет', short: 'ЮФУ', product: 'Контур', direction: 'Аналитика данных', owner: 'Михаил Орлов', stage: 's13', days: 1, initials: 'ЮФ' },
 ];
 
-export const LEGACY_UNIVERSITIES = [
-  { name: 'Казанский федеральный университет', product: 'МойОфис', direction: 'Информационные системы', status: 'Подписание документов', manager: 'Алина Воронова', updatedAt: '12.05.2026' },
-  { name: 'ИТМО', product: 'Р7-Офис', direction: 'Программная инженерия', status: 'Организация встречи', manager: 'Михаил Орлов', updatedAt: '09.05.2026' },
-  { name: 'УрФУ им. Б. Н. Ельцина', product: 'SberJazz', direction: 'Информационные системы', status: 'Обмен документами', manager: 'Елена Ким', updatedAt: '07.05.2026' },
-  { name: 'Томский политехнический университет', product: 'МойОфис', direction: 'Кибербезопасность', status: 'Организация встречи', manager: 'Алина Воронова', updatedAt: '04.05.2026' },
-  { name: 'НИУ ВШЭ', product: 'Контур', direction: 'Программная инженерия', status: 'Обмен документами', manager: 'Михаил Орлов', updatedAt: '02.05.2026' },
-  { name: 'Дальневосточный федеральный университет', product: 'Р7-Офис', direction: 'Аналитика данных', status: 'Сопровождение внедрения', manager: 'Елена Ким', updatedAt: '28.04.2026' },
-];
-
 /** Логотип вуза — первые буквы слов названия, как в прежнем дизайне: «Уи», «КФ», «И». */
 export const universityLogo = (name) =>
   name

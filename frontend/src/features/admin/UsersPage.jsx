@@ -190,7 +190,7 @@ export function UsersPage() {
         </InlineAlert>
       ) : (
         <InlineAlert tone="warning" title="Keycloak не подключён к CRM" className={styles.status}>
-          Сотрудники создаются только в CRM и войти пока не смогут. Настройте служебный клиент — см. backend/deploy/keycloak/README.md.
+          Сотрудники создаются только в CRM и войти пока не смогут. Настройте служебный клиент — см. README, раздел «Keycloak».
         </InlineAlert>
       ))}
 

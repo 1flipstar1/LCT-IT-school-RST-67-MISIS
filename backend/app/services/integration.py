@@ -65,6 +65,9 @@ def _now() -> str:
 
 
 def _records_from_payload(payload: Any) -> list[dict[str, Any]]:
+    """Контракты LMS и сайта ещё не утверждены, поэтому принимаем распространённые формы ответа:
+    массив записей, объект с массивом в items / records / data или одну запись-объект."""
+
     if isinstance(payload, list):
         records = payload
     elif isinstance(payload, dict):
@@ -143,6 +146,7 @@ def ingest_records(
     }
 
     def mutation(state: dict[str, Any]) -> dict[str, Any]:
+        # Повторная синхронизация идемпотентна: запись с уже известным externalId источника не дублируется.
         known_external_ids = {
             str(item.get("payload", {}).get("externalId"))
             for item in state["inbox"]

@@ -325,6 +325,17 @@ def mutate_state(
         raise last_conflict or APIError(409, "revision_conflict", "Состояние уже было изменено другим клиентом.")
 
 
+def _drop_events_of_removed_interactions(state: dict[str, Any], changes: dict[str, Any]) -> None:
+    """Удалённая заявка уходит вместе со всеми событиями — и с теми, что коллега добавил в ту же секунду:
+    браузер удалившего о них не знал, а событие без заявки не пройдёт проверку целостности (422 навсегда)."""
+
+    interaction_change = changes.get("interactions")
+    removed = interaction_change.get("remove", []) if isinstance(interaction_change, dict) else []
+    removed = {item for item in removed if isinstance(item, str)} if isinstance(removed, list) else set()
+    if removed and isinstance(state.get("events"), list):
+        state["events"] = [event for event in state["events"] if event.get("interactionId") not in removed]
+
+
 def apply_state_changes(
     db: Session,
     changes: dict[str, Any],
@@ -353,6 +364,7 @@ def apply_state_changes(
                 .execution_options(populate_existing=True)
             )
             next_state = apply_changes(locked.state, changes)  # builds new containers, does not modify locked.state
+            _drop_events_of_removed_interactions(next_state, changes)
             try:
                 return replace_state(db, next_state, expected_revision=locked.revision, principal=principal, scoped=False)
             except APIError as exc:

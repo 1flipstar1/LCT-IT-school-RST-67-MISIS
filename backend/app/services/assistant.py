@@ -279,19 +279,6 @@ def is_out_of_scope(message: str) -> bool:
     return any(pattern.search(text) for pattern in OFF_TOPIC)
 
 
-def _names(items: object, *, key: str = "name", limit: int = 60) -> str:
-    if not isinstance(items, list):
-        return "—"
-    names = []
-    for item in items[:limit]:
-        if not isinstance(item, dict) or not isinstance(item.get(key), str):
-            continue
-        name = item[key][:100]
-        short = item.get("shortName")
-        names.append(f"{name} ({short[:40]})" if isinstance(short, str) and short and short != name else name)
-    return ", ".join(names) or "—"
-
-
 def _workflow_context(state: dict) -> str:
     workflows = state.get("workflows", [])
     lines: list[str] = []
@@ -346,8 +333,8 @@ def _system_prompt(state: dict, payload: ChatRequest, role: str, articles: list[
 
 def _is_explanation(message: str) -> bool:
     text = message.strip().lower()
-    return ((text.startswith(("как ", "какие ", "объясни ", "расскажи ", "что ты умеешь"))
-             or text.startswith(("что делать на этапе", "что нужно на этапе", "что означает этап", "что значит этап"))
+    return ((text.startswith(("как ", "какие ", "объясни ", "расскажи ", "что ты умеешь",
+                              "что делать на этапе", "что нужно на этапе", "что означает этап", "что значит этап"))
              or "можешь помочь" in text
              or "что ты можешь" in text
              or "что умеешь" in text)

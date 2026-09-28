@@ -13,6 +13,7 @@ React 19 · Vite · FastAPI · PostgreSQL · Keycloak · Ollama · Telegram · D
   <tr><td>Сервис</td><td><a href="https://rtk-itschool.ru"><b>rtk-itschool.ru</b></a></td></tr>
   <tr><td>Логин (Keycloak)</td><td><code>testuser</code></td></tr>
   <tr><td>Пароль</td><td><code>ItSchool-2026!</code></td></tr>
+  <tr><td>Документация</td><td><a href="docs/README.pdf">PDF-версия</a></td></tr>
 </table>
 
 <br>
@@ -28,11 +29,14 @@ React 19 · Vite · FastAPI · PostgreSQL · Keycloak · Ollama · Telegram · D
 [Отчёты](#отчёты) · [Импорт](#импорт-из-excel) · [Администрирование](#администрирование) · [Профиль и Telegram](#профиль-и-telegram) ·
 [Справка](#справка-и-ошибки) · [Мобильная версия](#мобильная-версия)
 
-**Система:** [Архитектура](#архитектура) · [Данные и синхронизация](#данные-и-синхронизация) · [Безопасность](#безопасность-и-роли) ·
-[Защита ПДн](#защита-персональных-данных-152-фз-и-фстэк--117) ·
-[ИИ-помощник изнутри](#ии-помощник-изнутри) · [Telegram-бот изнутри](#telegram-бот-изнутри) · [База данных](#база-данных) ·
-[API](#api) · [Развёртывание](#развёртывание-и-cicd) · [Запуск](#запуск) · [Библиотеки](#библиотеки-и-компоненты) ·
-[Структура репозитория](#структура-репозитория)
+**Система:** [Требования ТЗ](#требования-тз--где-реализовано) · [Стек](#стек) · [Архитектура](#архитектура) ·
+[Данные и синхронизация](#данные-и-синхронизация) · [Безопасность](#безопасность-и-роли) ·
+[Защита ПДн](#защита-персональных-данных-152-фз-и-фстэк--117) · [ИИ-помощник изнутри](#ии-помощник-изнутри) ·
+[Telegram-бот изнутри](#telegram-бот-изнутри) · [База данных](#база-данных) · [API](#api)
+
+**Эксплуатация:** [Развёртывание](#развёртывание-на-сервере) · [Keycloak](#keycloak) · [Telegram-бот](#telegram-бот) ·
+[Переменные окружения](#переменные-окружения) · [Локальный запуск](#локальный-запуск) · [Тесты](#тесты) ·
+[Библиотеки](#библиотеки-и-компоненты) · [Структура репозитория](#структура-репозитория)
 
 ---
 
@@ -182,6 +186,37 @@ JSON — результирующий файл для других систем:
 
 # Система
 
+## Требования ТЗ → где реализовано
+
+| Требование ТЗ | Где в продукте | Где в коде |
+| --- | --- | --- |
+| Каталоги вузов, направлений, продуктов, ответственных; загрузка xls/xlsx по маппингу полей | «Справочники», «Импорт данных» | `features/catalogs`, `domain/import.js`, `lib/xlsx` |
+| Путь взаимодействия, переходы между статусами с комментарием, файлы в статусах | Карточка, доска этапов | `features/interactions`, `services/attachment.py` |
+| Создание и изменение workflow, переименование статусов | «Этапы работы» | `features/workflows` |
+| Фильтрация за период по вузам, направлениям, продуктам, ответственным | Панель фильтров | `features/filters`, `domain/filters.js` |
+| Статистика, диаграммы и графики в PNG/PDF | «Аналитика» | `features/analytics`, `ui/charts`, `lib/export` |
+| Отчёты xls/xlsx/pdf по выбранным колонкам; результирующий JSON | «Отчёты» | `features/reports`, `lib/export` |
+| Данные LMS и сайта по API (JSON) → существующий или новый workflow | «Интеграции» | `services/integration.py`, `features/integrations` |
+| Keycloak, роли «пользователь / руководитель / администратор», видимость данных | Вход, «Пользователи и доступ» | `core/security.py`, `domain/state.py`, `domain/roles.js` |
+| Кэш действий, работа без перезагрузки страницы, отклик ≤ 1 с | Везде | `store/persistence.js`, `store/rebase.js` |
+| Коды ошибок | «Справка → Коды ошибок», страницы 4◐4 / 5◐3 | `domain/errors.js`, `features/errors` |
+| Документация со скриншотами внутри платформы (пользователь и администратор) | «Справка» | `features/help` |
+| 152-ФЗ, приказ ФСТЭК № 117 | См. [Защита ПДн](#защита-персональных-данных-152-фз-и-фстэк--117) | `core/crypto.py`, `core/security_headers.py` |
+| 50 пользователей, 10 параллельных отчётов | Проверено: 150 пользователей и 15 отчётов, 0 ошибок | — |
+| Swagger, перечень библиотек, Docker, Linux, модель в Archi | `/docs`, [Библиотеки](#библиотеки-и-компоненты), `deploy/`, `docs/architecture` | — |
+
+## Стек
+
+| Слой | Технологии |
+| --- | --- |
+| Интерфейс | React 19, Vite 8, дизайн-система Ростелекома (Атомаро), шрифт Rostelecom Basis, GSAP; графики, PDF, XLSX, XLS — собственный код |
+| API | Python 3.12, FastAPI, Pydantic, SQLAlchemy 2, Alembic |
+| Данные | PostgreSQL 16 (локально — SQLite), шифрование AES-256-GCM |
+| Вход и роли | Keycloak 26 (OIDC, Authorization Code + PKCE) |
+| ИИ | Ollama с локальной моделью Qwen — данные не покидают сервер |
+| Уведомления | Telegram Bot API: отдельный контейнер бота, очередь в PostgreSQL |
+| Инфраструктура | Docker Compose, Caddy (HTTPS, Let's Encrypt), GitHub Actions, Linux (Ubuntu) |
+
 ## Архитектура
 
 ```mermaid
@@ -243,9 +278,11 @@ flowchart TB
 
 ## Данные и синхронизация
 
-Состояние CRM — один версионированный JSON-снимок (`state_snapshots`). Клиент меняет его оптимистично и отправляет целиком
-с ожидаемой ревизией. Сервер сливает его с актуальным снимком в пределах прав пользователя, проверяет и атомарно
-увеличивает `revision`.
+Состояние CRM — один версионированный JSON-снимок (`state_snapshots`), в базе он хранится зашифрованным. Интерфейс
+меняет свою копию сразу, а на сервер отправляет **только свои изменения** относительно последнего принятого снимка
+(`diffState` → `POST /state/changes`). Сервер под блокировкой строки накладывает их на актуальный снимок, проверяет права
+и целостность и возвращает снимок со всеми изменениями коллег. Поэтому одновременная работа не конфликтует и не
+затирает чужие правки: нагрузочный тест на 150 пользователей — 0 потерянных изменений.
 
 ```mermaid
 sequenceDiagram
@@ -258,15 +295,12 @@ sequenceDiagram
     UI->>S: действие (смена этапа)
     S-->>UI: reducer применяет сразу, «Отменить» в уведомлении
     Note over S: debounce 300 мс, копия в localStorage
-    S->>API: PUT /state {state, expectedRevision}
-    API->>API: merge по правам → validate → authorize
-    API->>DB: UPDATE … SET revision+1 WHERE revision = expected<br/>+ запись в telegram_deliveries (та же транзакция)
-    alt ревизия совпала
-        API-->>S: {state (проекция под роль), revision}
-    else кто-то сохранил раньше
-        API-->>S: 409 revision_conflict
-        S->>API: повтор с актуальной ревизией
-    end
+    S->>API: POST /state/changes {только свои изменения}
+    API->>DB: SELECT … FOR UPDATE (очередь записей)
+    API->>API: наложить изменения → validate → authorize
+    API->>DB: UPDATE (зашифрованный снимок), revision+1<br/>+ telegram_deliveries в той же транзакции
+    API-->>S: {state (проекция под роль, с правками коллег), revision}
+    S-->>UI: показать актуальный снимок
 ```
 
 - **Офлайн:** при потере сети изменения остаются в кэше и отправляются после восстановления.
@@ -448,7 +482,7 @@ Swagger: `/docs`, OpenAPI: `/openapi.json`. Все пути начинаются
 
 | Группа | Эндпоинты |
 | --- | --- |
-| Состояние | `GET/PUT /state`, `POST /state/reset`, `GET /state/export` |
+| Состояние | `GET /state`, `POST /state/changes` (изменения клиента), `PUT /state` (целый снимок, совместимость), `POST /state/reset`, `GET /state/export` (результирующий JSON) |
 | Авторизация | `POST /auth/demo`, `GET /auth/me` |
 | Профиль | `PUT /me/preferences`, `PUT /me/onboarding` |
 | Сотрудники | `POST /accounts`, `PUT /accounts/{id}/role`, `…/status`, `POST …/password` — учётки в Keycloak |
@@ -462,40 +496,156 @@ Swagger: `/docs`, OpenAPI: `/openapi.json`. Все пути начинаются
 
 Ошибки приходят в едином формате `{"error": {"code", "message", "details"}}`. Коды описаны во встроенной справке.
 
-## Развёртывание и CI/CD
+Пример — сохранить комментарий к взаимодействию:
+
+```http
+POST /api/v1/state/changes
+Authorization: Bearer <токен>
+Content-Type: application/json
+
+{"changes": {"events": {"op": "list", "append": [{"id": "e-1", "interactionId": "i-1", "type": "comment",
+  "userId": "usr-1", "at": "2026-09-29T10:00:00Z", "comment": "Созвонились", "files": []}]}}}
+```
+
+Формат изменений: `{"op": "list", "set", "prepend", "append", "remove"}` для списков, `{"op": "object", "fields"}` для
+вложенных объектов, `{"op": "value", "value"}` для остального. Демо-токен для Swagger: `POST /auth/demo` с `{"role": "admin"}`.
+
+---
+
+# Эксплуатация
+
+## Развёртывание на сервере
 
 ```mermaid
 flowchart LR
     push["push в main"] --> test["GitHub Actions: test<br/>npm test · build · check:assistant-knowledge<br/>pytest"]
     test --> sync["rsync на сервер"]
-    sync --> deploy["deploy/deploy.sh<br/>docker compose up --build<br/>alembic upgrade head · health-check"]
+    sync --> deploy["deploy/deploy.sh<br/>docker compose up --build<br/>миграции · шифрование · health-check"]
     deploy --> prod["https://rtk-itschool.ru"]
 ```
 
-- Продакшен — [`deploy/compose.yml`](deploy/compose.yml): Caddy (TLS), api, telegram-bot, telegram-egress, PostgreSQL 16,
-  Keycloak 26 с импортом realm, Ollama. Подробности — [`deploy/README.md`](deploy/README.md).
-- Локальный Docker-стенд — [`backend/docker-compose.yml`](backend/docker-compose.yml).
+**Требования:** Linux (Ubuntu 22.04+), Docker Engine и Docker Compose v2, 4 vCPU и 8 ГБ RAM (модель Ollama ~1–3 ГБ),
+открытые TCP 80 и 443. Наружу публикуется только Caddy; PostgreSQL, API, Keycloak и Ollama доступны лишь внутри сети Docker.
 
-## Запуск
+**Первый запуск:**
 
 ```bash
-backend/run-local.sh          # сборка фронтенда + API на http://localhost:8000
+git clone <репозиторий> ~/rtk-it-school && cd ~/rtk-it-school
+bash deploy/deploy.sh
 ```
 
-Разработка:
+Скрипт [`deploy/deploy.sh`](deploy/deploy.sh):
+
+1. Один раз создаёт `deploy/.env` (права 0600, не в Git): пароли PostgreSQL и Keycloak, секрет JWT, **ключ шифрования ПДн**,
+   секрет служебного клиента Keycloak. Адрес нового сервера задаётся в вызове `init.py http://<IP>` внутри скрипта.
+2. Готовит realm Keycloak со случайными временными паролями сотрудников — они в `deploy/generated/initial-credentials.json`.
+3. Собирает образы и запускает [`deploy/compose.yml`](deploy/compose.yml): Caddy, API (+ собранный фронтенд), бот Telegram,
+   SOCKS-шлюз для Telegram, PostgreSQL 16, Keycloak 26, Ollama.
+4. При старте API применяет миграции Alembic и шифрует данные, записанные до включения шифрования.
+5. Загружает модель Ollama, создаёт демо-учётку `testuser` и ждёт `GET /api/v1/health`.
+
+**Обновление** — тот же `bash deploy/deploy.sh` (или push в `main`): данные, секреты и ключ не меняются.
+
+**Домен и HTTPS.** A-запись домена → IP сервера, затем на сервере `python3 deploy/activate-domain.py`: скрипт переключит
+публичный адрес в `deploy/.env` и realm Keycloak, дождётся сертификата Let's Encrypt и откатит прокси, если сертификат не выдан.
+
+**CI/CD.** GitHub Actions ([`deploy.yml`](.github/workflows/deploy.yml)) после push в `main` прогоняет тесты, копирует код
+по SSH и запускает `deploy.sh`. Нужен секрет репозитория `DEPLOY_SSH_KEY_V2` (приватный ключ, публичный — в
+`~/.ssh/authorized_keys` на сервере); ключ хоста закреплён в `deploy/known_hosts`.
+
+**Проверка:**
 
 ```bash
-cd backend && TELEGRAM_POLLING_ENABLED=false uvicorn app.main:app --reload --port 8000
+curl -fsS https://<домен>/api/v1/health
+docker compose --env-file deploy/.env -f deploy/compose.yml ps
+docker compose --env-file deploy/.env -f deploy/compose.yml logs -f api telegram-bot
+```
+
+**Резервные копии:**
+
+```bash
+docker compose --env-file deploy/.env -f deploy/compose.yml exec -T postgres pg_dumpall -U rtk > backup.sql
+```
+
+Плюс том `rtk-it-school_attachments` (файлы уже зашифрованы) и **отдельно** `deploy/.env` с ключом шифрования —
+без ключа данные не восстановить. Не выполняйте `docker compose down -v`: это удалит базы, вложения и модель.
+
+## Keycloak
+
+Realm `it-school` ([`realm-it-school.json`](backend/deploy/keycloak/realm-it-school.json)) импортируется при первом старте:
+
+- **Роли через группы:** `kam` → менеджер, `manager_lead` → руководитель, `admin` → администратор.
+- **Клиенты:** `rtk-it-school-web` — публичный, Authorization Code + PKCE (S256), без секрета; `rtk-it-school-api` —
+  audience токенов; `rtk-it-school-admin` — служебный, CRM через него создаёт и блокирует учётки (только права на пользователей).
+- **Политики:** пароль от 12 символов с разными типами знаков, история 5 паролей, смена раз в 90 дней; блокировка после
+  5 неудачных попыток; токен доступа 5 минут, сессия гаснет через 30 минут бездействия; журнал событий — 180 дней;
+  самостоятельная регистрация выключена.
+- **Демо-учётка:** `testuser` / `ItSchool-2026!` (администратор). Остальные сотрудники — `a.voronova`, `m.orlov`, `e.kim`,
+  `d.sokolov`, `o.lebedeva` (менеджеры), `a.kozlov`, `n.belova` (руководители); локально пароль у всех `ItSchool-2026!`.
+- **Сотрудники заводятся в CRM** («Пользователи и доступ» → «Добавить сотрудника»): CRM создаёт учётку в Keycloak и
+  один раз показывает временный пароль; при первом входе Keycloak попросит задать свой.
+
+Локально без Docker (Java 21): `backend/deploy/keycloak/run-local.sh` — поднимет Keycloak на `http://localhost:8080`
+(консоль `admin` / `admin`).
+
+## Telegram-бот
+
+1. В [@BotFather](https://t.me/BotFather) отправьте `/newbot` — он пришлёт токен.
+2. Укажите `TELEGRAM_BOT_TOKEN=…` в `deploy/.env` (локально — в `backend/.env.local`, файл не в Git) и перезапустите.
+   Для кнопки «Открыть карточку» задайте `PUBLIC_APP_URL` (не localhost).
+3. Сотрудник: «Настройки профиля» → «Подключить Telegram» → «Старт» в Telegram. Состояние бота — на странице «Интеграции».
+
+С одним токеном опрашивать Telegram может только один процесс: локальный API запускайте с `TELEGRAM_POLLING_ENABLED=false`.
+Если Telegram из сети сервера недоступен, задайте `TELEGRAM_PROXY_URL` (`http://` или `socks5://`); в Docker по
+умолчанию используется встроенный шлюз `telegram-egress`.
+
+## Переменные окружения
+
+Полный список — [`backend/.env.example`](backend/.env.example) и [`frontend/.env.example`](frontend/.env.example).
+Главные:
+
+| Переменная | Назначение |
+| --- | --- |
+| `APP_ENV` | `development` / `demo` / `production`; в production API требует токен и ключ шифрования |
+| `DATABASE_URL` | Строка подключения, например `postgresql+psycopg://user:pass@host:5432/db`; по умолчанию SQLite |
+| `DATA_ENCRYPTION_KEYS` | Ключи AES-256 для ПДн: `id:ключ`, при ротации новый первым |
+| `JWT_SECRET`, `DEMO_AUTH_ENABLED` | Подпись демо-токенов и включение демо-входа |
+| `KEYCLOAK_ISSUER_URL`, `KEYCLOAK_AUDIENCE`, `KEYCLOAK_CLIENT_ID` | Проверка токенов Keycloak |
+| `KEYCLOAK_ADMIN_CLIENT_ID`, `KEYCLOAK_ADMIN_CLIENT_SECRET` | Служебный клиент для учёток из CRM |
+| `LMS_API_URL`, `WEBSITE_API_URL` (+ `_TOKEN`), `INTEGRATION_DEMO_ENABLED` | Источники LMS и сайта |
+| `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `ASSISTANT_ENABLED` | Локальная модель помощника |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_POLLING_ENABLED`, `TELEGRAM_PROXY_URL`, `PUBLIC_APP_URL` | Telegram-бот |
+| `VITE_KEYCLOAK_URL`, `VITE_KEYCLOAK_REALM`, `VITE_KEYCLOAK_CLIENT_ID` | Сборка фронтенда: кнопка «Войти через Keycloak» |
+
+## Локальный запуск
+
+Нужны Python 3.12+ и Node.js 22+.
+
+```bash
+cd backend && python3 -m venv .venv-local && .venv-local/bin/pip install -r requirements.txt && cd ..
+backend/run-local.sh          # сборка фронтенда + API на http://localhost:8000 (Swagger — /docs)
+```
+
+Разработка с горячей перезагрузкой:
+
+```bash
+cd backend && TELEGRAM_POLLING_ENABLED=false .venv-local/bin/uvicorn app.main:app --reload --port 8000
 cd frontend && npm install && npm run dev          # http://localhost:5173, /api проксируется на :8000
 ```
 
-| Тесты | |
+Весь стенд в Docker (API, PostgreSQL, Keycloak): `cd backend && docker compose up --build` — приложение на
+<http://localhost:8000>. Помощнику нужен Ollama: `ollama pull qwen3:4b-instruct`.
+
+## Тесты
+
+| Команда | Что проверяет |
 | --- | --- |
 | `cd frontend && npm test` | 98 юнит-тестов: доменная логика, синхронизация, чтение XLS (`node:test`) |
-| `cd backend && python -m pytest -q` | 63 теста: API, права, шифрование ПДн и его миграция, заголовки, импорт, Telegram |
+| `cd backend && python -m pytest -q` | 65 тестов: API, права, шифрование ПДн и его миграция, заголовки, импорт, Telegram |
 
-Переменные окружения — [`backend/.env.example`](backend/.env.example), [`frontend/.env.example`](frontend/.env.example).
-Секреты — только в `backend/.env.local` (он в `.gitignore`).
+Перед релизом дополнительно проводились сквозные проверки на отдельном стенде: 109 проверок API, 83 UI-сценария,
+обход 1681 элемента интерфейса тремя ролями, 15 одновременных отчётов и нагрузка до 150 пользователей
+(0 ошибок, p95 записи 117 мс).
 
 ## Библиотеки и компоненты
 
@@ -520,10 +670,8 @@ cd frontend && npm install && npm run dev          # http://localhost:5173, /api
 frontend/          SPA: src/{app,api,auth,domain,store,ui,layout,features,lib,styles}, tests/, scripts/
   design/          дизайн-правила и шрифт Rostelecom Basis
 backend/           FastAPI: app/{api,core,services,models,schemas,domain}, alembic/, tests/
-  deploy/keycloak  realm, роли и клиенты Keycloak
+  deploy/keycloak  realm Keycloak и локальный запуск
 deploy/            продакшен: compose, Caddy, домен, Telegram-шлюз
 logic/             правила процесса (этапы и переходы)
 docs/              медиа README, диаграмма репозитория, модель Archi (architecture/)
 ```
-
-Подробнее: [`frontend/README.md`](frontend/README.md), [`backend/README.md`](backend/README.md).

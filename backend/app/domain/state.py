@@ -352,7 +352,13 @@ def merge_state_for_principal(
     proposed: dict[str, Any],
     principal: Principal,
 ) -> dict[str, Any]:
-    """Merge a scoped browser snapshot back into the canonical aggregate."""
+    """Merge a scoped browser snapshot back into the canonical aggregate.
+
+    Браузер видит только свою проекцию (project_state_for_principal) и присылает её же. Поэтому
+    итог собирается из двух частей: всё, что пользователю не видно, берётся из текущего снимка без
+    изменений, а видимая часть — из присланного. Попытка изменить невидимую запись или закрытый
+    для роли раздел заканчивается 403, а не молчаливой потерей чужих данных.
+    """
 
     if principal.role == "admin":
         return restore_server_owned_user_fields(current, copy.deepcopy(proposed))

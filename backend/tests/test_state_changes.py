@@ -101,3 +101,23 @@ def test_lead_can_unassign_manager_and_still_sees_the_interaction(
     visible = client.get("/api/v1/state", headers=lead).json()["state"]["interactions"]
     assert next(item for item in visible if item["id"] == own["id"])["managerId"] is None
     assert all(item["id"] != own["id"] for item in client.get("/api/v1/state", headers=manager_headers).json()["state"]["interactions"])
+
+
+def test_deleting_an_interaction_also_drops_a_colleagues_simultaneous_comment(
+    client: TestClient, admin_headers: dict[str, str], manager_headers: dict[str, str]
+) -> None:
+    _reset(client, admin_headers)
+    lead = {"Authorization": f"Bearer {client.post('/api/v1/auth/demo', json={'role': 'lead'}).json()['accessToken']}"}
+    state = client.get("/api/v1/state", headers=lead).json()["state"]
+    target = next(item for item in state["interactions"] if item["managerId"] == "usr-1")
+    known_events = [event["id"] for event in state["events"] if event["interactionId"] == target["id"]]
+
+    # Менеджер успевает добавить комментарий, пока руководитель подтверждает удаление.
+    comment = {"id": "e-race", "interactionId": target["id"], "type": "comment", "userId": "usr-1", "at": "2026-09-29T10:00:00Z", "comment": "Созвонились", "files": []}
+    assert client.post("/api/v1/state/changes", headers=manager_headers, json={"changes": {"events": {"op": "list", "append": [comment]}}}).status_code == 200
+
+    delete = {"interactions": {"op": "list", "remove": [target["id"]]}, "events": {"op": "list", "remove": known_events}}
+    response = client.post("/api/v1/state/changes", headers=lead, json={"changes": delete})
+    assert response.status_code == 200, response.text
+    saved = client.get("/api/v1/state", headers=admin_headers).json()["state"]
+    assert all(event["interactionId"] != target["id"] for event in saved["events"])

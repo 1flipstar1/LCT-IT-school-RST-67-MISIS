@@ -216,3 +216,14 @@ def test_json_export(client: TestClient) -> None:
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/json")
     assert response.json()["state"]["version"] == 5
+
+
+def test_demo_tokens_are_rejected_when_demo_login_is_disabled(client: TestClient, admin_headers: dict[str, str]) -> None:
+    assert client.get("/api/v1/auth/me", headers=admin_headers).status_code == 200
+    original = settings.demo_auth_enabled
+    settings.demo_auth_enabled = False
+    try:
+        response = client.get("/api/v1/auth/me", headers=admin_headers)
+        assert response.status_code == 401 and response.json()["error"]["code"] == "invalid_token"
+    finally:
+        settings.demo_auth_enabled = original

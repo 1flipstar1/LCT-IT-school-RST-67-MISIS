@@ -30,6 +30,7 @@ async function readPayload(response) {
   }
 }
 
+/** Один AbortSignal на запрос: отмена вызывающим кодом (уход со страницы) или истёкший тайм-аут. */
 function createRequestSignal(signal, timeoutMs) {
   const controller = new AbortController();
   const abort = () => controller.abort(signal?.reason);

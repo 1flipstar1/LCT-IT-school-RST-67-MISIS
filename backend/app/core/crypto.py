@@ -103,10 +103,6 @@ class Keyring:
         self.primary_id = next(iter(self._keys))
         self._ciphers = {key_id: AESGCM(key) for key_id, key in self._keys.items()}
 
-    @property
-    def key_ids(self) -> list[str]:
-        return list(self._keys)
-
     def _cipher(self, key_id: str) -> AESGCM:
         cipher = self._ciphers.get(key_id)
         if cipher is None:

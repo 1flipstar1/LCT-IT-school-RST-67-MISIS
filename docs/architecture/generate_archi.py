@@ -142,6 +142,11 @@ FOLDERS = [
 ]
 
 
+def connection_id(view_name: str, relation: tuple[str, str, str, str]) -> str:
+    kind, source, target, _ = relation
+    return ident(f"conn-{view_name}-{kind}:{source}:{target}")
+
+
 def build() -> str:
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -170,17 +175,16 @@ def build() -> str:
     for view_name, positions in VIEWS.items():
         lines.append(f'    <element xsi:type="archimate:ArchimateDiagramModel" name={quoteattr(view_name)} id="{ident("view-" + view_name)}">')
         on_view = [relation for relation in RELATIONS if relation[1] in positions and relation[2] in positions]
-        connection_id = lambda relation: ident(f"conn-{view_name}-{relation[0]}:{relation[1]}:{relation[2]}")  # noqa: E731
         for key, (x, y) in positions.items():
             node = ident(f"node-{view_name}-{key}")
-            incoming = " ".join(connection_id(relation) for relation in on_view if relation[2] == key)
+            incoming = " ".join(connection_id(view_name, relation) for relation in on_view if relation[2] == key)
             target_attr = f' targetConnections="{incoming}"' if incoming else ""
             lines.append(f'      <child xsi:type="archimate:DiagramObject" id="{node}"{target_attr} archimateElement="{ident(key)}">')
             lines.append(f'        <bounds x="{x}" y="{y}" width="{W}" height="{H}"/>')
             for relation in (item for item in on_view if item[1] == key):
                 kind, source, target, _ = relation
                 lines.append(
-                    f'        <sourceConnection xsi:type="archimate:Connection" id="{connection_id(relation)}" '
+                    f'        <sourceConnection xsi:type="archimate:Connection" id="{connection_id(view_name, relation)}" '
                     f'source="{node}" target="{ident(f"node-{view_name}-{target}")}" '
                     f'archimateRelationship="{ident(f"{kind}:{source}:{target}")}"/>'
                 )

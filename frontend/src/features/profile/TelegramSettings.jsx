@@ -87,7 +87,7 @@ export function TelegramSettings() {
   if (!status.configured) {
     return (
       <InlineAlert tone="info" title="Уведомления в Telegram скоро будут доступны">
-        Администратору: создайте бота у @BotFather, укажите токен в TELEGRAM_BOT_TOKEN и перезапустите API — см. backend/README.md, раздел «Telegram-бот».
+        Администратору: создайте бота у @BotFather, укажите токен в TELEGRAM_BOT_TOKEN и перезапустите API — см. README, раздел «Telegram-бот».
       </InlineAlert>
     );
   }

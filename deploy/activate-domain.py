@@ -44,7 +44,7 @@ def main() -> None:
     proxy_config = DEPLOY / "generated/Caddyfile"
     shutil.copy2(DEPLOY / "Caddyfile.domain", proxy_config)
     run([*COMPOSE, "up", "-d", "--no-deps", "--force-recreate", "proxy"])
-    for attempt in range(36):
+    for _ in range(36):
         try:
             with urllib.request.urlopen(f"{PUBLIC_URL}/api/v1/health", timeout=10) as response:
                 if response.status == 200:

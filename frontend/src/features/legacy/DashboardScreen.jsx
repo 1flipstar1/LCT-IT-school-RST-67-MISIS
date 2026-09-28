@@ -28,8 +28,12 @@ import { Hint } from '../../ui/Hint.jsx';
 import { Kpi, LegacyButton, LegacyScreen, PageHeader, UniversityCell } from './legacyUi.jsx';
 import './DashboardScreen.css';
 
-/** Кольцо диаграммы прежнего дизайна: радиус 89 при размере 210 → длина окружности. */
-const DONUT_CIRCUMFERENCE = 559.2;
+/**
+ * Кольцо диаграммы: сегмент этапа — штрих окружности длиной ratio × длина окружности,
+ * сдвинутый на сумму долей предыдущих этапов (strokeDasharray / strokeDashoffset).
+ */
+const DONUT_RADIUS = 89;
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
 
 /**
  * Статистика и последние заявки по доступным взаимодействиям выбранного менеджера.
@@ -186,7 +190,7 @@ export function DashboardScreen() {
                     className={`donut-segment${hoveredStage && hoveredStage !== stage.id ? ' is-dimmed' : ''}`}
                     cx="105"
                     cy="105"
-                    r="89"
+                    r={DONUT_RADIUS}
                     stroke={stage.color}
                     strokeDasharray={`${ratio * DONUT_CIRCUMFERENCE} ${DONUT_CIRCUMFERENCE}`}
                     strokeDashoffset={-start * DONUT_CIRCUMFERENCE}

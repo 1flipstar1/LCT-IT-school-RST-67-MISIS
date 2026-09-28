@@ -7,6 +7,7 @@ realm. Roles are granted through groups, so a role change is a group swap.
 
 from __future__ import annotations
 
+import contextlib
 import time
 from typing import Any
 
@@ -138,10 +139,9 @@ class KeycloakAdmin:
         self._request("PUT", f"/users/{user_id}/reset-password", json={"type": "password", "value": password, "temporary": True})
 
     def delete_user(self, user_id: str) -> None:
-        try:
+        # Откат неудачного создания сотрудника: если учётки уже нет, чистить нечего.
+        with contextlib.suppress(APIError):
             self._request("DELETE", f"/users/{user_id}")
-        except APIError:
-            pass
 
     def exists(self, user_id: str) -> bool:
         try:

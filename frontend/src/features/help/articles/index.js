@@ -36,9 +36,6 @@ export const HELP_CATEGORIES = [
 
 export const HELP_ARTICLES = [...WORK_ARTICLES, ...PROFILE_ARTICLES, ...DATA_ARTICLES, ...ASSISTANT_ARTICLES, ...ADMIN_ARTICLES];
 
-const byId = new Map(HELP_ARTICLES.map((article) => [article.id, article]));
-export const articleById = (id) => byId.get(id) ?? null;
-
 /** Статьи, доступные роли пользователя. */
 export const articlesFor = (can) => HELP_ARTICLES.filter((article) => !article.permission || can(article.permission));
 
